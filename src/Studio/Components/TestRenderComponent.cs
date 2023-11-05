@@ -1,6 +1,7 @@
 using System.Numerics;
 using System.Text;
 using GameToolkit.Framework;
+using ImGuiNET;
 using Veldrid;
 using Veldrid.SPIRV;
 
@@ -22,13 +23,12 @@ public class TestRenderComponent : Component, IUpdatable, IRenderable
 		public const uint SizeInBytes = 24;
 	}
 
-	
 	private DeviceBuffer _vertexBuffer;
 	private DeviceBuffer _indexBuffer;
 	private Shader[]     _shaders;
 	private Pipeline     _pipeline;
 	private CommandList  _commandList = null!;
-
+	
 	private const string VertexCode = @"
 #version 450
 
@@ -54,10 +54,12 @@ void main()
     fsout_Color = fsin_Color;
 }";
 
+	private string _text = "";
+	
 	public void Init()
 	{
 		Engine.Scene.RegisterUpdatable(this);
-		Engine.Renderer.RegisterRenderable(this);
+		Engine.Scene.RegisterRenderable(this);
 
 		ResourceFactory factory = Engine.Renderer.Factory;
 		
@@ -120,7 +122,7 @@ ushort[] quadIndices = { 0, 1, 2, 3 };
             _commandList                = factory.CreateCommandList();
 	}
 
-	public void Draw()
+	public void Render()
 	{
 		_commandList.Begin();
 		_commandList.SetFramebuffer(Engine.Renderer.Device.SwapchainFramebuffer);
@@ -142,8 +144,17 @@ ushort[] quadIndices = { 0, 1, 2, 3 };
 	
 	public void Update(double timeDelta)
 	{
-		int x = 0;
-		//Console.WriteLine($"TestRenderComponent.Update({timeDelta})");
+		if (Engine.Input.Keyboard.IsKeyPressed(Silk.NET.Input.Key.F1))
+		{
+			Console.WriteLine("F1 pressed");
+		}
+
+		ImGui.SetNextWindowSizeConstraints(new Vector2(200, 200), new Vector2(2000, 2000));
+		if (ImGui.Begin("Test window"))
+		{
+			ImGui.InputText("Text", ref _text, 100);
+			ImGui.End();
+		}
 	}
 
 	public override void Dispose()

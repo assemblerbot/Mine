@@ -2,5 +2,5 @@ namespace GameToolkit.Framework;
 
 public interface IRenderable
 {
-	void Draw();
+	void Render();
 }

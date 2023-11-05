@@ -19,8 +19,6 @@ public class Renderer : IDisposable
 	public GraphicsDevice  Device  => _device;
 	public ResourceFactory Factory => _factory;
 	
-	private readonly List<IRenderable> _renderables = new();
-	
 	public Renderer(IView view, GraphicsBackend graphicsBackend)
 	{
 		_device = view.CreateGraphicsDevice(
@@ -36,7 +34,7 @@ public class Renderer : IDisposable
 		_factory = _device.ResourceFactory;
 	}
 
-	public void OnResize(Vector2D<int> size)
+	public void Resize(Vector2D<int> size)
 	{
 		_device.ResizeMainWindow((uint)size.X, (uint)size.Y);
 	}
@@ -46,23 +44,9 @@ public class Renderer : IDisposable
 		_device.Dispose();
 	}
 	
-	public void RegisterRenderable(IRenderable renderable)
+	public void EndOfFrame()
 	{
-		_renderables.Add(renderable);
-	}
-
-	public void UnregisterRenderable(IRenderable renderable)
-	{
-		_renderables.Remove(renderable);
-	}
-
-	public void Draw()
-	{
-		for (int i = 0; i < _renderables.Count; ++i)
-		{
-			_renderables[i].Draw();
-		}
-		
+		_device.WaitForIdle();
 		_device.SwapBuffers();
 	}
 }

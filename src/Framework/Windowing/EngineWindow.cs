@@ -13,7 +13,7 @@ public class EngineWindow
 	public Action?                OnLoadCallback;
 	public Action<Vector2D<int>>? OnResizeCallback;
 	public Action<double>?        OnUpdateCallback;
-	public Action<double>?        OnDrawCallback;
+	public Action<double>?        OnRenderCallback;
 	public Action?                OnCloseCallback;
 
 	public EngineWindow(string title, GraphicsBackend graphicsBackend)
@@ -32,7 +32,7 @@ public class EngineWindow
         
 		_window.Load    += OnLoad;
 		_window.Update  += OnUpdate;
-		_window.Render  += OnDraw;
+		_window.Render  += OnRender;
 		_window.Closing += OnClose;
 		_window.Resize  += OnResize;
 	}
@@ -58,9 +58,9 @@ public class EngineWindow
 		OnUpdateCallback?.Invoke(timeDelta);
 	}
 
-	private void OnDraw(double timeDelta)
+	private void OnRender(double timeDelta)
 	{
-		OnDrawCallback?.Invoke(timeDelta);
+		OnRenderCallback?.Invoke(timeDelta);
 	}
 
 	private void OnClose()

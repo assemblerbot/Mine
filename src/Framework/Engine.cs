@@ -14,7 +14,7 @@ public sealed class Engine
 	private          Renderer        _renderer     = null!;
 	private          Input           _input        = null!;
 	private          Scene           _scene        = new();
-	private readonly ImGuiWrapper    _imGuiWrapper = new();
+	private          ImGuiWrapper    _imGuiWrapper = null!;
 
 	public static Renderer Renderer => _instance._renderer;
 	public static Input    Input    => _instance._input;
@@ -37,7 +37,7 @@ public sealed class Engine
 		_window.OnResizeCallback += OnResize;
 		_window.OnLoadCallback   += OnLoad;
 		_window.OnUpdateCallback += OnUpdate;
-		_window.OnDrawCallback   += OnDraw;
+		_window.OnRenderCallback += OnRender;
 		_window.OnCloseCallback  += OnExit;
 	}
 
@@ -48,30 +48,39 @@ public sealed class Engine
 
 	private void OnResize(Vector2D<int> size)
 	{
-		_renderer.OnResize(size);
+		_renderer.Resize(size);
+		_imGuiWrapper.Resize(size);
 	}
 	
 	private void OnLoad()
 	{
-		_renderer = new Renderer(_window.View, _graphicsBackend);
-		_input    = new Input(_window.View);
+		_renderer     = new Renderer(_window.View, _graphicsBackend);
+		_input        = new Input(_window.View);
+		_imGuiWrapper = new ImGuiWrapper(_window.View.Size);
 		_onLoad?.Invoke();
 	}
 
 	private void OnUpdate(double timeDelta)
 	{
+		_imGuiWrapper.Update((float) timeDelta);
 		_scene.Update(timeDelta);
+		_input.EndOfFrame();
 	}
 
-	private void OnDraw(double timeDelta)
+	private void OnRender(double timeDelta)
 	{
-		_renderer.Draw();
+		_scene.Render();
+		_imGuiWrapper.Render();
+		_renderer.EndOfFrame();
 	}
 
 	private void OnExit()
 	{
 		_onExit?.Invoke();
 
+		_imGuiWrapper?.Dispose();
+		_imGuiWrapper = null!;
+		
 		_scene?.Dispose();
 		_scene = null!;
 
