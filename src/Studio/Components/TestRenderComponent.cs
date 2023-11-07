@@ -128,6 +128,7 @@ ushort[] quadIndices = { 0, 1, 2, 3 };
 		_commandList.SetFramebuffer(Engine.Renderer.Device.SwapchainFramebuffer);
 		_commandList.ClearColorTarget(0, RgbaFloat.Black);
 		
+		/*
 		_commandList.SetVertexBuffer(0, _vertexBuffer);
 		_commandList.SetIndexBuffer(_indexBuffer, IndexFormat.UInt16);
 		_commandList.SetPipeline(_pipeline);
@@ -137,7 +138,7 @@ ushort[] quadIndices = { 0, 1, 2, 3 };
 			indexStart: 0,
 			vertexOffset: 0,
 			instanceStart: 0);
-		
+		*/
 		_commandList.End();
 		Engine.Renderer.Device.SubmitCommands(_commandList);
 	}

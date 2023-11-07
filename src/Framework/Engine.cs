@@ -6,14 +6,18 @@ namespace GameToolkit.Framework;
 
 public sealed class Engine
 {
+	public const string ResourceDirectory = "Resources";
+	
 	private static Engine _instance = null!;
 	public static  Engine Instance => _instance;
 	
 	private readonly GraphicsBackend _graphicsBackend;
 	private readonly EngineWindow    _window;
-	private          Renderer        _renderer     = null!;
-	private          Input           _input        = null!;
-	private          Scene           _scene        = new();
+	private          Renderer        _renderer        = null!;
+	private          Input           _input           = null!;
+	private          Scene           _scene           = new();
+	private readonly ResourceManager _resourceManager = new();
+	
 	private          ImGuiWrapper    _imGuiWrapper = null!;
 
 	public static Renderer Renderer => _instance._renderer;
@@ -56,6 +60,7 @@ public sealed class Engine
 	{
 		_renderer     = new Renderer(_window.View, _graphicsBackend);
 		_input        = new Input(_window.View);
+		_resourceManager.Init();
 		_imGuiWrapper = new ImGuiWrapper(_window.View.Size);
 		_onLoad?.Invoke();
 	}

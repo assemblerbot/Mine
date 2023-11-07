@@ -6,7 +6,6 @@ namespace GameToolkit.Framework;
 
 public sealed class ImGuiWrapper : IDisposable
 {
-	public const string DefaultPath     = "Resources";
 	public const string DefaultFontFile = "Roboto-Regular.ttf";
 	public const int    Size            = 16;
 	
@@ -36,7 +35,7 @@ public sealed class ImGuiWrapper : IDisposable
 	{
 		ImGui.GetIO().Fonts.Clear();
 		
-		ImFontPtr font = ImGui.GetIO().Fonts.AddFontFromFileTTF(Path.Combine(DefaultPath, DefaultFontFile), Size);
+		ImFontPtr font = ImGui.GetIO().Fonts.AddFontFromFileTTF(Path.Combine(Engine.ResourceDirectory, DefaultFontFile), Size);
 		if (!font.IsLoaded())
 		{
 			ImGui.GetIO().Fonts.AddFontDefault();
