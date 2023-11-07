@@ -2,12 +2,14 @@ namespace GameToolkit.Framework;
 
 public readonly struct ResourceDescriptor
 {
-	public readonly ResourceType ResourceType;
-	public readonly string       FilePath;
+	public readonly ResourceSourceType ResourceSourceType;
+	public readonly string             SourceFilePath;
+	public readonly ResourceType	   ResourceType;
 
-	public ResourceDescriptor(ResourceType resourceType, string filePath)
+	public ResourceDescriptor(ResourceSourceType resourceSourceType, string sourceFilePath)
 	{
-		ResourceType = resourceType;
-		FilePath = filePath;
+		ResourceSourceType = resourceSourceType;
+		SourceFilePath     = sourceFilePath;
+		ResourceType       = ResourceType.Unknown;
 	}
 }
