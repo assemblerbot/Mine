@@ -23,6 +23,9 @@ public class TestRenderComponent : Component, IUpdatable, IRenderable
 		public const uint SizeInBytes = 24;
 	}
 
+	public int UpdateOrder => 0;
+	public int RenderOrder => 0;
+	
 	private DeviceBuffer _vertexBuffer;
 	private DeviceBuffer _indexBuffer;
 	private Shader[]     _shaders;
