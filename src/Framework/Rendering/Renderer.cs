@@ -34,9 +34,9 @@ public class Renderer : IDisposable
 		_factory = _device.ResourceFactory;
 	}
 
-	public void Resize(Vector2D<int> size)
+	public void Resize(Int2 size)
 	{
-		_device.ResizeMainWindow((uint)size.X, (uint)size.Y);
+		_device.ResizeMainWindow((uint)size.x, (uint)size.y);
 	}
 
 	public void Dispose()

@@ -2,6 +2,7 @@ using System.Numerics;
 using System.Text;
 using GameToolkit.Framework;
 using ImGuiNET;
+using Silk.NET.Maths;
 using Veldrid;
 using Veldrid.SPIRV;
 
@@ -23,8 +24,8 @@ public class TestRenderComponent : Component, IUpdatable, IRenderable
 		public const uint SizeInBytes = 24;
 	}
 
-	public int UpdateOrder => 0;
-	public int RenderOrder => 0;
+	public int GetUpdateOrder() => 0;
+	public int GetRenderOrder() => 0;
 	
 	private DeviceBuffer _vertexBuffer;
 	private DeviceBuffer _indexBuffer;
@@ -61,6 +62,9 @@ void main()
 	
 	public void Init()
 	{
+		Float3  test = new(1.111f, 2.222f, 3.333f);
+		Vector3 v3   = test.NumericsVector3;
+		
 		Engine.Scene.RegisterUpdatable(this);
 		Engine.Scene.RegisterRenderable(this);
 
@@ -145,7 +149,11 @@ ushort[] quadIndices = { 0, 1, 2, 3 };
 		_commandList.End();
 		Engine.Renderer.Device.SubmitCommands(_commandList);
 	}
-	
+
+	public void WindowResized(Int2 size)
+	{
+	}
+
 	public void Update(double timeDelta)
 	{
 		if (Engine.Input.Keyboard.IsKeyPressed(Silk.NET.Input.Key.F1))

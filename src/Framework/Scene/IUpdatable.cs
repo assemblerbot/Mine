@@ -2,6 +2,6 @@ namespace GameToolkit.Framework;
 
 public interface IUpdatable
 {
-	int UpdateOrder { get; }
+	int GetUpdateOrder();
 	void Update(double timeDelta);
 }

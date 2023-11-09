@@ -18,11 +18,10 @@ public sealed class Engine
 	private          Scene           _scene           = new();
 	private readonly ResourceManager _resourceManager = new();
 	
-	private          ImGuiWrapper    _imGuiWrapper = null!;
-
-	public static Renderer Renderer => _instance._renderer;
-	public static Input    Input    => _instance._input;
-	public static Scene    Scene    => _instance._scene;
+	public static EngineWindow Window   => _instance._window;
+	public static Renderer     Renderer => _instance._renderer;
+	public static Input        Input    => _instance._input;
+	public static Scene        Scene    => _instance._scene;
 
 	private Action? _onLoad;
 	private Action? _onExit;
@@ -52,8 +51,9 @@ public sealed class Engine
 
 	private void OnResize(Vector2D<int> size)
 	{
-		_renderer.Resize(size);
-		_imGuiWrapper.Resize(size);
+		Int2 newSize = new(size.X, size.Y);
+		_renderer.Resize(newSize);
+		_scene.WindowSizeChanged(newSize);
 	}
 	
 	private void OnLoad()
@@ -61,13 +61,11 @@ public sealed class Engine
 		_renderer     = new Renderer(_window.View, _graphicsBackend);
 		_input        = new Input(_window.View);
 		_resourceManager.Init();
-		_imGuiWrapper = new ImGuiWrapper(_window.View.Size);
 		_onLoad?.Invoke();
 	}
 
 	private void OnUpdate(double timeDelta)
 	{
-		_imGuiWrapper.Update((float) timeDelta);
 		_scene.Update(timeDelta);
 		_input.EndOfFrame();
 	}
@@ -75,7 +73,6 @@ public sealed class Engine
 	private void OnRender(double timeDelta)
 	{
 		_scene.Render();
-		_imGuiWrapper.Render();
 		_renderer.EndOfFrame();
 	}
 
@@ -83,9 +80,6 @@ public sealed class Engine
 	{
 		_onExit?.Invoke();
 
-		_imGuiWrapper?.Dispose();
-		_imGuiWrapper = null!;
-		
 		_scene?.Dispose();
 		_scene = null!;
 

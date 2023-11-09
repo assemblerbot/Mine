@@ -21,7 +21,7 @@
 
     <ItemGroup>
       <Folder Include="Resources\" />
-      <Folder Include="World\BuiltInComponents\" />
+      <Folder Include="Scene\BuiltInComponents\" />
     </ItemGroup>
 
     <ItemGroup>

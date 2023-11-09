@@ -4,19 +4,28 @@ using Veldrid;
 
 namespace GameToolkit.Framework;
 
-public sealed class ImGuiWrapper : IDisposable
+// built-in game object component
+public sealed class ImGuiComponent : Component, IUpdatable, IRenderable
 {
 	public const string DefaultFontFile = "Roboto-Regular.ttf";
 	public const int    Size            = 16;
+
+	public int UpdateOrder = Int32.MinValue;
+	public int GetUpdateOrder() => UpdateOrder;
+	
+	public int RenderOrder = Int32.MaxValue;
+	public int GetRenderOrder() => RenderOrder;
 	
 	private ImGuiRenderer _renderer;
 	private CommandList _commandList;
 	
 	private ImGuiInputSnapshot _imGuiInputSnapshot;
 	//private ImFontPtr _defaultFont = null!;
-
-	public ImGuiWrapper(Vector2D<int> windowSize)
+	
+	public ImGuiComponent()
 	{
+		Vector2D<int> windowSize = Engine.Window.View.Size;
+		
 		_imGuiInputSnapshot = new ImGuiInputSnapshot();
 		
 		_renderer = new ImGuiRenderer(
@@ -31,6 +40,12 @@ public sealed class ImGuiWrapper : IDisposable
 		LoadFonts();
 	}
 
+	public void Init()
+	{
+		Scene.RegisterUpdatable(this);
+		Scene.RegisterRenderable(this);
+	}
+	
 	private void LoadFonts()
 	{
 		ImGui.GetIO().Fonts.Clear();
@@ -44,7 +59,7 @@ public sealed class ImGuiWrapper : IDisposable
 		_renderer.RecreateFontDeviceTexture();
 	}
 
-	public void Dispose()
+	public override void Dispose()
 	{
 		_renderer.ClearCachedImageResources();
 		_renderer.DestroyDeviceObjects();
@@ -53,10 +68,10 @@ public sealed class ImGuiWrapper : IDisposable
 		_commandList.Dispose();
 	}
 
-	public void Update(float timeDelta)
+	public void Update(double timeDelta)
 	{
 		_imGuiInputSnapshot.Update();
-		_renderer?.Update(timeDelta, _imGuiInputSnapshot);
+		_renderer?.Update((float)timeDelta, _imGuiInputSnapshot);
 	}
 
 	public void Render()
@@ -68,8 +83,8 @@ public sealed class ImGuiWrapper : IDisposable
 		Engine.Renderer.Device.SubmitCommands(_commandList);
 	}
 	
-	public void Resize(Vector2D<int> size)
+	public void WindowResized(Int2 size)
 	{
-		_renderer?.WindowResized(size.X, size.Y);
+		_renderer?.WindowResized(size.x, size.x);
 	}
 }
