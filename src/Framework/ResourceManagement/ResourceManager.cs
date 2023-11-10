@@ -18,7 +18,7 @@ public sealed class ResourceManager
 		//debug
 		foreach(var pair in _resourceDictionary)
 		{
-			Console.WriteLine($"{pair.Key} in {pair.Value.SourceFilePath} as {pair.Value.ResourceSourceType}");
+			Console.WriteLine($"Resource: {pair.Key} in {pair.Value.SourceFilePath} as {pair.Value.ResourceSourceType}");
 		}
 	}
 
