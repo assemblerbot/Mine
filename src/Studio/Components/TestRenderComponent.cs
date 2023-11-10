@@ -2,7 +2,6 @@ using System.Numerics;
 using System.Text;
 using GameToolkit.Framework;
 using ImGuiNET;
-using Silk.NET.Maths;
 using Veldrid;
 using Veldrid.SPIRV;
 
@@ -62,8 +61,8 @@ void main()
 	
 	public void Init()
 	{
-		Float3  test = new(1.111f, 2.222f, 3.333f);
-		Vector3 v3   = test.NumericsVector3;
+		Vector3Float test = new(1.111f, 2.222f, 3.333f);
+		Vector3      v3   = test.NumericsVector3;
 		
 		Engine.Scene.RegisterUpdatable(this);
 		Engine.Scene.RegisterRenderable(this);
@@ -78,55 +77,55 @@ void main()
 			new VertexPositionColor(new Vector2(0.75f,  -0.75f), RgbaFloat.Yellow)
 		};
 		
-ushort[] quadIndices = { 0, 1, 2, 3 };
+		ushort[] quadIndices = { 0, 1, 2, 3 };
 
-            _vertexBuffer = factory.CreateBuffer(new BufferDescription(4 * VertexPositionColor.SizeInBytes, BufferUsage.VertexBuffer));
-            _indexBuffer = factory.CreateBuffer(new BufferDescription(4 * sizeof(ushort), BufferUsage.IndexBuffer));
+		_vertexBuffer = factory.CreateBuffer(new BufferDescription(4 * VertexPositionColor.SizeInBytes, BufferUsage.VertexBuffer));
+		_indexBuffer  = factory.CreateBuffer(new BufferDescription(4 * sizeof(ushort),                  BufferUsage.IndexBuffer));
 
-            Engine.Renderer.Device.UpdateBuffer(_vertexBuffer, 0, quadVertices);
-            Engine.Renderer.Device.UpdateBuffer(_indexBuffer,  0, quadIndices);
+		Engine.Renderer.Device.UpdateBuffer(_vertexBuffer, 0, quadVertices);
+		Engine.Renderer.Device.UpdateBuffer(_indexBuffer,  0, quadIndices);
 
-            VertexLayoutDescription vertexLayout = new VertexLayoutDescription(
-                new VertexElementDescription("Position", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2),
-                new VertexElementDescription("Color", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float4));
+		VertexLayoutDescription vertexLayout = new VertexLayoutDescription(
+			new VertexElementDescription("Position", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2),
+			new VertexElementDescription("Color",    VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float4));
 
-            ShaderDescription vertexShaderDesc = new ShaderDescription(
-                ShaderStages.Vertex,
-                Encoding.UTF8.GetBytes(VertexCode),
-                "main");
-            ShaderDescription fragmentShaderDesc = new ShaderDescription(
-                ShaderStages.Fragment,
-                Encoding.UTF8.GetBytes(FragmentCode),
-                "main");
+		ShaderDescription vertexShaderDesc = new ShaderDescription(
+			ShaderStages.Vertex,
+			Encoding.UTF8.GetBytes(VertexCode),
+			"main");
+		ShaderDescription fragmentShaderDesc = new ShaderDescription(
+			ShaderStages.Fragment,
+			Encoding.UTF8.GetBytes(FragmentCode),
+			"main");
 
-            _shaders = factory.CreateFromSpirv(vertexShaderDesc, fragmentShaderDesc);
+		_shaders = factory.CreateFromSpirv(vertexShaderDesc, fragmentShaderDesc);
 
-            GraphicsPipelineDescription pipelineDescription = new GraphicsPipelineDescription();
-            pipelineDescription.BlendState = BlendStateDescription.SingleOverrideBlend;
+		GraphicsPipelineDescription pipelineDescription = new GraphicsPipelineDescription();
+		pipelineDescription.BlendState = BlendStateDescription.SingleOverrideBlend;
 
-            pipelineDescription.DepthStencilState = new DepthStencilStateDescription(
-                depthTestEnabled: true,
-                depthWriteEnabled: true,
-                comparisonKind: ComparisonKind.LessEqual);
+		pipelineDescription.DepthStencilState = new DepthStencilStateDescription(
+			depthTestEnabled: true,
+			depthWriteEnabled: true,
+			comparisonKind: ComparisonKind.LessEqual);
 
-            pipelineDescription.RasterizerState = new RasterizerStateDescription(
-                cullMode: FaceCullMode.Back,
-                fillMode: PolygonFillMode.Solid,
-                frontFace: FrontFace.Clockwise,
-                depthClipEnabled: true,
-                scissorTestEnabled: false);
+		pipelineDescription.RasterizerState = new RasterizerStateDescription(
+			cullMode: FaceCullMode.Back,
+			fillMode: PolygonFillMode.Solid,
+			frontFace: FrontFace.Clockwise,
+			depthClipEnabled: true,
+			scissorTestEnabled: false);
 
-            pipelineDescription.PrimitiveTopology = PrimitiveTopology.TriangleStrip;
-            pipelineDescription.ResourceLayouts = System.Array.Empty<ResourceLayout>();
+		pipelineDescription.PrimitiveTopology = PrimitiveTopology.TriangleStrip;
+		pipelineDescription.ResourceLayouts   = System.Array.Empty<ResourceLayout>();
 
-            pipelineDescription.ShaderSet = new ShaderSetDescription(
-                vertexLayouts: new VertexLayoutDescription[] { vertexLayout },
-                shaders: _shaders);
+		pipelineDescription.ShaderSet = new ShaderSetDescription(
+			vertexLayouts: new VertexLayoutDescription[] { vertexLayout },
+			shaders: _shaders);
 
-            pipelineDescription.Outputs = Engine.Renderer.Device.SwapchainFramebuffer.OutputDescription;
-            _pipeline                   = factory.CreateGraphicsPipeline(pipelineDescription);
+		pipelineDescription.Outputs = Engine.Renderer.Device.SwapchainFramebuffer.OutputDescription;
+		_pipeline                   = factory.CreateGraphicsPipeline(pipelineDescription);
 
-            _commandList                = factory.CreateCommandList();
+		_commandList = factory.CreateCommandList();
 	}
 
 	public void Render()
@@ -150,7 +149,7 @@ ushort[] quadIndices = { 0, 1, 2, 3 };
 		Engine.Renderer.Device.SubmitCommands(_commandList);
 	}
 
-	public void WindowResized(Int2 size)
+	public void WindowResized(Vector2Int size)
 	{
 	}
 

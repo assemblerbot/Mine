@@ -83,7 +83,7 @@ public sealed class Scene : IDisposable
 		}
 	}
 
-	public void WindowSizeChanged(Int2 size)
+	public void WindowSizeChanged(Vector2Int size)
 	{
 		foreach(var renderablePair in _renderables)
 		{

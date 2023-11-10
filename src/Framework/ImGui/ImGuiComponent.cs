@@ -83,7 +83,7 @@ public sealed class ImGuiComponent : Component, IUpdatable, IRenderable
 		Engine.Renderer.Device.SubmitCommands(_commandList);
 	}
 	
-	public void WindowResized(Int2 size)
+	public void WindowResized(Vector2Int size)
 	{
 		_renderer?.WindowResized(size.x, size.x);
 	}

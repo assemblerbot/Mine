@@ -51,7 +51,7 @@ public sealed class Engine
 
 	private void OnResize(Vector2D<int> size)
 	{
-		Int2 newSize = new(size.X, size.Y);
+		Vector2Int newSize = new(size.X, size.Y);
 		_renderer.Resize(newSize);
 		_scene.WindowSizeChanged(newSize);
 	}

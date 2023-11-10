@@ -4,5 +4,5 @@ public interface IRenderable
 {
 	int  GetRenderOrder();
 	void Render();
-	void WindowResized(Int2 size);
+	void WindowResized(Vector2Int size);
 }
