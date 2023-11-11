@@ -40,12 +40,18 @@ public sealed class ImGuiComponent : Component, IUpdatable, IRenderable
 		LoadFonts();
 	}
 
-	public void Init()
+	public override void AfterAddedToScene()
 	{
 		Scene.RegisterUpdatable(this);
 		Scene.RegisterRenderable(this);
 	}
-	
+
+	public override void BeforeRemovedFromScene()
+	{
+		Scene.UnregisterUpdatable(this);
+		Scene.UnregisterRenderable(this);
+	}
+
 	private void LoadFonts()
 	{
 		ImGui.GetIO().Fonts.Clear();

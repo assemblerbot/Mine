@@ -6,6 +6,11 @@ public sealed class GameObject
 {
 	private string _name;
 	public  string Name => _name;
+
+	private bool _activeSelf        = true;
+	private bool _activeInHierarchy = true;
+	public  bool ActiveSelf        => _activeSelf;
+	public  bool ActiveInHierarchy => _activeInHierarchy;
 	
 	private Vector3    _position;
 	private Quaternion _rotation;
@@ -61,6 +66,35 @@ public sealed class GameObject
 		_children.Clear();
 	}
 
+	#region Activity
+	public void SetActive(bool active)
+	{
+		if (_activeSelf == active)
+		{
+			return;
+		}
+
+		_activeSelf = active;
+
+		if (!_activeInHierarchy)
+		{
+			return;
+		}
+		
+		UpdateActiveInHierarchyRecursive(true);
+	}
+
+	private void UpdateActiveInHierarchyRecursive(bool parentIsActive)
+	{
+		_activeInHierarchy = parentIsActive && _activeSelf;
+		
+		for (int i = 0; i < _children.Count; ++i)
+		{
+			_children[i].UpdateActiveInHierarchyRecursive(_activeInHierarchy);
+		}
+	}
+	#endregion
+
 	#region Component management
 	public GameObject AddComponent(Component component)
 	{
@@ -80,5 +114,34 @@ public sealed class GameObject
 
 		_components.RemoveAt(index); // TODO - not sure if this should be called here or posponed until end of Update
 	}
+	#endregion
+
+	#region Scene Add/Remove
+	protected internal void AfterAddedToScene()
+	{
+		for (int i = 0; i < _components.Count; ++i)
+		{
+			_components[i].AfterAddedToScene();
+		}
+		
+		for (int i = 0; i < _children.Count; ++i)
+		{
+			_children[i].AfterAddedToScene();
+		}
+	}
+
+	protected internal void BeforeRemovedFromScene()
+	{
+		for (int i = 0; i < _children.Count; ++i)
+		{
+			_children[i].BeforeRemovedFromScene();
+		}
+
+		for (int i = 0; i < _components.Count; ++i)
+		{
+			_components[i].BeforeRemovedFromScene();
+		}
+	}
+
 	#endregion
 }

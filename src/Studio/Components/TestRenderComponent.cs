@@ -59,7 +59,7 @@ void main()
 
 	private string _text = "";
 	
-	public void Init()
+	public override void AfterAddedToScene()
 	{
 		Vector3Float test = new(1.111f, 2.222f, 3.333f);
 		Vector3      v3   = test.NumericsVector3;

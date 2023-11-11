@@ -22,18 +22,20 @@ public sealed class StudioMain
 	
 	public void OnLoad()
 	{
-		// initialize scene
-		GameObject imguiGameObject = new GameObject("ImGui").AddComponent(new ImGuiComponent());
-		Engine.Scene.Add(imguiGameObject);
-		imguiGameObject.CallOnComponentsInHierarchy<ImGuiComponent>(x => x.Init());
-		
-		GameObject testGameObject = new GameObject("Test Object").AddComponent(new TestRenderComponent());
-		Engine.Scene.Add(testGameObject);
-		testGameObject.CallOnComponentsInHierarchy<TestRenderComponent>(x => x.Init());
+		InitImGui();
 	}
 
 	public void OnExit()
 	{
 		
+	}
+
+	private void InitImGui()
+	{
+		GameObject imguiGameObject = new GameObject("ImGui").AddComponent(new ImGuiComponent());
+		Engine.Scene.Add(imguiGameObject);
+
+		GameObject testGameObject = new GameObject("Test Object").AddComponent(new TestRenderComponent());
+		Engine.Scene.Add(testGameObject);
 	}
 }

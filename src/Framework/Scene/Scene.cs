@@ -12,9 +12,11 @@ public sealed class Scene : IDisposable
 	private readonly List<IUpdatable>  _updatablesToRemove  = new();
 	private readonly List<IRenderable> _renderablesToRemove = new();
 	
+	#region Add/Remove
 	public void Add(GameObject gameObject)
 	{
 		_gameObjects.Add(gameObject);
+		gameObject.AfterAddedToScene();
 	}
 
 	public void Remove(GameObject gameObject)
@@ -22,21 +24,23 @@ public sealed class Scene : IDisposable
 		int index = _gameObjects.IndexOf(gameObject);
 		if (index == -1)
 		{
-			// TODO - log error
 			return;
 		}
 
-		// gameObject.Disable();
-		
+		gameObject.BeforeRemovedFromScene();
 		_gameObjects.Remove(gameObject);
 	}
+	#endregion
 	
 	#region Updating
 	public void Update(double timeDelta)
 	{
 		foreach(var updatablePair in _updatables)
 		{
-			updatablePair.Value.Update(timeDelta);
+			if (updatablePair.Value.GameObject.ActiveInHierarchy)
+			{
+				updatablePair.Value.Update(timeDelta);
+			}
 		}
 
 		CleanupUpdatables();
@@ -79,7 +83,10 @@ public sealed class Scene : IDisposable
 	{
 		foreach(var renderablePair in _renderables)
 		{
-			renderablePair.Value.Render();
+			if (renderablePair.Value.GameObject.ActiveInHierarchy)
+			{
+				renderablePair.Value.Render();
+			}
 		}
 	}
 
@@ -127,6 +134,7 @@ public sealed class Scene : IDisposable
 	{
 		for (int i = 0; i < _gameObjects.Count; ++i)
 		{
+			_gameObjects[i].BeforeRemovedFromScene();
 			_gameObjects[i].Dispose();
 		}
 		_gameObjects.Clear();
