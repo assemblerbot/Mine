@@ -5,7 +5,7 @@ using ImGuiNET;
 using Veldrid;
 using Veldrid.SPIRV;
 
-namespace GameToolkit.Studio.Components;
+namespace GameToolkit.Studio;
 
 public class TestRenderComponent : Component, IUpdatable, IRenderable
 {

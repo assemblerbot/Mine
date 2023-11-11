@@ -12,12 +12,14 @@ public sealed class Engine
 	public static  Engine Instance => _instance;
 	
 	private readonly GraphicsBackend _graphicsBackend;
+	private readonly Types           _types = new();
 	private readonly EngineWindow    _window;
 	private          Renderer        _renderer        = null!;
 	private          Input           _input           = null!;
 	private          Scene           _scene           = new();
 	private readonly ResourceManager _resourceManager = new();
-	
+
+	public static Types        Types    => _instance._types;
 	public static EngineWindow Window   => _instance._window;
 	public static Renderer     Renderer => _instance._renderer;
 	public static Input        Input    => _instance._input;
@@ -58,8 +60,8 @@ public sealed class Engine
 	
 	private void OnLoad()
 	{
-		_renderer     = new Renderer(_window.View, _graphicsBackend);
-		_input        = new Input(_window.View);
+		_renderer = new Renderer(_window.View, _graphicsBackend);
+		_input    = new Input(_window.View);
 		_resourceManager.Init();
 		_onLoad?.Invoke();
 	}

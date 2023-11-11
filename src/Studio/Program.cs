@@ -1,11 +1,11 @@
 ﻿using GameToolkit.Framework;
-using GameToolkit.Studio.Components;
 
 namespace GameToolkit.Studio;
 
 internal static class Program
 {
-	private static Engine _engine = null!;
+	private static Engine     _engine = null!;
+	private static StudioMain _studio = null!;
 	
 	private static void Main(string[] args)
 	{
@@ -15,19 +15,12 @@ internal static class Program
 
 	private static void OnLoad()
 	{
-		// initialize scene
-		
-		GameObject imguiGameObject = new GameObject("ImGui").AddComponent(new ImGuiComponent());
-		Engine.Scene.Add(imguiGameObject);
-		imguiGameObject.CallOnComponentsInHierarchy<ImGuiComponent>(x => x.Init());
-		
-		GameObject testGameObject = new GameObject("Test Object").AddComponent(new TestRenderComponent());
-		Engine.Scene.Add(testGameObject);
-		testGameObject.CallOnComponentsInHierarchy<TestRenderComponent>(x => x.Init());
+		_studio = new StudioMain();
+		_studio.OnLoad();
 	}
 
 	private static void OnExit()
 	{
-		
+		_studio.OnExit();
 	}
 }
