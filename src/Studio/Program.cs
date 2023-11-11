@@ -4,8 +4,7 @@ namespace GameToolkit.Studio;
 
 internal static class Program
 {
-	private static Engine     _engine = null!;
-	private static StudioMain _studio = null!;
+	private static Engine _engine = null!;
 	
 	private static void Main(string[] args)
 	{
@@ -15,12 +14,10 @@ internal static class Program
 
 	private static void OnLoad()
 	{
-		_studio = new StudioMain();
-		_studio.OnLoad();
+		Engine.Scene.Add(new GameObject("Studio").AddComponent<StudioComponent>());
 	}
 
 	private static void OnExit()
 	{
-		_studio.OnExit();
 	}
 }

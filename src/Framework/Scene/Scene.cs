@@ -1,13 +1,11 @@
-using Silk.NET.Maths;
-
 namespace GameToolkit.Framework;
 
 public sealed class Scene : IDisposable
 {
 	private List<GameObject> _gameObjects = new();
 
-	private readonly SortedList<int, IUpdatable>  _updatables  = new();
-	private readonly SortedList<int, IRenderable> _renderables = new();
+	private readonly List<IUpdatable>  _updatables  = new();	// sorted by update order
+	private readonly List<IRenderable> _renderables = new();	// sorted by render order
 
 	private readonly List<IUpdatable>  _updatablesToRemove  = new();
 	private readonly List<IRenderable> _renderablesToRemove = new();
@@ -35,11 +33,11 @@ public sealed class Scene : IDisposable
 	#region Updating
 	public void Update(double timeDelta)
 	{
-		foreach(var updatablePair in _updatables)
+		for(int i=0;i<_updatables.Count;++i)
 		{
-			if (updatablePair.Value.GameObject.ActiveInHierarchy)
+			if (_updatables[i].GameObject.ActiveInHierarchy)
 			{
-				updatablePair.Value.Update(timeDelta);
+				_updatables[i].Update(timeDelta);
 			}
 		}
 
@@ -48,7 +46,9 @@ public sealed class Scene : IDisposable
 
 	public void RegisterUpdatable(IUpdatable updatable)
 	{
-		_updatables.Add(updatable.GetUpdateOrder(), updatable);
+		int order = updatable.GetUpdateOrder();
+		int index = _updatables.FindInsertionIndexBinary(x => x.GetUpdateOrder().CompareTo(order));
+		_updatables.Insert(index, updatable);
 	}
 	
 	public void UnregisterUpdatable(IUpdatable updatable)
@@ -63,9 +63,9 @@ public sealed class Scene : IDisposable
 			return;
 		}
 
-		foreach (IUpdatable updatable in _updatablesToRemove)
+		for(int i=0;i<_updatablesToRemove.Count; ++i)
 		{
-			int index = _updatables.IndexOfValue(updatable);
+			int index = _updatables.IndexOf(_updatablesToRemove[i]);
 			if (index == -1)
 			{
 				continue;
@@ -81,26 +81,28 @@ public sealed class Scene : IDisposable
 	#region Rendering
 	public void Render()
 	{
-		foreach(var renderablePair in _renderables)
+		for(int i=0;i<_renderables.Count; ++i)
 		{
-			if (renderablePair.Value.GameObject.ActiveInHierarchy)
+			if(_renderables[i].GameObject.ActiveInHierarchy)
 			{
-				renderablePair.Value.Render();
+				_renderables[i].Render();
 			}
 		}
 	}
 
 	public void WindowSizeChanged(Vector2Int size)
 	{
-		foreach(var renderablePair in _renderables)
+		for(int i=0;i<_renderables.Count; ++i)
 		{
-			renderablePair.Value.WindowResized(size);
+			_renderables[i].WindowResized(size);
 		}
 	}
 
 	public void RegisterRenderable(IRenderable renderable)
 	{
-		_renderables.Add(renderable.GetRenderOrder(), renderable);
+		int order = renderable.GetRenderOrder();
+		int index = _renderables.FindInsertionIndexBinary(x => x.GetRenderOrder().CompareTo(order));
+		_renderables.Insert(index, renderable);
 	}
 
 	public void UnregisterRenderable(IRenderable renderable)
@@ -115,9 +117,9 @@ public sealed class Scene : IDisposable
 			return;
 		}
 
-		foreach (IRenderable renderable in _renderablesToRemove)
+		for(int i=0;i<_renderablesToRemove.Count;++i)
 		{
-			int index = _renderables.IndexOfValue(renderable);
+			int index = _renderables.IndexOf(_renderablesToRemove[i]);
 			if (index == -1)
 			{
 				continue;

@@ -3,12 +3,19 @@ using System.Runtime.InteropServices;
 namespace GameToolkit.Framework;
 
 [StructLayout(LayoutKind.Explicit)]
-public partial record struct Point3Float(float x, float y, float z)
+public partial record struct Point3Float
 {
-	[FieldOffset(0)] public float x = x;
-	[FieldOffset(4)] public float y = y;
-	[FieldOffset(8)] public float z = z;
+	[FieldOffset(sizeof(float) * 0)] public float x;
+	[FieldOffset(sizeof(float) * 1)] public float y;
+	[FieldOffset(sizeof(float) * 2)] public float z;
 
+	public Point3Float(float x, float y, float z)
+	{
+		this.x = x;
+		this.y = y;
+		this.z = z;
+	}
+	
 	public void Deconstruct(out float x, out float y, out float z)
 	{
 		x = this.x;

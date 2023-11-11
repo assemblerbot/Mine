@@ -91,6 +91,6 @@ public sealed class ImGuiComponent : Component, IUpdatable, IRenderable
 	
 	public void WindowResized(Vector2Int size)
 	{
-		_renderer?.WindowResized(size.x, size.x);
+		_renderer?.WindowResized(size.x, size.y);
 	}
 }

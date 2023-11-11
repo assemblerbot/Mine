@@ -4,16 +4,23 @@ using System.Runtime.InteropServices;
 namespace GameToolkit.Framework;
 
 [StructLayout(LayoutKind.Explicit)]
-public partial record struct Vector3Float(float x, float y, float z)
+public partial record struct Vector3Float
 {
-	[FieldOffset(0)] public float x = x;
-	[FieldOffset(4)] public float y = y;
-	[FieldOffset(8)] public float z = z;
+	[FieldOffset(sizeof(float) * 0)] public float x;
+	[FieldOffset(sizeof(float) * 1)] public float y;
+	[FieldOffset(sizeof(float) * 2)] public float z;
 	
 	#region Constants
 	public static Vector3Float Zero => new (0, 0, 0);
 	public static Vector3Float One  => new (1, 1, 1);
 	#endregion
+	
+	public Vector3Float(float x, float y, float z)
+	{
+		this.x = x;
+		this.y = y;
+		this.z = z;
+	}
 	
 	#region Operators
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]

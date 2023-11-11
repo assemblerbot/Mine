@@ -42,6 +42,11 @@ public class EngineWindow
 		_window.Run();
 	}
 
+	public void Close()
+	{
+		_window?.Close();
+	}
+	
 	private void OnLoad()
 	{
 		_window!.IsVisible = true;

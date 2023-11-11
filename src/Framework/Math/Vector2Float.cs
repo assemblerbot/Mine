@@ -4,15 +4,21 @@ using System.Runtime.InteropServices;
 namespace GameToolkit.Framework;
 
 [StructLayout(LayoutKind.Explicit)]
-public partial record struct Vector2Float(float x, float y)
+public partial record struct Vector2Float
 {
-	[FieldOffset(0)] public float x = x;
-	[FieldOffset(4)] public float y = y;
+	[FieldOffset(sizeof(float) * 0)] public float x;
+	[FieldOffset(sizeof(float) * 1)] public float y;
 	
 	#region Constants
 	public static Vector2Float Zero => new (0, 0);
 	public static Vector2Float One  => new (1, 1);
 	#endregion
+	
+	public Vector2Float(float x, float y)
+	{
+		this.x = x;
+		this.y = y;
+	}
 	
 	#region Operators
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -96,13 +96,17 @@ public sealed class GameObject
 	#endregion
 
 	#region Component management
-	public GameObject AddComponent(Component component)
+	public GameObject AddComponent<T>() where T : Component, new()
 	{
+		Component component = new T();
+		
 		component.SetGameObject(this);
 		_components.Add(component);
+
+		component.OnInstantiate();
 		return this;
 	}
-
+	
 	public void RemoveComponent(Component component)
 	{
 		int index = _components.IndexOf(component);

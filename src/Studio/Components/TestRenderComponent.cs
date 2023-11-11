@@ -155,17 +155,17 @@ void main()
 
 	public void Update(double timeDelta)
 	{
-		if (Engine.Input.Keyboard.IsKeyPressed(Silk.NET.Input.Key.F1))
-		{
-			Console.WriteLine("F1 pressed");
-		}
-
-		ImGui.SetNextWindowSizeConstraints(new Vector2(200, 200), new Vector2(2000, 2000));
-		if (ImGui.Begin("Test window"))
-		{
-			ImGui.InputText("Text", ref _text, 100);
-			ImGui.End();
-		}
+		// if (Engine.Input.Keyboard.IsKeyPressed(Silk.NET.Input.Key.F1))
+		// {
+		// 	Console.WriteLine("F1 pressed");
+		// }
+		//
+		// ImGui.SetNextWindowSizeConstraints(new Vector2(200, 200), new Vector2(2000, 2000));
+		// if (ImGui.Begin("Test window"))
+		// {
+		// 	ImGui.InputText("Text", ref _text, 100);
+		// 	ImGui.End();
+		// }
 	}
 
 	public override void Dispose()

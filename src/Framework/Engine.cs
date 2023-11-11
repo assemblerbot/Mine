@@ -27,6 +27,8 @@ public sealed class Engine
 
 	private Action? _onLoad;
 	private Action? _onExit;
+	
+	private static bool _exitRequested = false;
 
 	public Engine(string windowTitle, Action? onLoad = null, Action? onExit = null)
 	{
@@ -51,6 +53,11 @@ public sealed class Engine
 		_window.Run();
 	}
 
+	public static void Exit()
+	{
+		_exitRequested = true;
+	}
+	
 	private void OnResize(Vector2D<int> size)
 	{
 		Vector2Int newSize = new(size.X, size.Y);
@@ -70,6 +77,11 @@ public sealed class Engine
 	{
 		_scene.Update(timeDelta);
 		_input.EndOfFrame();
+
+		if (_exitRequested)
+		{
+			_instance._window.Close();
+		}
 	}
 
 	private void OnRender(double timeDelta)
@@ -92,6 +104,7 @@ public sealed class Engine
 		_renderer = null!;
 	}
 	
+	// TODO - shouldn't be here
 	private GraphicsBackend GetPreferredBackend()
 	{
 		if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
