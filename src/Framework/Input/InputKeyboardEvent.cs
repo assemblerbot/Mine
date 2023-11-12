@@ -1,6 +1,6 @@
 using Key = Silk.NET.Input.Key;
 
-namespace GameToolkit.Framework;
+namespace Mine.Framework;
 
 public readonly struct InputKeyboardEvent
 {

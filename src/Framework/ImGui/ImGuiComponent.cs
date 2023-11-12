@@ -2,7 +2,7 @@ using ImGuiNET;
 using Silk.NET.Maths;
 using Veldrid;
 
-namespace GameToolkit.Framework;
+namespace Mine.Framework;
 
 // built-in game object component
 public sealed class ImGuiComponent : Component, IUpdatable, IRenderable
@@ -56,7 +56,7 @@ public sealed class ImGuiComponent : Component, IUpdatable, IRenderable
 	{
 		ImGui.GetIO().Fonts.Clear();
 		
-		ImFontPtr font = ImGui.GetIO().Fonts.AddFontFromFileTTF(Path.Combine(Engine.ResourceDirectory, DefaultFontFile), Size);
+		ImFontPtr font = ImGui.GetIO().Fonts.AddFontFromFileTTF(Path.Combine(Engine.ResourcesPath, DefaultFontFile), Size);
 		if (!font.IsLoaded())
 		{
 			ImGui.GetIO().Fonts.AddFontDefault();

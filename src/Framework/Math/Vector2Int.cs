@@ -1,7 +1,7 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace GameToolkit.Framework;
+namespace Mine.Framework;
 
 [StructLayout(LayoutKind.Explicit)]
 public record struct Vector2Int

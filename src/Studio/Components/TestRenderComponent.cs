@@ -1,11 +1,11 @@
 using System.Numerics;
 using System.Text;
-using GameToolkit.Framework;
+using Mine.Framework;
 using ImGuiNET;
 using Veldrid;
 using Veldrid.SPIRV;
 
-namespace GameToolkit.Studio;
+namespace Mine.Studio;
 
 public class TestRenderComponent : Component, IUpdatable, IRenderable
 {

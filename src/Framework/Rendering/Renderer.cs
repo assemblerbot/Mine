@@ -9,7 +9,7 @@ using Veldrid;
 
  */
 
-namespace GameToolkit.Framework;
+namespace Mine.Framework;
 
 public class Renderer : IDisposable
 {

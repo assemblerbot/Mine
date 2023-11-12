@@ -1,7 +1,9 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace GameToolkit.Framework;
+// https://github.com/dotnet/runtime/blob/main/docs/coding-guidelines/vectorization-guidelines.md#code-structure
+
+namespace Mine.Framework;
 
 [StructLayout(LayoutKind.Explicit)]
 public partial record struct Vector3Float

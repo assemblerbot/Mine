@@ -1,6 +1,6 @@
 using System.Numerics;
 
-namespace GameToolkit.Framework;
+namespace Mine.Framework;
 
 public sealed class GameObject
 {
@@ -121,7 +121,7 @@ public sealed class GameObject
 	#endregion
 
 	#region Scene Add/Remove
-	protected internal void AfterAddedToScene()
+	internal void AfterAddedToScene()
 	{
 		for (int i = 0; i < _components.Count; ++i)
 		{
@@ -134,7 +134,7 @@ public sealed class GameObject
 		}
 	}
 
-	protected internal void BeforeRemovedFromScene()
+	internal void BeforeRemovedFromScene()
 	{
 		for (int i = 0; i < _children.Count; ++i)
 		{

@@ -1,37 +1,28 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <OutputType>WinExe</OutputType>
         <TargetFramework>net7.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>
+      <Reference Include="Framework">
+        <HintPath>..\Libraries\Framework.dll</HintPath>
+      </Reference>
+      <Reference Include="OdinSerializer">
+        <HintPath>..\Libraries\OdinSerializer.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
       <PackageReference Include="AssimpNet" Version="5.0.0-beta1" />
-      <PackageReference Include="NativeFileDialogSharp" Version="0.6.0-alpha" />
       <PackageReference Include="Silk.NET.Core" Version="2.18.0" />
       <PackageReference Include="Silk.NET.Input.Sdl" Version="2.18.0" />
-      <PackageReference Include="Silk.NET.Windowing.Common" Version="2.18.0" />
       <PackageReference Include="Silk.NET.Windowing.Extensions.Veldrid" Version="2.18.0" />
       <PackageReference Include="Veldrid" Version="4.9.0" />
-      <PackageReference Include="Veldrid.ImGui" Version="5.89.2-ga121087cad" />
       <PackageReference Include="Veldrid.SPIRV" Version="1.0.15" />
       <PackageReference Include="Veldrid.Utilities" Version="4.9.0" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\Framework\Framework.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Packages\" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Reference Include="OdinSerializer">
-        <HintPath>..\Libraries\OdinSerializer\OdinSerializer.dll</HintPath>
-      </Reference>
     </ItemGroup>
 
 </Project>

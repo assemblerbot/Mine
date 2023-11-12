@@ -1,12 +1,13 @@
-using GameToolkit.Framework;
+using Mine.Framework;
 using ImGuiNET;
+using NativeFileDialogSharp;
 using RedHerring.Studio.Models;
 using RedHerring.Studio.Models.Project.Importers;
 using RedHerring.Studio.Tools;
 using RedHerring.Studio.UserInterface;
 using RedHerring.Studio.UserInterface.Dialogs;
 
-namespace GameToolkit.Studio;
+namespace Mine.Studio;
 
 public sealed class StudioComponent : Component, IUpdatable
 {
@@ -84,6 +85,7 @@ public sealed class StudioComponent : Component, IUpdatable
 	#region Menu
 	private void InitMenu()
 	{
+		_menu.AddItem("File/New project..",  OnNewProjectClicked);
 		_menu.AddItem("File/Open project..", OnOpenProjectClicked);
 		_menu.AddItem("File/Exit",           OnExitClicked);
 
@@ -102,14 +104,25 @@ public sealed class StudioComponent : Component, IUpdatable
 		_menu.AddItem("Debug/Importer test",       OnDebugImporterTestClicked);
 	}
 
+	private void OnNewProjectClicked()
+	{
+		DialogResult result = Dialog.FolderPicker();
+		if(!result.IsOk)
+		{
+			return;
+		}
+		
+		
+	}
+
 	private async void OnOpenProjectClicked()
 	{
-		// DialogResult result = Dialog.FolderPicker();
-		// if(!result.IsOk)
-		// {
-		// 	return;
-		// }
-  //       
+		DialogResult result = Dialog.FolderPicker();
+		if(!result.IsOk)
+		{
+			return;
+		}
+		
 		// await _studioModel.OpenProject(result.Path);
 		// _importerThread.Continue();
 	}

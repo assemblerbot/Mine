@@ -1,7 +1,7 @@
 using Silk.NET.Input;
 using Silk.NET.Windowing;
 
-namespace GameToolkit.Framework;
+namespace Mine.Framework;
 
 public sealed class Input : IDisposable
 {

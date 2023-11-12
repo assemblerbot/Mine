@@ -6,7 +6,7 @@ using VMouseButton = Veldrid.MouseButton;
 using SKey = Silk.NET.Input.Key;
 using VKey = Veldrid.Key;
 
-namespace GameToolkit.Framework;
+namespace Mine.Framework;
 
 public class ImGuiInputSnapshot : InputSnapshot
 {

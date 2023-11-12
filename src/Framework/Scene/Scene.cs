@@ -1,4 +1,4 @@
-namespace GameToolkit.Framework;
+namespace Mine.Framework;
 
 public sealed class Scene : IDisposable
 {

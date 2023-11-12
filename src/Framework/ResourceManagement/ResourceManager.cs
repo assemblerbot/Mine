@@ -1,6 +1,6 @@
 using System.IO.Compression;
 
-namespace GameToolkit.Framework;
+namespace Mine.Framework;
 
 public sealed class ResourceManager
 {
@@ -43,12 +43,12 @@ public sealed class ResourceManager
 
 	private byte[]? ReadResourceFromFile(string path, ResourceDescriptor descriptor)
 	{
-		return File.ReadAllBytes(Path.Combine(Path.Combine(Engine.ResourceDirectory, descriptor.SourceFilePath)));
+		return File.ReadAllBytes(Path.Combine(Path.Combine(Engine.ResourcesPath, descriptor.SourceFilePath)));
 	}
 
 	private byte[]? ReadResourceFromPackage(string path, ResourceDescriptor descriptor)
 	{
-		using ZipArchive archive = ZipFile.OpenRead(Path.Combine(Engine.ResourceDirectory, descriptor.SourceFilePath));
+		using ZipArchive archive = ZipFile.OpenRead(Path.Combine(Engine.ResourcesPath, descriptor.SourceFilePath));
 		ZipArchiveEntry? entry = archive.GetEntry(path);
 		if (entry == null)
 		{
@@ -66,7 +66,12 @@ public sealed class ResourceManager
 	#region Scanning
 	private void ScanResourcePackages()
 	{
-		foreach (string fileName in Directory.EnumerateFiles(Engine.ResourceDirectory))
+		if (!Directory.Exists(Engine.ResourcesPath))
+		{
+			return;
+		}
+
+		foreach (string fileName in Directory.EnumerateFiles(Engine.ResourcesPath))
 		{
 			if (!fileName.EndsWith(DefaultResourcePackageExtension))
 			{
@@ -98,14 +103,19 @@ public sealed class ResourceManager
 	
 	private void BuildDictionaryFromFiles()
 	{
+		if (!Directory.Exists(Engine.ResourcesPath))
+		{
+			return;
+		}
+
 		BuildDictionaryFromFilesInDirectoryRecursive("");
 	}
 
 	private void BuildDictionaryFromFilesInDirectoryRecursive(string relativePath)
 	{
-		int resourceDirectoryLength = Engine.ResourceDirectory.Length + 1;
+		int resourceDirectoryLength = Engine.ResourcesPath.Length + 1;
 		
-		string absolutePath = Path.Combine(Engine.ResourceDirectory, relativePath);
+		string absolutePath = Path.Combine(Engine.ResourcesPath, relativePath);
 		foreach (string absoluteFilePath in Directory.EnumerateFiles(absolutePath))
 		{
 			if (absoluteFilePath.EndsWith(DefaultResourcePackageExtension))

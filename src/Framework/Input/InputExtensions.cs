@@ -1,7 +1,7 @@
 ﻿using SKey = Silk.NET.Input.Key;
 using VKey = Veldrid.Key;
 
-namespace GameToolkit.Framework;
+namespace Mine.Framework;
 
 public static class InputExtensions
 {

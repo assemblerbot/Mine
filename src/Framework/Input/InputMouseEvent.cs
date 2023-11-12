@@ -1,6 +1,6 @@
 ﻿using Button = Silk.NET.Input.MouseButton;
 
-namespace GameToolkit.Framework;
+namespace Mine.Framework;
 
 public readonly struct InputMouseEvent
 {

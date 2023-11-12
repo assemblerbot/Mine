@@ -2,11 +2,12 @@ using System.Runtime.InteropServices;
 using Silk.NET.Maths;
 using Veldrid;
 
-namespace GameToolkit.Framework;
+namespace Mine.Framework;
 
 public sealed class Engine
 {
-	public const string ResourceDirectory = "Resources";
+	private const string _resourcesDirectory = "Resources";
+	public static string ResourcesPath = _resourcesDirectory;
 	
 	private static Engine _instance = null!;
 	public static  Engine Instance => _instance;
@@ -30,9 +31,11 @@ public sealed class Engine
 	
 	private static bool _exitRequested = false;
 
-	public Engine(string windowTitle, Action? onLoad = null, Action? onExit = null)
+	public Engine(string[] applicationArguments, string windowTitle, Action? onLoad = null, Action? onExit = null)
 	{
 		_instance = this;
+
+		ParseArguments(applicationArguments);
 		
 		_onLoad = onLoad;
 		_onExit = onExit;
@@ -103,7 +106,19 @@ public sealed class Engine
 		_renderer?.Dispose();
 		_renderer = null!;
 	}
-	
+
+	private void ParseArguments(string[] arguments)
+	{
+		for (int i = 0; i < arguments.Length; ++i)
+		{
+			if (arguments[i] == "--resources")
+			{
+				ResourcesPath = arguments[++i];
+				continue;
+			}
+		}
+	}
+
 	// TODO - shouldn't be here
 	private GraphicsBackend GetPreferredBackend()
 	{

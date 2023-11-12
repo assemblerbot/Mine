@@ -1,6 +1,6 @@
 ﻿using Mine.Framework;
 
-namespace Mine.Studio;
+namespace Template;
 
 internal static class Program
 {
@@ -8,13 +8,13 @@ internal static class Program
 	
 	private static void Main(string[] args)
 	{
-		_engine = new Engine(args, "MINE - Studio", OnLoad, OnExit);
+		_engine = new Engine(args, "Template", OnLoad, OnExit);
 		_engine.Run();
 	}
 
 	private static void OnLoad()
 	{
-		Engine.Scene.Add(new GameObject("Studio").AddComponent<StudioComponent>());
+		Engine.Scene.Add(new GameObject("Game").AddComponent<GameComponent>());
 	}
 
 	private static void OnExit()

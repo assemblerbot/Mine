@@ -1,6 +1,6 @@
-﻿using GameToolkit.Framework;
+﻿using Mine.Framework;
 
-namespace GameToolkit.Game;
+namespace Mine.Game;
 
 internal static class Program
 {

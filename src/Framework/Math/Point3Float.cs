@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace GameToolkit.Framework;
+namespace Mine.Framework;
 
 [StructLayout(LayoutKind.Explicit)]
 public partial record struct Point3Float

@@ -3,7 +3,7 @@ using Silk.NET.Windowing;
 using Silk.NET.Windowing.Extensions.Veldrid;
 using Veldrid;
 
-namespace GameToolkit.Framework;
+namespace Mine.Framework;
 
 public class EngineWindow
 {
