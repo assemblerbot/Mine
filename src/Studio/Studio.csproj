@@ -25,10 +25,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Packages\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <Reference Include="OdinSerializer">
         <HintPath>..\Libraries\OdinSerializer\OdinSerializer.dll</HintPath>
       </Reference>

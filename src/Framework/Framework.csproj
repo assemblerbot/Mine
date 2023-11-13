@@ -20,15 +20,11 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Resources\" />
       <Folder Include="Scene\BuiltInComponents\" />
     </ItemGroup>
 
     <ItemGroup>
       <None Remove="Resources\Roboto-Regular.ttf" />
-      <Content Include="Resources\Roboto-Regular.ttf">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
     </ItemGroup>
 
     <ItemGroup>

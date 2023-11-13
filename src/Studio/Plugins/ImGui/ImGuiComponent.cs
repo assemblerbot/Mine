@@ -7,8 +7,8 @@ namespace Mine.Framework;
 // built-in game object component
 public sealed class ImGuiComponent : Component, IUpdatable, IRenderable
 {
-	public const string DefaultFontFile = "Roboto-Regular.ttf";
-	public const int    Size            = 16;
+	public static readonly string DefaultFontFile = Path.Join("Plugins", "ImGui", "Roboto-Regular.ttf");
+	public const           int    Size            = 16;
 
 	public int UpdateOrder = Int32.MinValue;
 	public int GetUpdateOrder() => UpdateOrder;
@@ -17,10 +17,9 @@ public sealed class ImGuiComponent : Component, IUpdatable, IRenderable
 	public int GetRenderOrder() => RenderOrder;
 	
 	private ImGuiRenderer _renderer;
-	private CommandList _commandList;
+	private CommandList   _commandList;
 	
 	private ImGuiInputSnapshot _imGuiInputSnapshot;
-	//private ImFontPtr _defaultFont = null!;
 	
 	public ImGuiComponent()
 	{
@@ -56,6 +55,7 @@ public sealed class ImGuiComponent : Component, IUpdatable, IRenderable
 	{
 		ImGui.GetIO().Fonts.Clear();
 		
+		// TODO - change to engine resource load
 		ImFontPtr font = ImGui.GetIO().Fonts.AddFontFromFileTTF(Path.Combine(Engine.ResourcesPath, DefaultFontFile), Size);
 		if (!font.IsLoaded())
 		{
