@@ -21,9 +21,7 @@
 - studio is like a game built on top of engine
 - studio must be able to create new game projects including it's solution and all necessary files
   - from template 
-- studio must organize assets and resources through package manager
-- studio should be able to manage code packages for the game
-  - TODO - how to handle resources included in packages?
+- studio must organize assets and resources through plugin manager
 
 ## Scripts
 
@@ -151,3 +149,12 @@
 - UI is rendered as a separate render pass
 - all UI objects are rendered by UI renderable component that must be attached to a game object
 - ImGui is optional and it's implemented as built-in component
+
+### Plugins
+
+- plugin is combination of scripts and resources
+- plugin manager have to copy:
+  - scripts to **Scripts/Plugins** folder
+  - resources to **Assets/Plugins** folder
+- reverse process - updating of the plugin - needs to combine those two folders into one plugin folder
+- plugin json and possible descriptors/meta files/etc sould be together with scripts
