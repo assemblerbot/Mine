@@ -6,12 +6,11 @@ public static class TemplateUtility
 {
 	private static readonly HashAlgorithm _hashAlgorithm = SHA1.Create();
 	
-	private const           string        _templatePath  = "Template";
-	private const           string        _librariesPath = "Libraries";
+	private const string _templatePath  = "Template";
+	private const string _librariesPath = "Libraries";
 
 	// copy template to target path and rename to project name
-	// sourcePath is path to template directory
-	// targetPath is path to project directory (including name of project)
+	// targetPath is path to project directory (including name of project directory at the end)
 	public static void InstantiateTemplate(string targetPath, string projectName)
 	{
 		FileUtility.Copy(_templatePath, targetPath);
@@ -19,6 +18,8 @@ public static class TemplateUtility
 		File.Move(Path.Combine(targetPath, "Template.sln"), Path.Combine(targetPath, $"{projectName}.sln"));
 		
 		FileUtility.ReplaceTextInFilesRecursive(targetPath, fileName => fileName.EndsWith(".cs"), "Template", projectName);
+
+		UpdateFromTemplate(targetPath);
 	}
 
 	// check if libraries in target path are up to date with template

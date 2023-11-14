@@ -10,12 +10,14 @@ public sealed class ObjectDialog
 {
 	private readonly string    _titleId;
 	private readonly Inspector _inspector;
+	private readonly Action?   _onClose;
 
-	public ObjectDialog(string titleId, CommandHistory history, object sourceObject)
+	public ObjectDialog(string titleId, CommandHistory history, object sourceObject, Action? onClose = null)
 	{
 		_titleId   = titleId;
 		_inspector = new Inspector(history);
 		_inspector.Init(sourceObject);
+		_onClose = onClose;
 	}
 
 	public void Open()
@@ -34,6 +36,11 @@ public sealed class ObjectDialog
 		{
 			_inspector.Update();
 			Gui.EndPopup();
+		}
+		
+		if(!unusedIsOpen)
+		{
+			_onClose?.Invoke();
 		}
 	}
 }

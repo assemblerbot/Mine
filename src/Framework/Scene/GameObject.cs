@@ -96,7 +96,7 @@ public sealed class GameObject
 	#endregion
 
 	#region Component management
-	public GameObject AddComponent<T>() where T : Component, new()
+	public T AddComponent<T>() where T : Component, new()
 	{
 		Component component = new T();
 		
@@ -104,7 +104,7 @@ public sealed class GameObject
 		_components.Add(component);
 
 		component.OnInstantiate();
-		return this;
+		return (component as T)!;
 	}
 	
 	public void RemoveComponent(Component component)

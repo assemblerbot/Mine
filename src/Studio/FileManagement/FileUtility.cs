@@ -6,8 +6,8 @@ public static class FileUtility
 {
 	public static void Copy(string sourceDirectory, string targetDirectory)
 	{
-		DirectoryInfo diSource = new DirectoryInfo(sourceDirectory);
-		DirectoryInfo diTarget = new DirectoryInfo(targetDirectory);
+		DirectoryInfo diSource = new (sourceDirectory);
+		DirectoryInfo diTarget = new (targetDirectory);
 
 		Copy(diSource, diTarget);
 	}	
@@ -33,13 +33,13 @@ public static class FileUtility
 	public static void ReplaceTextInFile(string path, string find, string replaceBy)
 	{
 		string text = File.ReadAllText(path);
-		text.Replace(find, replaceBy, false, CultureInfo.InvariantCulture);
+		text = text.Replace(find, replaceBy, false, CultureInfo.InvariantCulture);
 		File.WriteAllText(path, text);
 	}
 
 	public static void ReplaceTextInFilesRecursive(string path, Func<string,bool> fileNameFilter, string find, string replaceBy)
 	{
-		DirectoryInfo source = new DirectoryInfo(path);
+		DirectoryInfo source = new (path);
 		ReplaceTextInFilesRecursive(source, fileNameFilter, find, replaceBy);
 	}
 

@@ -23,6 +23,7 @@ public sealed class StudioComponent : Component, IUpdatable
 	private readonly StatusBar      _statusBar       = new();
 	private          ObjectDialog _projectSettings = null!;
 	private          ObjectDialog _studioSettings  = null!;
+	private TemplateApplicationMakerDialog _templateApplicationMakerDialog = null!;
 	private readonly MessageBox     _messageBox      = new();
 	#endregion
 	
@@ -35,10 +36,11 @@ public sealed class StudioComponent : Component, IUpdatable
 
 		_toolManager.Init(_studioModel);
 
-		_projectSettings = new ObjectDialog("Project settings", _studioModel.CommandHistory, _studioModel.Project.ProjectSettings);
-		_studioSettings  = new ObjectDialog("Studio settings",  _studioModel.CommandHistory, _studioModel.StudioSettings);
+		_projectSettings                = new ObjectDialog("Project settings", _studioModel.CommandHistory, _studioModel.Project.ProjectSettings);
+		_studioSettings                 = new ObjectDialog("Studio settings",  _studioModel.CommandHistory, _studioModel.StudioSettings);
+		_templateApplicationMakerDialog = new TemplateApplicationMakerDialog();
 		
-		Engine.Scene.Add(new GameObject("Test Object").AddComponent<TestRenderComponent>());
+		Engine.Scene.Add(new GameObject("Test Object").AddComponent<TestRenderComponent>().GameObject);
 
 		_statusBar.Message = "Ready";
 
@@ -50,7 +52,7 @@ public sealed class StudioComponent : Component, IUpdatable
 		// int       index4 = test.FindInsertionIndexBinary(x => x.CompareTo(2));
 		// int       index5 = test.FindInsertionIndexBinary(x => x.CompareTo(12));
 		//
-		// int       d      = 0;
+		// int d=0;
 	}
 	
 	public override void BeforeRemovedFromScene()
@@ -71,13 +73,14 @@ public sealed class StudioComponent : Component, IUpdatable
 		_projectSettings.Update();
 		_studioSettings.Update();
 		_messageBox.Update();
+		_templateApplicationMakerDialog.Update();
 
 		_toolManager.Update();
 	}
 	
 	private void InitImGui()
 	{
-		Engine.Scene.Add(new GameObject("ImGui").AddComponent<ImGuiComponent>());
+		Engine.Scene.Add(new GameObject("ImGui").AddComponent<ImGuiComponent>().GameObject);
 		ImGui.GetIO().ConfigFlags |= ImGuiConfigFlags.DockingEnable;
 	}
 	
@@ -106,13 +109,7 @@ public sealed class StudioComponent : Component, IUpdatable
 
 	private void OnNewProjectClicked()
 	{
-		DialogResult result = Dialog.FolderPicker();
-		if(!result.IsOk)
-		{
-			return;
-		}
-		
-		
+		_templateApplicationMakerDialog.Open();
 	}
 
 	private async void OnOpenProjectClicked()

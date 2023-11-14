@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using Mine.Studio;
 using RedHerring.Studio.UserInterface.Attributes;
 
 namespace RedHerring.Studio.UserInterface;
@@ -41,7 +42,7 @@ public abstract class AnInspectorControl
 	{
 		if (sourceField != null)
 		{
-			Label   = sourceField.Name;//.PrettyCamelCase();
+			Label   = sourceField.Name.PrettyCamelCase();
 			LabelId = Label + Id;
 		}
 
@@ -52,7 +53,7 @@ public abstract class AnInspectorControl
 	{
 		ValueBindings.Add(new InspectorValueBinding(source, sourceField, GetOnCommitValue(sourceOwner, sourceField)));
 	}
-
+	
 	public abstract void Update();
 
 	public void SetCustomLabel(string? label)

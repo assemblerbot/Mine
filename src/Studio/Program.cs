@@ -14,7 +14,7 @@ internal static class Program
 
 	private static void OnLoad()
 	{
-		Engine.Scene.Add(new GameObject("Studio").AddComponent<StudioComponent>());
+		Engine.Scene.Add(new GameObject("Studio").AddComponent<StudioComponent>().GameObject);
 	}
 
 	private static void OnExit()
