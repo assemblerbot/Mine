@@ -5,7 +5,6 @@ using RedHerring.Studio.Models;
 using RedHerring.Studio.Models.Project.Importers;
 using RedHerring.Studio.Tools;
 using RedHerring.Studio.UserInterface;
-using RedHerring.Studio.UserInterface.Dialogs;
 
 namespace Mine.Studio;
 
@@ -22,8 +21,8 @@ public sealed class StudioComponent : Component, IUpdatable
 	private readonly DockSpace      _dockSpace       = new();
 	private readonly Menu           _menu            = new();
 	private readonly StatusBar      _statusBar       = new();
-	private          SettingsDialog _projectSettings = null!;
-	private          SettingsDialog _studioSettings  = null!;
+	private          ObjectDialog _projectSettings = null!;
+	private          ObjectDialog _studioSettings  = null!;
 	private readonly MessageBox     _messageBox      = new();
 	#endregion
 	
@@ -36,8 +35,8 @@ public sealed class StudioComponent : Component, IUpdatable
 
 		_toolManager.Init(_studioModel);
 
-		_projectSettings = new SettingsDialog("Project settings", _studioModel.CommandHistory, _studioModel.Project.ProjectSettings);
-		_studioSettings  = new SettingsDialog("Studio settings",  _studioModel.CommandHistory, _studioModel.StudioSettings);
+		_projectSettings = new ObjectDialog("Project settings", _studioModel.CommandHistory, _studioModel.Project.ProjectSettings);
+		_studioSettings  = new ObjectDialog("Studio settings",  _studioModel.CommandHistory, _studioModel.StudioSettings);
 		
 		Engine.Scene.Add(new GameObject("Test Object").AddComponent<TestRenderComponent>());
 
@@ -97,6 +96,7 @@ public sealed class StudioComponent : Component, IUpdatable
 		_menu.AddItem("View/Project",   OnViewProjectClicked);
 		_menu.AddItem("View/Console",   OnViewConsoleClicked);
 		_menu.AddItem("View/Inspector", OnViewInspectorClicked);
+		_menu.AddItem("View/Plugins",   OnViewPluginsClicked);
 
 		_menu.AddItem("Debug/Modal window",        () => ImGui.OpenPopup("MessageBox"));
 		_menu.AddItem("Debug/Task processor test", OnDebugTaskProcessorTestClicked);
@@ -157,6 +157,11 @@ public sealed class StudioComponent : Component, IUpdatable
 		_toolManager.Activate(ToolInspector.ToolName);
 	}
 
+	private void OnViewPluginsClicked()
+	{
+		_toolManager.Activate(ToolPlugins.ToolName);
+	}
+	
 	private void OnDebugTaskProcessorTestClicked()
 	{
 		// for(int i=0;i <20;++i)

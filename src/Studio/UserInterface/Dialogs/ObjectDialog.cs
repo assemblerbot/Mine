@@ -1,20 +1,21 @@
 ﻿using System.Numerics;
 using ImGuiNET;
 using RedHerring.Studio.Commands;
+using RedHerring.Studio.UserInterface;
 using Gui = ImGuiNET.ImGui;
 
-namespace RedHerring.Studio.UserInterface.Dialogs;
+namespace Mine.Studio;
 
-public sealed class SettingsDialog
+public sealed class ObjectDialog
 {
 	private readonly string    _titleId;
 	private readonly Inspector _inspector;
 
-	public SettingsDialog(string titleId, CommandHistory history, object sourceModel)
+	public ObjectDialog(string titleId, CommandHistory history, object sourceObject)
 	{
 		_titleId   = titleId;
 		_inspector = new Inspector(history);
-		_inspector.Init(sourceModel);
+		_inspector.Init(sourceObject);
 	}
 
 	public void Open()

@@ -2,7 +2,7 @@
 using ImGuiNET;
 using Gui = ImGuiNET.ImGui;
 
-namespace RedHerring.Studio.UserInterface.Dialogs;
+namespace Mine.Studio;
 
 public class MessageBox
 {
