@@ -1,6 +1,7 @@
 using ImGuiNET;
 using NativeFileDialogSharp;
 using RedHerring.Studio.Commands;
+using RedHerring.Studio.Models.ViewModels.Console;
 using RedHerring.Studio.UserInterface.Attributes;
 
 namespace Mine.Studio;
@@ -31,11 +32,19 @@ public sealed class TemplateApplicationMakerDialog
 	[Button("Create!")]
 	private void Create()
 	{
-		TemplateUtility.InstantiateTemplate(_targetPath, _name);
+		ConsoleViewModel.Log($"Creating new application at {_targetPath}", ConsoleItemType.Info);
+		try
+		{
+			TemplateUtility.InstantiateTemplate(_targetPath, _name);
+		}
+		catch(Exception e)
+		{
+			ConsoleViewModel.Log(e.Message, ConsoleItemType.Exception);
+			ConsoleViewModel.Log(e.StackTrace, ConsoleItemType.Exception);
+			return;
+		}
 
 		// TODO - open created project
-		
-		// TODO - write to console
 		
 		ImGui.CloseCurrentPopup();
 	}

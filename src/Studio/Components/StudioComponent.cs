@@ -120,8 +120,8 @@ public sealed class StudioComponent : Component, IUpdatable
 			return;
 		}
 		
-		// await _studioModel.OpenProject(result.Path);
-		// _importerThread.Continue();
+		await _studioModel.OpenProject(result.Path);
+		_importerThread.Continue();
 	}
 
 	private void OnExitClicked()
