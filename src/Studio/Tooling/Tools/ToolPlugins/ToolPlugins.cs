@@ -15,6 +15,8 @@ public class ToolPlugins : Tool
 	private readonly PluginManagerCollections                 _pluginCollections;
 	private readonly Dictionary<string, PluginManagerFoldout> _pluginFoldouts = new();
 
+	private bool _refreshRequested = false;
+
 	public ToolPlugins(StudioModel studioModel, int uniqueId) : base(studioModel, uniqueId)
 	{
 		_settings          = new PluginManagerSettings(studioModel.Project);
@@ -46,8 +48,13 @@ public class ToolPlugins : Tool
 		List<PluginManagerCollections.CPluginsPair> listOfPlugins = _pluginCollections.BuildListOfPlugins();
 		foreach (PluginManagerCollections.CPluginsPair pluginsPair in listOfPlugins)
 		{
-			_pluginFoldouts.Add(pluginsPair.Id, new PluginManagerFoldout(_settings, _pluginCollections, pluginsPair, Refresh));
+			_pluginFoldouts.Add(pluginsPair.Id, new PluginManagerFoldout(_settings, _pluginCollections, pluginsPair, RequestRefresh));
 		}
+	}
+
+	private void RequestRefresh()
+	{
+		_refreshRequested = true;
 	}
 
 	#region UI
@@ -56,9 +63,19 @@ public class ToolPlugins : Tool
 		bool isOpen = true;
 		if (ImGui.Begin(NameId, ref isOpen))
 		{
+			if (_refreshRequested)
+			{
+				_refreshRequested = false;
+				Refresh();
+			}
+
 			SettingsUI();
 			PluginsUI();
 			ImGui.End();
+		}
+		else
+		{
+			_refreshRequested = true;
 		}
 
 		return !isOpen;

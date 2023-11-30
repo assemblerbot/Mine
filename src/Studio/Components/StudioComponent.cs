@@ -18,13 +18,13 @@ public sealed class StudioComponent : Component, IUpdatable
 	private ToolManager _toolManager = new();
 	
 	#region User Interface
-	private readonly DockSpace      _dockSpace       = new();
-	private readonly Menu           _menu            = new();
-	private readonly StatusBar      _statusBar       = new();
-	private          ObjectDialog _projectSettings = null!;
-	private          ObjectDialog _studioSettings  = null!;
-	private NewProjectDialog _newProjectDialog = null!;
-	private readonly MessageBox     _messageBox      = new();
+	private readonly DockSpace        _dockSpace        = new();
+	private readonly Menu             _menu             = new();
+	private readonly StatusBar        _statusBar        = new();
+	private          ObjectDialog     _projectSettings  = null!;
+	private          ObjectDialog     _studioSettings   = null!;
+	private          NewProjectDialog _newProjectDialog = null!;
+	private readonly MessageBox       _messageBox       = new();
 	#endregion
 	
 	public override void AfterAddedToScene()
@@ -36,8 +36,8 @@ public sealed class StudioComponent : Component, IUpdatable
 
 		_toolManager.Init(_studioModel);
 
-		_projectSettings                = new ObjectDialog("Project settings", _studioModel.CommandHistory, _studioModel.Project.ProjectSettings);
-		_studioSettings                 = new ObjectDialog("Studio settings",  _studioModel.CommandHistory, _studioModel.StudioSettings);
+		_projectSettings  = new ObjectDialog("Project settings", _studioModel.CommandHistory, _studioModel.Project.ProjectSettings);
+		_studioSettings   = new ObjectDialog("Studio settings",  _studioModel.CommandHistory, _studioModel.StudioSettings);
 		_newProjectDialog = new NewProjectDialog();
 		
 		Engine.Scene.Add(new GameObject("Test Object").AddComponent<TestRenderComponent>().GameObject);

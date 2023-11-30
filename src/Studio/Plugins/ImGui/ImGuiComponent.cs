@@ -1,3 +1,4 @@
+using System.Numerics;
 using ImGuiNET;
 using Silk.NET.Maths;
 using Veldrid;
@@ -7,9 +8,13 @@ namespace Mine.Framework;
 // built-in game object component
 public sealed class ImGuiComponent : Component, IUpdatable, IRenderable
 {
-	public static readonly string DefaultFontFile = Path.Join("Plugins", "ImGui", "Roboto-Regular.ttf");
+	public static readonly string DefaultFontFile = "Plugins/ImGui/Roboto-Regular.ttf";
+	public static readonly string FontFARegular   = "Plugins/ImGui/fa-regular-400.ttf";
+	public static readonly string FontFASolid   = "Plugins/ImGui/fa-solid-900.ttf";
 	public const           int    Size            = 16;
 
+	private static ushort[] GlyphRange = { FontAwesome6.IconMin, FontAwesome6.IconMax, 0 };
+	
 	public int UpdateOrder = Int32.MinValue;
 	public int GetUpdateOrder() => UpdateOrder;
 	
@@ -54,15 +59,70 @@ public sealed class ImGuiComponent : Component, IUpdatable, IRenderable
 	private void LoadFonts()
 	{
 		ImGui.GetIO().Fonts.Clear();
+
+		LoadDefaultFont();
+		LoadIconsFont(FontFARegular);
+		LoadIconsFont(FontFASolid);
 		
-		// TODO - change to engine resource load
-		ImFontPtr font = ImGui.GetIO().Fonts.AddFontFromFileTTF(Path.Combine(Engine.ResourcesPath, DefaultFontFile), Size);
-		if (!font.IsLoaded())
-		{
-			ImGui.GetIO().Fonts.AddFontDefault();
-		}
+		ImGui.GetIO().Fonts.Build();
 		
 		_renderer.RecreateFontDeviceTexture();
+		
+	}
+
+	private unsafe void LoadDefaultFont()
+	{
+		try
+		{
+			byte[]? fontData = Engine.Resources.ReadResource(DefaultFontFile);
+			ImFontConfig config = new()
+			                      {
+				                      MergeMode          = 0,
+				                      OversampleH        = 1,
+				                      OversampleV        = 1,
+				                      PixelSnapH         = 1,
+				                      RasterizerMultiply = 1,
+				                      GlyphMinAdvanceX   = 1,
+				                      GlyphMaxAdvanceX   = 256,
+			                      };
+
+			fixed (byte* ptr = fontData)
+			{
+				ImFontPtr font = ImGui.GetIO().Fonts.AddFontFromMemoryTTF((IntPtr) ptr, fontData.Length, Size, &config);
+			}
+		}
+		catch(Exception e)
+		{
+			Console.WriteLine(e);
+			ImGui.GetIO().Fonts.AddFontDefault();
+		}
+	}
+
+	private unsafe void LoadIconsFont(string path)
+	{
+		byte[]? fontData = Engine.Resources.ReadResource(path);
+		if (fontData != null)
+		{
+			ushort[] range = { FontAwesome6.IconMin, FontAwesome6.IconMax, 0 };
+
+			fixed(byte* fontDataPtr = fontData)
+			fixed(ushort* glyphRangePtr = range)
+			{
+				ImFontConfig config = new()
+				                      {
+					                      GlyphRanges        = glyphRangePtr,
+					                      MergeMode          = 1,
+					                      OversampleH        = 1,
+					                      OversampleV        = 1,
+					                      PixelSnapH         = 1,
+					                      RasterizerMultiply = 1,
+					                      GlyphMinAdvanceX   = 1,
+					                      GlyphMaxAdvanceX   = 256,
+				                      };
+				
+				ImFontPtr font = ImGui.GetIO().Fonts.AddFontFromMemoryTTF((IntPtr)fontDataPtr, fontData.Length, Size, &config);
+			}
+		}
 	}
 
 	public override void Dispose()

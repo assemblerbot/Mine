@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 using ImGuiNET;
+using Mine.Framework;
 
 namespace Mine.Studio;
 
@@ -16,7 +18,7 @@ public class PluginManagerFoldout
 	
 	private readonly string                _repositoryVersion;
 	private readonly string                _projectVersion;
-	private readonly string                _title;
+	private readonly string                _titleId;
 
 	private readonly List<PluginManagerPlugin> _pluginsDependentOnThis;
 
@@ -52,7 +54,7 @@ public class PluginManagerFoldout
 
 		_repositoryVersion = _repositoryPlugin?.Version ?? "not available";
 		_projectVersion    = _projectPlugin?.Version    ?? "not installed";
-		_title             = $"{_plugin.Name} ({_projectVersion})";
+		_titleId           = $"{_plugin.Name} ({_projectVersion})##{_plugin.Id}.title";
 
 		_pluginsDependentOnThis = collections.GetAllProjectPluginsDependentOn(_plugin.Id);
 		_isDependencyError      = collections.IsDependencyError(_plugin);
@@ -80,7 +82,7 @@ public class PluginManagerFoldout
 				{
 					if (projectVersionNumber < repositoryVersionNumber)
 					{
-						_buttonNameIdUpgrade = $"Upgrade to{_repositoryPlugin.Version}{apiBreak}##{_plugin.Id}.upgrade";
+						_buttonNameIdUpgrade = $"Upgrade to {_repositoryPlugin.Version}{apiBreak}##{_plugin.Id}.upgrade";
 					}
 					else
 					{
@@ -129,12 +131,53 @@ public class PluginManagerFoldout
 
 	private void StatusIconUI()
 	{
-		ImGui.Text("+"); // status icon - TODO
+		ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(0, 1, 0, 1));
+		ImGui.Text(FontAwesome6.Check); // status icon - TODO
+		ImGui.PopStyleColor();
 	}
 
 	private void DescriptionUI()
 	{
-		ImGui.Text(_title);
+		if (ImGui.CollapsingHeader(_titleId))
+		{
+			ImGui.Indent();
+			ImGui.Text(_plugin.Description);
+
+			// GuiPluginDependencies(plugin, collections, icons);
+			// GuiPluginsDependentOn(plugins_dependent_on_this, collections, icons);
+			ImGui.Spacing();
+			
+			ImGui.Text("Id:");
+			ImGui.SameLine();
+			ImGui.Text(_plugin.Id);
+
+			ImGui.Text("Repository:");
+			ImGui.SameLine();
+			ImGui.Text(_repositoryVersion);
+
+			// // errors
+			// if (repository_plugin != null && !string.IsNullOrEmpty(repository_plugin.Error))
+			// {
+			// 	SimplePluginManagerUIUtils.ErrorLabel(repository_plugin.Error);
+			// }
+			//
+			// if (project_plugin != null && !string.IsNullOrEmpty(project_plugin.Error))
+			// {
+			// 	SimplePluginManagerUIUtils.ErrorLabel(project_plugin.Error);
+			// }
+			//
+			// if (is_version_error)
+			// {
+			// 	SimplePluginManagerUIUtils.ErrorLabel("Plugin has invalid version format!");
+			// }
+			//
+			// if (is_dependency_error)
+			// {
+			// 	SimplePluginManagerUIUtils.ErrorLabel("Plugin is dependent on non existing plugin!");
+			// }
+
+			ImGui.Unindent();
+		}
 	}
 
 	private void InstallationUI()
@@ -166,6 +209,15 @@ public class PluginManagerFoldout
 			return;
 		}
 
+		if (_buttonNameIdCreateInRepository != null)
+		{
+			if(ImGui.Button(_buttonNameIdCreateInRepository))
+			{
+				CreateInRepository();
+			}
+			return;
+		}
+
 		if (_textUpToDate != null)
 		{
 			ImGui.Text(_textUpToDate);
@@ -176,13 +228,19 @@ public class PluginManagerFoldout
 	{
 		if (_buttonNameIdUninstall != null)
 		{
-			ImGui.Button(_buttonNameIdUninstall);
+			if (ImGui.Button(_buttonNameIdUninstall))
+			{
+				Uninstall();
+			}
 			return;
 		}
 
 		if (_buttonNameIdDowngrade != null)
 		{
-			ImGui.Button(_buttonNameIdDowngrade);
+			if (ImGui.Button(_buttonNameIdDowngrade))
+			{
+				Downgrade();
+			}
 			return;
 		}
 
@@ -214,6 +272,24 @@ public class PluginManagerFoldout
 		_onChange();
 	}
 
+	private void Uninstall()
+	{
+		_projectPlugin!.RemoveFromProject();
+		_onChange();
+	}
+
+	private void Downgrade()
+	{
+		_collections.CopyDependenciesFromRepositoryToProject(_repositoryPlugin!, _settings);
+		_repositoryPlugin!.CopyFromRepositoryToProject(_settings);
+		_onChange();
+	}
+
+	private void CreateInRepository()
+	{
+		_projectPlugin!.CopyFromProjectToRepository(_settings);
+		_onChange();
+	}
 	#endregion
 	
 /*

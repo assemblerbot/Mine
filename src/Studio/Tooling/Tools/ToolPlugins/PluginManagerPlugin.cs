@@ -19,25 +19,21 @@ public class PluginManagerPlugin
 
     public void CopyFromRepositoryToProject(PluginManagerSettings settings)
     {
-        /*
         SimplePluginManagerFileUtils.CopyPlugin(
             PathToPlugin,
-            settings.GetValidRepositoryPath(out string repository_error_message),
-            settings.GetValidProjectPath(out string project_error_message)
+            settings.RepositoryPath!,
+            settings.ProjectPath!
         );
         AddGlobalDefines();
-        */
     }
 
     public void CopyFromProjectToRepository(PluginManagerSettings settings)
     {
-        /*
         SimplePluginManagerFileUtils.CopyPlugin(
             PathToPlugin,
-            settings.GetValidProjectPath(out string project_error_message),
-            settings.GetValidRepositoryPath(out string repository_error_message)
+            settings.ProjectPath!,
+            settings.RepositoryPath!
         );
-        */
     }
 
     public void RemoveFromProject()
