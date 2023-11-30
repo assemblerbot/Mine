@@ -14,12 +14,6 @@ public sealed class ToolInspector : Tool
 
 	private List<object> _tests = new(){new InspectorTest2(), new InspectorTest()}; // TODO debug
 
-	public ToolInspector(StudioModel studioModel) : base(studioModel)
-	{
-		_inspector = new Inspector(studioModel.CommandHistory);
-		_inspector.Init(_tests);
-	}
-
 	public ToolInspector(StudioModel studioModel, int uniqueId) : base(studioModel, uniqueId)
 	{
 		_inspector = new Inspector(studioModel.CommandHistory);

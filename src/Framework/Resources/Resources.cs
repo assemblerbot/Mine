@@ -2,7 +2,7 @@ using System.IO.Compression;
 
 namespace Mine.Framework;
 
-public sealed class ResourceManager
+public sealed class Resources
 {
 	private const string DefaultResourcePackageExtension = ".zip";
 	
@@ -43,12 +43,12 @@ public sealed class ResourceManager
 
 	private byte[]? ReadResourceFromFile(string path, ResourceDescriptor descriptor)
 	{
-		return File.ReadAllBytes(Path.Combine(Path.Combine(Engine.ResourcesPath, descriptor.SourceFilePath)));
+		return File.ReadAllBytes(descriptor.SourceFilePath);
 	}
 
 	private byte[]? ReadResourceFromPackage(string path, ResourceDescriptor descriptor)
 	{
-		using ZipArchive archive = ZipFile.OpenRead(Path.Combine(Engine.ResourcesPath, descriptor.SourceFilePath));
+		using ZipArchive archive = ZipFile.OpenRead(descriptor.SourceFilePath);
 		ZipArchiveEntry? entry = archive.GetEntry(path);
 		if (entry == null)
 		{
@@ -124,7 +124,7 @@ public sealed class ResourceManager
 			}
 
 			string relativeFilePath = absoluteFilePath.Substring(resourceDirectoryLength).Replace('\\', '/');
-			_resourceDictionary[relativeFilePath] = new ResourceDescriptor(ResourceSourceType.File, Path.Combine(relativePath, absoluteFilePath));
+			_resourceDictionary[relativeFilePath] = new ResourceDescriptor(ResourceSourceType.File, absoluteFilePath);
 		}
 
 		foreach (string absoluteDirectoryPath in Directory.EnumerateDirectories(absolutePath))

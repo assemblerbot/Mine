@@ -18,9 +18,7 @@ public sealed class ToolManager
 
 	public Tool? Activate(string toolName, int uniqueId = -1)
 	{
-		Tool? tool = uniqueId == -1
-				? (Tool?) Activator.CreateInstance(_toolsByName[toolName], _studioModel)
-				: (Tool?) Activator.CreateInstance(_toolsByName[toolName], _studioModel, uniqueId);
+		Tool? tool = (Tool?) Activator.CreateInstance(_toolsByName[toolName], _studioModel, uniqueId);
 		if (tool == null)
 		{
 			return null;

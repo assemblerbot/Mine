@@ -16,6 +16,9 @@ public sealed class ProjectSettings
 
 	[NonSerialized] private string? _absoluteResourcesPath;
 	public                  string  AbsoluteResourcesPath => _absoluteResourcesPath ??= Path.Combine(GameFolderPath, RelativeResourcesPath);
+
+	[NonSerialized] private string? _absoluteScriptsPath;
+	public                  string  AbsoluteScriptsPath => _absoluteScriptsPath ??= Path.Combine(GameFolderPath, "GameLibrary");
 }
 
 #region Migration

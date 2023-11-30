@@ -1,7 +1,7 @@
 namespace Mine.Studio;
 
 [Serializable]
-public class SimplePluginManagerPlugin
+public class PluginManagerPlugin
 {
     // JSON serialized data
     public string       Id;
@@ -17,23 +17,27 @@ public class SimplePluginManagerPlugin
         
     public SimplePluginManagerVersion ParseVersion => new SimplePluginManagerVersion(Version);
 
-    public void CopyFromRepositoryToProject(SimplePluginManagerSettings settings)
+    public void CopyFromRepositoryToProject(PluginManagerSettings settings)
     {
+        /*
         SimplePluginManagerFileUtils.CopyPlugin(
             PathToPlugin,
             settings.GetValidRepositoryPath(out string repository_error_message),
             settings.GetValidProjectPath(out string project_error_message)
         );
         AddGlobalDefines();
+        */
     }
 
-    public void CopyFromProjectToRepository(SimplePluginManagerSettings settings)
+    public void CopyFromProjectToRepository(PluginManagerSettings settings)
     {
+        /*
         SimplePluginManagerFileUtils.CopyPlugin(
             PathToPlugin,
             settings.GetValidProjectPath(out string project_error_message),
             settings.GetValidRepositoryPath(out string repository_error_message)
         );
+        */
     }
 
     public void RemoveFromProject()

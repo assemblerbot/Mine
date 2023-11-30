@@ -1,3 +1,4 @@
+using System.Numerics;
 using ImGuiNET;
 using RedHerring.Studio.Models;
 using RedHerring.Studio.Tools;
@@ -10,12 +11,15 @@ public class ToolPlugins : Tool
 	public const       string ToolName = "Plugins";
 	protected override string Name => ToolName;
 
-	public ToolPlugins(StudioModel studioModel) : base(studioModel)
-	{
-	}
+	private readonly PluginManagerSettings                    _settings;
+	private readonly PluginManagerCollections                 _pluginCollections;
+	private readonly Dictionary<string, PluginManagerFoldout> _pluginFoldouts = new();
 
 	public ToolPlugins(StudioModel studioModel, int uniqueId) : base(studioModel, uniqueId)
 	{
+		_settings          = new PluginManagerSettings(studioModel.Project);
+		_pluginCollections = new PluginManagerCollections();
+		Refresh();
 	}
 	
 	public override void Update(out bool finished)
@@ -23,15 +27,99 @@ public class ToolPlugins : Tool
 		finished = UpdateUI();
 	}
 
+	private void Refresh()
+	{
+		_pluginFoldouts.Clear();
+
+		if (_settings.IsError)
+		{
+			return;
+		}
+
+		_pluginCollections.Refresh(_settings);
+
+		if (_pluginCollections.IsError)
+		{
+			return;
+		}
+
+		List<PluginManagerCollections.CPluginsPair> listOfPlugins = _pluginCollections.BuildListOfPlugins();
+		foreach (PluginManagerCollections.CPluginsPair pluginsPair in listOfPlugins)
+		{
+			_pluginFoldouts.Add(pluginsPair.Id, new PluginManagerFoldout(_settings, _pluginCollections, pluginsPair, Refresh));
+		}
+	}
+
+	#region UI
 	private bool UpdateUI()
 	{
 		bool isOpen = true;
 		if (ImGui.Begin(NameId, ref isOpen))
 		{
-			//_inspector.Update();
+			SettingsUI();
+			PluginsUI();
 			ImGui.End();
 		}
 
 		return !isOpen;
 	}
+
+	private void SettingsUI()
+	{
+		ImGui.PushStyleVar(ImGuiStyleVar.Alpha, 0.5f);
+		
+		string settingsPath = PluginManagerSettings.StudioPluginsSettingsPath;
+		ImGui.InputText("Settings file", ref settingsPath, (uint)settingsPath.Length);
+
+		string? repositoryPath = _settings.RepositoryPath;
+		if (repositoryPath != null)
+		{
+			ImGui.InputText("Repository path", ref repositoryPath, (uint) repositoryPath.Length);
+		}
+
+		string? projectPath = _settings.ProjectPath;
+		if (projectPath != null)
+		{
+			ImGui.InputText("Project path", ref projectPath, (uint) projectPath.Length);
+		}
+
+		ImGui.PopStyleVar();
+
+		string? errorMessage = _settings.ErrorMessage;
+		if (errorMessage != null)
+		{
+			ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(1, 0, 0, 1));
+			ImGui.Text(errorMessage);
+			ImGui.PopStyleColor();
+		}
+	}
+
+	private void PluginsUI()
+	{
+		if (_pluginCollections.IsError)
+		{
+			ImGui.Separator();
+			ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(1, 0, 0, 1));
+			ImGui.Text(_pluginCollections.ErrorMessage);
+			ImGui.PopStyleColor();
+			return;
+		}
+		
+		if (ImGui.BeginTable("PluginsTable", 4, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg))
+		{
+			ImGui.TableSetupColumn("",               ImGuiTableColumnFlags.WidthFixed);
+			ImGui.TableSetupColumn("Name & version", ImGuiTableColumnFlags.WidthStretch);
+			ImGui.TableSetupColumn("Installation",   ImGuiTableColumnFlags.WidthFixed);
+			ImGui.TableSetupColumn("Uninstallation", ImGuiTableColumnFlags.WidthFixed);
+			ImGui.TableHeadersRow();
+			
+			foreach (PluginManagerFoldout foldout in _pluginFoldouts.Values)
+			{
+				foldout.UpdateUI();
+			}
+
+			ImGui.EndTable();
+		}
+	}
+	#endregion
 }

@@ -16,10 +16,6 @@ public sealed class ToolProjectView : Tool
 	
 	protected override string Name => ToolName;
     
-	public ToolProjectView(StudioModel studioModel) : base(studioModel)
-	{
-	}
-    
 	public ToolProjectView(StudioModel studioModel, int uniqueId) : base(studioModel, uniqueId)
 	{
 	}

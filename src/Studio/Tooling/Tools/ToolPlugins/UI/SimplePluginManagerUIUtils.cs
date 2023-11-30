@@ -1,6 +1,7 @@
 
 namespace Mine.Studio;
 
+/*
 public static class SimplePluginManagerUIUtils
 {
 	public static void ErrorLabel(string label)
@@ -20,3 +21,4 @@ public static class SimplePluginManagerUIUtils
 		EditorGUI.DrawRect(rect, new Color ( 0.5f, 0.5f, 0.5f, 1 ) );
 	}
 }
+*/

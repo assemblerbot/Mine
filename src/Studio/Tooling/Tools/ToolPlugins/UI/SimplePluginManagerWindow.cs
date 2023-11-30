@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace Mine.Studio;
-
+/*
 public class SimplePluginManagerWindow : EditorWindow
 {
 	private SimplePluginManagerSettings    m_Settings;
@@ -138,3 +138,4 @@ public class SimplePluginManagerWindow : EditorWindow
 		return m_Icons ??= new SimplePluginManagerStatusIcons();
 	}
 }
+*/

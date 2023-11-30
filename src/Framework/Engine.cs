@@ -18,13 +18,14 @@ public sealed class Engine
 	private          Renderer        _renderer        = null!;
 	private          Input           _input           = null!;
 	private          Scene           _scene           = new();
-	private readonly ResourceManager _resourceManager = new();
+	private readonly Resources _resources = new();
 
-	public static Types        Types    => _instance._types;
-	public static EngineWindow Window   => _instance._window;
-	public static Renderer     Renderer => _instance._renderer;
-	public static Input        Input    => _instance._input;
-	public static Scene        Scene    => _instance._scene;
+	public static Types        Types     => _instance._types;
+	public static EngineWindow Window    => _instance._window;
+	public static Renderer     Renderer  => _instance._renderer;
+	public static Input        Input     => _instance._input;
+	public static Scene        Scene     => _instance._scene;
+	public static Resources    Resources => _instance._resources;
 
 	private Action? _onLoad;
 	private Action? _onExit;
@@ -72,7 +73,7 @@ public sealed class Engine
 	{
 		_renderer = new Renderer(_window.View, _graphicsBackend);
 		_input    = new Input(_window.View);
-		_resourceManager.Init();
+		_resources.Init();
 		_onLoad?.Invoke();
 	}
 

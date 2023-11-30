@@ -1,33 +1,243 @@
 using System;
 using System.Collections.Generic;
+using ImGuiNET;
 
 namespace Mine.Studio;
 
-public class SimplePluginManagerPluginFoldout
+public class PluginManagerFoldout
 {
-	private bool m_IsExpanded = false;
+	private readonly PluginManagerSettings    _settings;
+	private readonly PluginManagerCollections _collections;
+	private          Action                   _onChange;
 
+	private readonly PluginManagerPlugin? _repositoryPlugin;
+	private readonly PluginManagerPlugin? _projectPlugin;
+	private readonly PluginManagerPlugin  _plugin;
+	
+	private readonly string                _repositoryVersion;
+	private readonly string                _projectVersion;
+	private readonly string                _title;
+
+	private readonly List<PluginManagerPlugin> _pluginsDependentOnThis;
+
+	private readonly bool _isDependencyError;
+	private readonly bool _isVersionError;
+	private          bool IsError => _isDependencyError || _isVersionError;
+
+	private readonly string? _buttonNameIdInstall;
+	private readonly string? _buttonNameIdUninstall;
+	private readonly string? _buttonNameIdUpgrade;
+	private readonly string? _buttonNameIdDowngrade;
+	private readonly string? _buttonNameIdCopyToRepository;
+	private readonly string? _buttonNameIdCreateInRepository;
+	
+	private readonly string? _textRequiredByOtherPlugins;
+	private readonly string? _textUpToDate;
+	
+	public PluginManagerFoldout(
+		PluginManagerSettings settings,
+		PluginManagerCollections              collections,
+		PluginManagerCollections.CPluginsPair pluginsPair,
+		Action onChange
+	)
+	{
+		_settings    = settings;
+		_collections = collections;
+		_onChange    = onChange;
+
+		// gather resources
+		_repositoryPlugin = pluginsPair.RepositoryPlugin;
+		_projectPlugin    = pluginsPair.ProjectPlugin;
+		_plugin           = _projectPlugin ?? _repositoryPlugin!;
+
+		_repositoryVersion = _repositoryPlugin?.Version ?? "not available";
+		_projectVersion    = _projectPlugin?.Version    ?? "not installed";
+		_title             = $"{_plugin.Name} ({_projectVersion})";
+
+		_pluginsDependentOnThis = collections.GetAllProjectPluginsDependentOn(_plugin.Id);
+		_isDependencyError      = collections.IsDependencyError(_plugin);
+		_isVersionError         = (_repositoryPlugin?.ParseVersion.IsError ?? false) || (_projectPlugin?.ParseVersion.IsError ?? false);
+
+		// status
+		if (IsError)
+		{
+			return;
+		}
+
+		if (_repositoryPlugin != null)
+		{
+			if (_projectPlugin == null)
+			{
+				_buttonNameIdInstall = $"Install##{_plugin.Id}.install";
+			}
+			else
+			{
+				SimplePluginManagerVersion repositoryVersionNumber = _repositoryPlugin.ParseVersion;
+				SimplePluginManagerVersion projectVersionNumber    = _projectPlugin.ParseVersion;
+				string                     apiBreak = SimplePluginManagerVersion.IsApiBreak(repositoryVersionNumber, projectVersionNumber) ? " INCOMPATIBLE" : "";
+
+				if (projectVersionNumber < repositoryVersionNumber || projectVersionNumber == repositoryVersionNumber)
+				{
+					if (projectVersionNumber < repositoryVersionNumber)
+					{
+						_buttonNameIdUpgrade = $"Upgrade to{_repositoryPlugin.Version}{apiBreak}##{_plugin.Id}.upgrade";
+					}
+					else
+					{
+						_textUpToDate = "Up to date.";
+					}
+
+					if (_pluginsDependentOnThis.Count > 0)
+					{
+						_textRequiredByOtherPlugins = "Required by other plugin(s).";
+					}
+					else
+					{
+						_buttonNameIdUninstall = $"Uninstall##{_plugin.Id}.uninstall";
+					}
+				}
+				else
+				{
+					_buttonNameIdDowngrade = $"Downgrade to {_repositoryPlugin.Version}{apiBreak}##{_plugin.Id}.downgrade";
+					_buttonNameIdCopyToRepository = $"Copy to repository##{_plugin.Id}.copy";
+				}
+			}
+		}
+		else if (_projectPlugin != null)
+		{
+			_buttonNameIdCreateInRepository = $"Create in repository##{_plugin.Id}.create";
+		}
+	}
+
+	#region UI
+	public void UpdateUI()
+	{
+		ImGui.TableNextRow();
+		
+		ImGui.TableSetColumnIndex(0);
+		StatusIconUI();
+
+		ImGui.TableSetColumnIndex(1);
+		DescriptionUI();
+
+		ImGui.TableSetColumnIndex(2);
+		InstallationUI();
+
+		ImGui.TableSetColumnIndex(3);
+		UninstallationUI();
+	}
+
+	private void StatusIconUI()
+	{
+		ImGui.Text("+"); // status icon - TODO
+	}
+
+	private void DescriptionUI()
+	{
+		ImGui.Text(_title);
+	}
+
+	private void InstallationUI()
+	{
+		if (_buttonNameIdInstall != null)
+		{
+			if (ImGui.Button(_buttonNameIdInstall))
+			{
+				Install();
+			}
+			return;
+		}
+
+		if (_buttonNameIdUpgrade != null)
+		{
+			if (ImGui.Button(_buttonNameIdUpgrade))
+			{
+				Upgrade();
+			}
+			return;
+		}
+
+		if (_buttonNameIdCopyToRepository != null)
+		{
+			if (ImGui.Button(_buttonNameIdCopyToRepository))
+			{
+				CopyToRepository();
+			}
+			return;
+		}
+
+		if (_textUpToDate != null)
+		{
+			ImGui.Text(_textUpToDate);
+		}
+	}
+
+	private void UninstallationUI()
+	{
+		if (_buttonNameIdUninstall != null)
+		{
+			ImGui.Button(_buttonNameIdUninstall);
+			return;
+		}
+
+		if (_buttonNameIdDowngrade != null)
+		{
+			ImGui.Button(_buttonNameIdDowngrade);
+			return;
+		}
+
+		if (_textRequiredByOtherPlugins != null)
+		{
+			ImGui.Text(_textRequiredByOtherPlugins);
+		}
+	}
+	#endregion
+
+	#region Manipulation
+	private void Install()
+	{
+		_collections.CopyDependenciesFromRepositoryToProject(_repositoryPlugin!, _settings);
+		_repositoryPlugin!.CopyFromRepositoryToProject(_settings);
+		_onChange();
+	}
+
+	private void Upgrade()
+	{
+		_collections.CopyDependenciesFromRepositoryToProject(_repositoryPlugin!, _settings);
+		_repositoryPlugin!.CopyFromRepositoryToProject(_settings);
+		_onChange();
+	}
+
+	private void CopyToRepository()
+	{
+		_projectPlugin!.CopyFromProjectToRepository(_settings);
+		_onChange();
+	}
+
+	#endregion
+	
+/*
 	public void OnGui(
-		SimplePluginManagerSettings                 settings,
-		SimplePluginManagerCollections              collections,
-		SimplePluginManagerCollections.CPluginsPair plugins_pair,
-		SimplePluginManagerStatusIcons              icons,
-		Action                                      on_collections_changed
+		PluginManagerSettings                 settings,
+		PluginManagerCollections              collections,
+		PluginManagerCollections.CPluginsPair plugins_pair,
+		PluginManagerStatusIcons              icons,
+		Action                                on_collections_changed
 	)
 	{
 		// gather resources
-		SimplePluginManagerPlugin repository_plugin = plugins_pair.RepositoryPlugin;
-		SimplePluginManagerPlugin project_plugin    = plugins_pair.ProjectPlugin;
-		SimplePluginManagerPlugin plugin            = project_plugin ?? repository_plugin;
+		PluginManagerPlugin repository_plugin = plugins_pair.RepositoryPlugin;
+		PluginManagerPlugin project_plugin    = plugins_pair.ProjectPlugin;
+		PluginManagerPlugin plugin            = project_plugin ?? repository_plugin;
 
 		string repository_version = repository_plugin == null ? "not available" : repository_plugin.Version;
 		string project_version    = project_plugin    == null ? "not installed" : project_plugin.Version;
 
-		List<SimplePluginManagerPlugin> plugins_dependent_on_this = collections.GetAllProjectPluginsDependentOn(plugin.Id);
-		bool                            is_dependency_error       = collections.IsDependencyError(plugin);
-		bool                            is_version_error          = (repository_plugin?.ParseVersion.IsError ?? false) || (project_plugin?.ParseVersion.IsError ?? false);
-		bool                            is_error                  = is_dependency_error                                || is_version_error;
-	        
+		List<PluginManagerPlugin> plugins_dependent_on_this = collections.GetAllProjectPluginsDependentOn(plugin.Id);
+		bool                      is_dependency_error       = collections.IsDependencyError(plugin);
+		bool                      is_version_error          = (repository_plugin?.ParseVersion.IsError ?? false) || (project_plugin?.ParseVersion.IsError ?? false);
+		bool                      is_error                  = is_dependency_error                                || is_version_error;
+
 		// layout
 		EditorGUILayout.BeginHorizontal();
 		{
@@ -102,13 +312,13 @@ public class SimplePluginManagerPluginFoldout
 			EditorGUILayout.EndVertical();
 		}
 		EditorGUILayout.EndHorizontal();
-	        
+
 		SimplePluginManagerUIUtils.Line();
 	}
-		
+
 	private void GuiPluginDependencies(
-		SimplePluginManagerPlugin      plugin,
-		SimplePluginManagerCollections collections, 
+		PluginManagerPlugin            plugin,
+		SimplePluginManagerCollections collections,
 		SimplePluginManagerStatusIcons icons
 	)
 	{
@@ -125,9 +335,9 @@ public class SimplePluginManagerPluginFoldout
 	}
 
 	private void GuiPluginsDependentOn(
-		List<SimplePluginManagerPlugin> plugins_dependent_on_this,
-		SimplePluginManagerCollections  collections, 
-		SimplePluginManagerStatusIcons  icons
+		List<PluginManagerPlugin>      plugins_dependent_on_this,
+		SimplePluginManagerCollections collections,
+		SimplePluginManagerStatusIcons icons
 	)
 	{
 		if (plugins_dependent_on_this.Count == 0)
@@ -137,7 +347,7 @@ public class SimplePluginManagerPluginFoldout
 
 		GUILayout.Space(8);
 		GUILayout.Label("Required by plugins:", EditorStyles.boldLabel);
-		foreach (SimplePluginManagerPlugin plugin in plugins_dependent_on_this)
+		foreach (PluginManagerPlugin plugin in plugins_dependent_on_this)
 		{
 			GuiPluginSublistItem(plugin.Id, collections, icons);
 		}
@@ -165,8 +375,8 @@ public class SimplePluginManagerPluginFoldout
 	private void GuiButtons(
 		SimplePluginManagerSettings    settings,
 		SimplePluginManagerCollections collections,
-		SimplePluginManagerPlugin      repository_plugin,
-		SimplePluginManagerPlugin      project_plugin,
+		PluginManagerPlugin            repository_plugin,
+		PluginManagerPlugin            project_plugin,
 		bool                           any_plugins_dependent_on_this,
 		bool                           is_error,
 		Action                         on_collections_changed
@@ -183,7 +393,7 @@ public class SimplePluginManagerPluginFoldout
 					on_collections_changed();
 					AssetDatabase.Refresh();
 				}
-			        
+
 				GUILayout.Label(" ", GUILayout.Width(256));
 			}
 			else
@@ -253,7 +463,7 @@ public class SimplePluginManagerPluginFoldout
 			if (project_plugin != null)
 			{
 				GUILayout.Label("", GUILayout.Width(256));
-					
+
 				if (!is_error && GUILayout.Button("Create in repository", GUILayout.Width(256)))
 				{
 					project_plugin.CopyFromProjectToRepository(settings);
@@ -263,5 +473,5 @@ public class SimplePluginManagerPluginFoldout
 			}
 		}
 	}
-		
+	*/	
 }
