@@ -4,7 +4,7 @@ using RedHerring.Studio.Models;
 namespace RedHerring.Studio.Tools;
 
 [Tool(ToolName)]
-public class ToolPlugins : ATool
+public class ToolPlugins : Tool
 {
 	public const       string    ToolName = "Plugins";
 	protected override string    Name => ToolName;
@@ -25,7 +25,7 @@ public class ToolPlugins : ATool
 	private bool UpdateUI()
 	{
 		bool isOpen = true;
-		if (ImGui.Begin(NameWithSalt, ref isOpen))
+		if (ImGui.Begin(NameId, ref isOpen))
 		{
 			//_inspector.Update();
 			ImGui.End();

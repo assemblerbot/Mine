@@ -4,7 +4,7 @@ using RedHerring.Studio.UserInterface.Attributes;
 
 namespace RedHerring.Studio.Models;
 
-[Serializable, SerializedClassId("project-settings-class-id")]
+[Serializable, SerializedClassId("project-settings")]
 public sealed class ProjectSettings
 {
 	[ReadOnlyInInspector, NonSerialized] public string GameFolderPath = "[here will be path to game folder]";
@@ -16,7 +16,6 @@ public sealed class ProjectSettings
 
 	[NonSerialized] private string? _absoluteResourcesPath;
 	public                  string  AbsoluteResourcesPath => _absoluteResourcesPath ??= Path.Combine(GameFolderPath, RelativeResourcesPath);
-
 }
 
 #region Migration

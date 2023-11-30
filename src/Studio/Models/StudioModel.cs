@@ -40,21 +40,21 @@ public class StudioModel
 		_project = new ProjectModel(_migrationManager);
 	}
 
-	public void Cancel()
+	public void Close()
 	{
 		_taskProcessor.Cancel();
-		Project.Close();
+		Project.CloseAsync().GetAwaiter().GetResult();
 	}
 
-	public async Task OpenProject(string path)
+	public async Task OpenProjectAsync(string path)
 	{
 		Selection.DeselectAll();
-		Project.Close();
+		Project.CloseAsync().GetAwaiter().GetResult();;
 		
 		try
 		{
 			ConsoleViewModel.Log($"Opening project from {path}", ConsoleItemType.Info);
-			await Project.Open(path);
+			await Project.OpenAsync(path);
 			ConsoleViewModel.Log($"Project opened", ConsoleItemType.Success);
 		}
 		catch (Exception e)

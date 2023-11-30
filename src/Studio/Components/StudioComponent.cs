@@ -23,7 +23,7 @@ public sealed class StudioComponent : Component, IUpdatable
 	private readonly StatusBar      _statusBar       = new();
 	private          ObjectDialog _projectSettings = null!;
 	private          ObjectDialog _studioSettings  = null!;
-	private TemplateApplicationMakerDialog _templateApplicationMakerDialog = null!;
+	private NewProjectDialog _newProjectDialog = null!;
 	private readonly MessageBox     _messageBox      = new();
 	#endregion
 	
@@ -38,7 +38,7 @@ public sealed class StudioComponent : Component, IUpdatable
 
 		_projectSettings                = new ObjectDialog("Project settings", _studioModel.CommandHistory, _studioModel.Project.ProjectSettings);
 		_studioSettings                 = new ObjectDialog("Studio settings",  _studioModel.CommandHistory, _studioModel.StudioSettings);
-		_templateApplicationMakerDialog = new TemplateApplicationMakerDialog();
+		_newProjectDialog = new NewProjectDialog();
 		
 		Engine.Scene.Add(new GameObject("Test Object").AddComponent<TestRenderComponent>().GameObject);
 
@@ -57,6 +57,7 @@ public sealed class StudioComponent : Component, IUpdatable
 	
 	public override void BeforeRemovedFromScene()
 	{
+		_studioModel.Close();
 		Engine.Scene.UnregisterUpdatable(this);
 	}
 
@@ -73,7 +74,7 @@ public sealed class StudioComponent : Component, IUpdatable
 		_projectSettings.Update();
 		_studioSettings.Update();
 		_messageBox.Update();
-		_templateApplicationMakerDialog.Update();
+		_newProjectDialog.Update();
 
 		_toolManager.Update();
 	}
@@ -109,10 +110,10 @@ public sealed class StudioComponent : Component, IUpdatable
 
 	private void OnNewProjectClicked()
 	{
-		_templateApplicationMakerDialog.Open();
+		_newProjectDialog.Open();
 	}
 
-	private async void OnOpenProjectClicked()
+	private void OnOpenProjectClicked()
 	{
 		DialogResult result = Dialog.FolderPicker();
 		if(!result.IsOk)
@@ -120,8 +121,8 @@ public sealed class StudioComponent : Component, IUpdatable
 			return;
 		}
 		
-		await _studioModel.OpenProject(result.Path);
-		_importerThread.Continue();
+		_studioModel.OpenProjectAsync(result.Path).GetAwaiter().GetResult();
+		//_importerThread.Continue();
 	}
 
 	private void OnExitClicked()

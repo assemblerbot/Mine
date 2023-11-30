@@ -6,7 +6,7 @@ using RedHerring.Studio.UserInterface.Attributes;
 
 namespace Mine.Studio;
 
-public sealed class TemplateApplicationMakerDialog
+public sealed class NewProjectDialog
 {
 	public int GetUpdateOrder() => 0;
 
@@ -32,7 +32,7 @@ public sealed class TemplateApplicationMakerDialog
 	[Button("Create!")]
 	private void Create()
 	{
-		ConsoleViewModel.Log($"Creating new application at {_targetPath}", ConsoleItemType.Info);
+		ConsoleViewModel.Log($"Creating new project at {_targetPath}", ConsoleItemType.Info);
 		try
 		{
 			TemplateUtility.InstantiateTemplate(_targetPath, _name);
@@ -54,9 +54,9 @@ public sealed class TemplateApplicationMakerDialog
 		_targetPath = Path.Combine(_path, _name);
 	}
 
-	public TemplateApplicationMakerDialog()
+	public NewProjectDialog()
 	{
-		_dialog = new ObjectDialog("Create new application", new CommandHistory(), this);
+		_dialog = new ObjectDialog("Create new project", new CommandHistory(), this);
 	}
 	
 	public void Open()

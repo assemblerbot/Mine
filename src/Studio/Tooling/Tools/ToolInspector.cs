@@ -6,7 +6,7 @@ using Gui = ImGuiNET.ImGui;
 namespace RedHerring.Studio.Tools;
 
 [Tool(ToolName)]
-public sealed class ToolInspector : ATool
+public sealed class ToolInspector : Tool
 {
 	public const       string    ToolName = "Inspector";
 	protected override string    Name => ToolName;
@@ -34,7 +34,7 @@ public sealed class ToolInspector : ATool
 	private bool UpdateUI()
 	{
 		bool isOpen = true;
-		if (Gui.Begin(NameWithSalt, ref isOpen))
+		if (Gui.Begin(NameId, ref isOpen))
 		{
 			_inspector.Update();
 			Gui.End();

@@ -6,7 +6,7 @@ using Gui = ImGuiNET.ImGui;
 namespace RedHerring.Studio.Tools;
 
 [Tool(ToolName)]
-public sealed class ToolProjectView : ATool
+public sealed class ToolProjectView : Tool
 {
 	public const string ToolName = "Project view";
 	
@@ -32,7 +32,7 @@ public sealed class ToolProjectView : ATool
 	private bool UpdateUI()
 	{
 		bool isOpen = true;
-		if (Gui.Begin(NameWithSalt, ref isOpen))
+		if (Gui.Begin(NameId, ref isOpen))
 		{
 			//Tree();
 			UpdateFolder(StudioModel.Project.AssetsFolder);
@@ -84,6 +84,7 @@ public sealed class ToolProjectView : ATool
 			flags |= ImGuiTreeNodeFlags.Selected;
 		}
 
+		
 		bool nodeExpanded = Gui.TreeNodeEx(id, flags, node.Name);
 
 		if (Gui.IsItemClicked() && !Gui.IsItemToggledOpen())

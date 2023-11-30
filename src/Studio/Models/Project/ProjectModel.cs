@@ -1,6 +1,7 @@
 using System.Reflection;
 using Migration;
 using RedHerring.Studio.Models.Project.FileSystem;
+using RedHerring.Studio.Models.ViewModels.Console;
 
 namespace RedHerring.Studio.Models.Project;
 
@@ -25,15 +26,15 @@ public sealed class ProjectModel
 	}
 	
 	#region Open/close
-	public void Close()
+	public async Task CloseAsync()
 	{
-		SaveSettings();
+		await SaveSettingsAsync();
 		_assetsFolder = null;
 	}
 	
-	public async Task Open(string projectPath)
+	public async Task OpenAsync(string projectPath)
 	{
-		LoadSettings(projectPath);
+		await LoadSettingsAsync(projectPath);
 		
 		string            assetsPath   = Path.Join(projectPath, _assetsFolderName);
 		ProjectFolderNode assetsFolder = new ProjectRootNode(_assetsFolderName, assetsPath);
@@ -41,7 +42,7 @@ public sealed class ProjectModel
 		if (!Directory.Exists(assetsPath))
 		{
 			// error
-			Console.WriteLine($"Assets folder not found on path {assetsPath}");
+			ConsoleViewModel.Log($"Assets folder not found on path {assetsPath}", ConsoleItemType.Error);
 			await assetsFolder.InitMetaRecursive(_migrationManager); // create meta for at least root
 			return;
 		}
@@ -54,7 +55,7 @@ public sealed class ProjectModel
 		}
 		catch (Exception e)
 		{
-			Console.WriteLine($"Exception: {e}");
+			ConsoleViewModel.Log($"Exception: {e}", ConsoleItemType.Exception);
 		}
 
 		await assetsFolder.InitMetaRecursive(_migrationManager);
@@ -95,22 +96,23 @@ public sealed class ProjectModel
 	#endregion
 	
 	#region Settings
-	public void SaveSettings()
+	public async Task SaveSettingsAsync()
 	{
 		if (_projectSettings == null)
 		{
 			return;
 		}
 
-		byte[] json = MigrationSerializer.SerializeAsync(_projectSettings, SerializedDataFormat.JSON, Assembly).Result;
-		File.WriteAllBytes(Path.Join(_projectSettings.GameFolderPath, _settingsFileName), json);
+		byte[] json = await MigrationSerializer.SerializeAsync(_projectSettings, SerializedDataFormat.JSON, Assembly);
+		await File.WriteAllBytesAsync(Path.Join(_projectSettings.GameFolderPath, _settingsFileName), json);
 	}
 
-	public void LoadSettings(string projectPath)
+	public async Task LoadSettingsAsync(string projectPath)
 	{
 		string path = Path.Join(projectPath, _settingsFileName);
 		if(!File.Exists(path))
 		{
+			ConsoleViewModel.Log("Project settings not found, creating new", ConsoleItemType.Warning);
 			_projectSettings = new ProjectSettings
                               {
                                   GameFolderPath = projectPath
@@ -118,8 +120,8 @@ public sealed class ProjectModel
 			return;
 		}
 		
-		byte[] json = File.ReadAllBytes(path);
-		ProjectSettings settings = MigrationSerializer.DeserializeAsync<ProjectSettings, IStudioSettingsMigratable>(_migrationManager.TypesHash, json, SerializedDataFormat.JSON, _migrationManager, false, Assembly).Result;
+		byte[] json = await File.ReadAllBytesAsync(path);
+		ProjectSettings settings = await MigrationSerializer.DeserializeAsync<ProjectSettings, IStudioSettingsMigratable>(_migrationManager.TypesHash, json, SerializedDataFormat.JSON, _migrationManager, false, Assembly);
 		settings.GameFolderPath = projectPath;
 		
 		_projectSettings = settings;

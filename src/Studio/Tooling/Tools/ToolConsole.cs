@@ -5,7 +5,7 @@ using Gui = ImGuiNET.ImGui;
 namespace RedHerring.Studio.Tools;
 
 [Tool(ToolName)]
-public sealed class ToolConsole : ATool
+public sealed class ToolConsole : Tool
 {
 	public const       string ToolName = "Console";
 	protected override string Name => ToolName;
@@ -26,7 +26,7 @@ public sealed class ToolConsole : ATool
 	private bool UpdateUI()
 	{
 		bool isOpen = true;
-		if (Gui.Begin(NameWithSalt, ref isOpen))
+		if (Gui.Begin(NameId, ref isOpen))
 		{
 			for(int i=0; i<StudioModel.Console.Count; ++i)
 			{

@@ -2,7 +2,7 @@
 
 namespace RedHerring.Studio.Tools;
 
-public abstract class ATool
+public abstract class Tool
 {
 	protected readonly StudioModel StudioModel;
 
@@ -10,20 +10,20 @@ public abstract class ATool
 	public static  int UniqueToolIdGeneratorState => _uniqueToolIdGenerator; // used for saving
 	
 	private readonly   int    UniqueId;
-	protected readonly string NameWithSalt;
+	protected readonly string NameId;
 	
 	protected abstract string Name { get; }
 	public ToolId Id => new(Name, UniqueId);
 	
-	protected ATool(StudioModel studioModel)
+	protected Tool(StudioModel studioModel)
 		: this(studioModel, _uniqueToolIdGenerator++)
 	{
 	}
 
-	protected ATool(StudioModel studioModel, int uniqueId)
+	protected Tool(StudioModel studioModel, int uniqueId)
 	{
 		UniqueId     = uniqueId;
-		NameWithSalt = $"{Name}##{UniqueId}";
+		NameId = $"{Name}##{UniqueId}";
 		StudioModel  = studioModel;
 	}
 	
