@@ -71,16 +71,16 @@ public static class PluginManagerStatusIcons
 		color = _iconCanDowngradeOrOverwriteColor;
 	}
 
-	public static void GetDependencyStatusIcon(bool project_contains_dependency, bool repository_contains_dependency, out string icon, out Vector4 color)
+	public static void GetDependencyStatusIcon(bool projectContainsDependency, bool repositoryContainsDependency, out string icon, out Vector4 color)
 	{
-		if (project_contains_dependency)
+		if (projectContainsDependency)
 		{
 			icon  = _iconUpToDate;
 			color = _iconUpToDateColor;
 			return;
 		}
 
-		if (repository_contains_dependency)
+		if (repositoryContainsDependency)
 		{
 			icon  = _iconNotInstalled;
 			color = _iconNotInstalledColor;
