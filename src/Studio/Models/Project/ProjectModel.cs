@@ -18,7 +18,7 @@ public sealed class ProjectModel
 	public  ProjectFolderNode? AssetsFolder => _assetsFolder;
 
 	private ProjectSettings? _projectSettings;
-	public  ProjectSettings ProjectSettings => _projectSettings!;
+	public  ProjectSettings? ProjectSettings => _projectSettings;
 	
 	public ProjectModel(MigrationManager migrationManager)
 	{

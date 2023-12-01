@@ -7,133 +7,137 @@ namespace Mine.Studio;
 
 public sealed class PluginManagerSettings
 {
-    public const string StudioPluginsSettingsPath = "Plugins/PluginsSettings.xml";
-    private const string ProjectPluginsPath        = "Plugins";
+	public const  string StudioPluginsSettingsPath = "Plugins/PluginsSettings.xml";
+	private const string ProjectPluginsPath        = "Plugins";
 
-    private List<string> _repositoryPluginsPaths = new();
-    private string?      _repositoryPath;
-    private string?      _projectPath;
-    private string?      _errorMessage;
+	private List<string> _repositoryPluginsPaths = new();
+	private string?      _repositoryPath;
+	private string?      _projectScriptsPath;
+	private string?      _projectAssetsPath;
+	private string?      _errorMessage;
 
-    public string? RepositoryPath => _repositoryPath;
-    public string? ProjectPath    => _projectPath;
-    public string? ErrorMessage   => _errorMessage;
-    public bool    IsError        => _errorMessage != null;
+	public string? RepositoryPath     => _repositoryPath;
+	public string? ProjectScriptsPath => _projectScriptsPath;
+	public string? ProjectAssetsPath  => _projectAssetsPath;
+	public string? ErrorMessage       => _errorMessage;
+	public bool    IsError            => _errorMessage != null;
 
-    public void Refresh(ProjectModel projectModel)
-    {
-        _repositoryPluginsPaths.Clear();
-        _repositoryPath = null;
-        _projectPath    = null;
-        _errorMessage   = null;
+	public void Refresh(ProjectModel projectModel)
+	{
+		_repositoryPluginsPaths.Clear();
+		_repositoryPath     = null;
+		_projectScriptsPath = null;
+		_projectAssetsPath  = null;
+		_errorMessage       = null;
         
-        byte[]? settingsResource = Engine.Resources.ReadResource(StudioPluginsSettingsPath);
-        if (settingsResource == null)
-        {
-            ConsoleViewModel.LogError($"Plugins setting file not found at: {StudioPluginsSettingsPath}");
-            return;
-        }
+		byte[]? settingsResource = Engine.Resources.ReadResource(StudioPluginsSettingsPath);
+		if (settingsResource == null)
+		{
+			ConsoleViewModel.LogError($"Plugins setting file not found at: {StudioPluginsSettingsPath}");
+			return;
+		}
 
-        ParseSettings(settingsResource);
-        _repositoryPath = GetValidRepositoryPath(out _errorMessage);
-        if (_errorMessage != null)
-        {
-            return;
-        }
+		ParseSettings(settingsResource);
+		_repositoryPath = GetValidRepositoryPath(out _errorMessage);
+		if (_errorMessage != null)
+		{
+			return;
+		}
 
-        _projectPath    = GetValidProjectPath(projectModel, out _errorMessage);
-    }
+		if (projectModel.ProjectSettings == null)
+		{
+			_errorMessage = "Project is not opened. Cannot evaluate project path!";
+			return;
+		}
 
-    private string? GetValidRepositoryPath(out string? errorMessage)
-    {
-        if (_repositoryPluginsPaths.Count == 0)
-        {
-            errorMessage = "Repository paths are empty!";
-            return null;
-        }
+		_projectScriptsPath = GetValidProjectPath(projectModel.ProjectSettings.AbsoluteScriptsPath, out _errorMessage);
+		_projectAssetsPath  = GetValidProjectPath(projectModel.ProjectSettings.AbsoluteAssetsPath,  out _errorMessage);
+	}
 
-        string? validPath = null;
-        foreach (string path in _repositoryPluginsPaths)
-        {
-            if (Directory.Exists(path))
-            {
-                if (validPath == null)
-                {
-                    validPath = path;
-                }
-                else
-                {
-                    errorMessage = "Multiple repository paths are valid, cannot determine which one is correct!";
-                    return null;
-                }
-            }
-        }
+	private string? GetValidRepositoryPath(out string? errorMessage)
+	{
+		if (_repositoryPluginsPaths.Count == 0)
+		{
+			errorMessage = "Repository paths are empty!";
+			return null;
+		}
 
-        if (validPath == null)
-        {
-            errorMessage = "No valid repository path found. Add one!";
-            return null;
-        }
+		string? validPath = null;
+		foreach (string path in _repositoryPluginsPaths)
+		{
+			if (Directory.Exists(path))
+			{
+				if (validPath == null)
+				{
+					validPath = path;
+				}
+				else
+				{
+					errorMessage = "Multiple repository paths are valid, cannot determine which one is correct!";
+					return null;
+				}
+			}
+		}
 
-        errorMessage = null;
-        return validPath;
-    }
+		if (validPath == null)
+		{
+			errorMessage = "No valid repository path found. Add one!";
+			return null;
+		}
 
-    private string? GetValidProjectPath(ProjectModel projectModel, out string? errorMessage)
-    {
-        if (projectModel.ProjectSettings == null)
-        {
-            errorMessage = "Project is not opened. Cannot evaluate project path!";
-            return null;
-        }
+		errorMessage = null;
+		return validPath;
+	}
 
-        string validPath = Path.Combine(projectModel.ProjectSettings.AbsoluteScriptsPath, ProjectPluginsPath);
-        if (Directory.Exists(validPath))
-        {
-            errorMessage = null;
-            return validPath;
-        }
+	private string? GetValidProjectPath(string projectPath, out string? errorMessage)
+	{
+		string path = Path.Combine(projectPath, ProjectPluginsPath);
+		if (Directory.Exists(path))
+		{
+			errorMessage = null;
+			return path;
+		}
 
-        errorMessage = $"Project path doesn't exist! ({validPath})";
-        return null;
-    }
+		errorMessage = $"Project path doesn't exist! ({path})";
+		return null;
+	}
     
-    #region Initialization
+	#region Initialization
 
-    private void ParseSettings(byte[] settingsResource)
-    {
-        using Stream settingsStream = new MemoryStream(settingsResource);
+	private void ParseSettings(byte[] settingsResource)
+	{
+		using Stream settingsStream = new MemoryStream(settingsResource);
         
-        XmlDocument document       = new();
-        try
-        {
-            document.Load(settingsStream);
-        }
-        catch (Exception e)
-        {
-            ConsoleViewModel.LogException($"Invalid plugins settings file at {StudioPluginsSettingsPath}, exception: {e}");
-            return;
-        }
+		XmlDocument document = new();
+		try
+		{
+			document.Load(settingsStream);
+		}
+		catch (Exception e)
+		{
+			ConsoleViewModel.LogException($"Invalid plugins settings file at {StudioPluginsSettingsPath}, exception: {e}");
+			return;
+		}
 
-        XmlNode? settingsNode = document.FindChild("settings");
-        if (settingsNode == null)
-        {
-            ConsoleViewModel.LogError("Invalid plugins settings file structure. <settings> expected");
-            return;
-        }
+		XmlNode? settingsNode = document.FindChild("settings");
+		if (settingsNode == null)
+		{
+			ConsoleViewModel.LogError("Invalid plugins settings file structure. <settings> expected");
+			return;
+		}
 
-        foreach (XmlNode child in settingsNode)
-        {
-            if (child.Name == "repository")
-            {
-                string? path = child.GetAttributeValueString("path");
-                if (path != null)
-                {
-                    _repositoryPluginsPaths.Add(path);
-                }
-            }
-        }
-    }
+		foreach (XmlNode child in settingsNode)
+		{
+			if (child.Name == "repository")
+			{
+				string? path = child.GetAttributeValueString("path");
+				if (path != null)
+				{
+					_repositoryPluginsPaths.Add(path);
+				}
+			}
+		}
+	}
 
-    #endregion
+	#endregion
 }

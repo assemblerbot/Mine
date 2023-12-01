@@ -28,15 +28,24 @@ public class PluginManagerCollections
 			return;
 		}
 
+		// repository
 		_repository  = new PluginManagerCollection();
-		_errorMessage = _repository.Init(settings.RepositoryPath!);
+		_errorMessage = _repository.Scan(settings.RepositoryPath!, false);
 		if (_errorMessage != null)
 		{
 			return;
 		}
 
+		// project - scripts
 		_project     = new PluginManagerCollection();
-		_errorMessage = _project.Init(settings.ProjectPath!);
+		_errorMessage = _project.Scan(settings.ProjectScriptsPath!, false);
+		if (_errorMessage != null)
+		{
+			return;
+		}
+
+		// project - assets
+		_errorMessage = _project.Scan(settings.ProjectAssetsPath!, true);
 	}
         
 	public List<CPluginsPair> BuildListOfPlugins()

@@ -3,17 +3,23 @@ namespace Mine.Studio;
 [Serializable]
 public class PluginManagerPlugin
 {
+    //private const string _targetScripts = "Scripts"; // everything which is not Assets is Scripts
+    private const string _targetAssets = "Assets";
+    
     // JSON serialized data
     public string        Id;
     public string        Name;
     public string        Description;
     public string        Version;
+    public string?       Target;
     public List<string>? Dependencies;
     public List<string>? GlobalDefines;
         
     // non serialized data
     [NonSerialized] public string  PathToPlugin = null!;
     [NonSerialized] public string? Error;
+    
+    public bool IsAssetPlugin => Target == _targetAssets;
         
     public PluginManagerVersion ParseVersion => new PluginManagerVersion(Version);
 
@@ -22,7 +28,7 @@ public class PluginManagerPlugin
         PluginManagerFileUtils.CopyPlugin(
             PathToPlugin,
             settings.RepositoryPath!,
-            settings.ProjectPath!
+            IsAssetPlugin ? settings.ProjectAssetsPath! : settings.ProjectScriptsPath!
         );
         AddGlobalDefines();
     }
@@ -31,7 +37,7 @@ public class PluginManagerPlugin
     {
         PluginManagerFileUtils.CopyPlugin(
             PathToPlugin,
-            settings.ProjectPath!,
+            IsAssetPlugin ? settings.ProjectAssetsPath! : settings.ProjectScriptsPath!,
             settings.RepositoryPath!
         );
     }

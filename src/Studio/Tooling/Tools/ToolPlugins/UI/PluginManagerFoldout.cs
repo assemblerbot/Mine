@@ -1,5 +1,6 @@
 using System.Numerics;
 using ImGuiNET;
+using Mine.Framework;
 
 namespace Mine.Studio;
 
@@ -51,7 +52,7 @@ public class PluginManagerFoldout
 
 		_repositoryVersion = _repositoryPlugin?.Version ?? "not available";
 		_projectVersion    = _projectPlugin?.Version    ?? "not installed";
-		_titleId           = $"{_plugin.Name} ({_projectVersion})##{_plugin.Id}.title";
+		_titleId           = $"{(_plugin.IsAssetPlugin ? FontAwesome6.Cubes : FontAwesome6.Code)} {_plugin.Name} ({_projectVersion})##{_plugin.Id}.title";
 
 		_pluginsDependentOnThis = collections.GetAllProjectPluginsDependentOn(_plugin.Id);
 		_isDependencyError      = collections.IsDependencyError(_plugin, _projectPlugin != null);
@@ -60,6 +61,7 @@ public class PluginManagerFoldout
 		// status
 		if (IsError)
 		{
+			_buttonNameIdUninstall = $"Uninstall##{_plugin.Id}.uninstall";
 			return;
 		}
 

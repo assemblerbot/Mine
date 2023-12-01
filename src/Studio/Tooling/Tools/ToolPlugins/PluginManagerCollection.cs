@@ -11,10 +11,13 @@ public class PluginManagerCollection
     private Dictionary<string, PluginManagerPlugin> _plugins = null!;
     public  Dictionary<string, PluginManagerPlugin> Plugins => _plugins;
         
-    public string? Init(string path)
+    public string? Scan(string path, bool add)
     {
-        _plugins = new Dictionary<string, PluginManagerPlugin>();
-            
+        if (!add)
+        {
+            _plugins = new Dictionary<string, PluginManagerPlugin>();
+        }
+
         if (!Directory.Exists(path))
         {
             return null;

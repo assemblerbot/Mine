@@ -100,12 +100,18 @@ public class ToolPlugins : Tool
 			ImGui.InputText("Repository path", ref repositoryPath, (uint) repositoryPath.Length);
 		}
 
-		string? projectPath = _settings.ProjectPath;
-		if (projectPath != null)
+		string? projectScriptsPath = _settings.ProjectScriptsPath;
+		if (projectScriptsPath != null)
 		{
-			ImGui.InputText("Project path", ref projectPath, (uint) projectPath.Length);
+			ImGui.InputText("Project scripts path", ref projectScriptsPath, (uint) projectScriptsPath.Length);
 		}
 
+		string? projectAssetsPath = _settings.ProjectAssetsPath;
+		if (projectAssetsPath != null)
+		{
+			ImGui.InputText("Project assets path", ref projectAssetsPath, (uint) projectAssetsPath.Length);
+		}
+		
 		ImGui.PopStyleVar();
 
 		string? errorMessage = _settings.ErrorMessage;
