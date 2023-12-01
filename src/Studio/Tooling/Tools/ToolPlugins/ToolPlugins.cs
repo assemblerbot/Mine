@@ -1,5 +1,6 @@
 using System.Numerics;
 using ImGuiNET;
+using Mine.Framework;
 using RedHerring.Studio.Models;
 using RedHerring.Studio.Tools;
 
@@ -11,6 +12,8 @@ public class ToolPlugins : Tool
 	public const       string ToolName = "Plugins";
 	protected override string Name => ToolName;
 
+	private readonly StudioModel _studioModel;
+	
 	private readonly PluginManagerSettings                    _settings;
 	private readonly PluginManagerCollections                 _pluginCollections;
 	private readonly Dictionary<string, PluginManagerFoldout> _pluginFoldouts = new();
@@ -19,7 +22,8 @@ public class ToolPlugins : Tool
 
 	public ToolPlugins(StudioModel studioModel, int uniqueId) : base(studioModel, uniqueId)
 	{
-		_settings          = new PluginManagerSettings(studioModel.Project);
+		_studioModel       = studioModel;
+		_settings          = new PluginManagerSettings();
 		_pluginCollections = new PluginManagerCollections();
 		Refresh();
 	}
@@ -33,6 +37,7 @@ public class ToolPlugins : Tool
 	{
 		_pluginFoldouts.Clear();
 
+		_settings.Refresh(_studioModel.Project);
 		if (_settings.IsError)
 		{
 			return;
@@ -70,12 +75,13 @@ public class ToolPlugins : Tool
 			}
 
 			SettingsUI();
+			RefreshButtonUI();
 			PluginsUI();
 			ImGui.End();
 		}
 		else
 		{
-			_refreshRequested = true;
+			RequestRefresh();
 		}
 
 		return !isOpen;
@@ -108,6 +114,14 @@ public class ToolPlugins : Tool
 			ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(1, 0, 0, 1));
 			ImGui.Text(errorMessage);
 			ImGui.PopStyleColor();
+		}
+	}
+
+	private void RefreshButtonUI()
+	{
+		if (ImGui.Button(FontAwesome6.ArrowsRotate))
+		{
+			RequestRefresh();
 		}
 	}
 

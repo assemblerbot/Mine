@@ -57,7 +57,7 @@ public class PluginManagerFoldout
 		_titleId           = $"{_plugin.Name} ({_projectVersion})##{_plugin.Id}.title";
 
 		_pluginsDependentOnThis = collections.GetAllProjectPluginsDependentOn(_plugin.Id);
-		_isDependencyError      = collections.IsDependencyError(_plugin);
+		_isDependencyError      = collections.IsDependencyError(_plugin, _projectPlugin != null);
 		_isVersionError         = (_repositoryPlugin?.ParseVersion.IsError ?? false) || (_projectPlugin?.ParseVersion.IsError ?? false);
 
 		// status
@@ -131,20 +131,26 @@ public class PluginManagerFoldout
 
 	private void StatusIconUI()
 	{
-		ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(0, 1, 0, 1));
-		ImGui.Text(FontAwesome6.Check); // status icon - TODO
+		PluginManagerStatusIcons.GetPluginStatusIcon(_repositoryPlugin, _projectPlugin, out string icon, out Vector4 color);
+		ImGui.PushStyleColor(ImGuiCol.Text, color);
+		ImGui.Text(icon);
 		ImGui.PopStyleColor();
 	}
 
 	private void DescriptionUI()
 	{
+		if (IsError)
+		{
+			ImGui.SetNextItemOpen(true);
+		}
+
 		if (ImGui.CollapsingHeader(_titleId))
 		{
 			ImGui.Indent();
 			ImGui.Text(_plugin.Description);
 
-			// GuiPluginDependencies(plugin, collections, icons);
-			// GuiPluginsDependentOn(plugins_dependent_on_this, collections, icons);
+			ThisDependsOnUI();
+			OtherDependentOnThisUI();
 			ImGui.Spacing();
 			
 			ImGui.Text("Id:");
@@ -155,26 +161,26 @@ public class PluginManagerFoldout
 			ImGui.SameLine();
 			ImGui.Text(_repositoryVersion);
 
-			// // errors
-			// if (repository_plugin != null && !string.IsNullOrEmpty(repository_plugin.Error))
-			// {
-			// 	SimplePluginManagerUIUtils.ErrorLabel(repository_plugin.Error);
-			// }
-			//
-			// if (project_plugin != null && !string.IsNullOrEmpty(project_plugin.Error))
-			// {
-			// 	SimplePluginManagerUIUtils.ErrorLabel(project_plugin.Error);
-			// }
-			//
-			// if (is_version_error)
-			// {
-			// 	SimplePluginManagerUIUtils.ErrorLabel("Plugin has invalid version format!");
-			// }
-			//
-			// if (is_dependency_error)
-			// {
-			// 	SimplePluginManagerUIUtils.ErrorLabel("Plugin is dependent on non existing plugin!");
-			// }
+			// errors
+			if (_repositoryPlugin != null && !string.IsNullOrEmpty(_repositoryPlugin.Error))
+			{
+				ErrorText(_repositoryPlugin.Error);
+			}
+			
+			if (_projectPlugin != null && !string.IsNullOrEmpty(_projectPlugin.Error))
+			{
+				ErrorText(_projectPlugin.Error);
+			}
+			
+			if (_isVersionError)
+			{
+				ErrorText("Plugin has invalid version format!");
+			}
+			
+			if (_isDependencyError)
+			{
+				ErrorText("Plugin is dependent on non existing plugin!");
+			}
 
 			ImGui.Unindent();
 		}
@@ -248,6 +254,63 @@ public class PluginManagerFoldout
 		{
 			ImGui.Text(_textRequiredByOtherPlugins);
 		}
+	}
+
+	private void ThisDependsOnUI()
+	{
+		if (_plugin.Dependencies != null && _plugin.Dependencies.Count > 0)
+		{
+			ImGui.Text("Required plugins:");
+			ImGui.Indent();
+			foreach (string dependency in _plugin.Dependencies)
+			{
+				CreatePluginDescriptionRow(dependency);
+			}
+			ImGui.Unindent();
+		}
+	}
+
+	private void OtherDependentOnThisUI()
+	{
+		if (_pluginsDependentOnThis.Count == 0)
+		{
+			return;
+		}
+
+		ImGui.Text("Required by plugins:");
+		ImGui.Indent();
+		foreach (PluginManagerPlugin plugin in _pluginsDependentOnThis)
+		{
+			CreatePluginDescriptionRow(plugin.Id);
+		}
+		ImGui.Unindent();
+	}
+
+	private void CreatePluginDescriptionRow(string pluginId)
+	{
+		PluginManagerStatusIcons.GetDependencyStatusIcon(
+			_collections.IsInProject(pluginId),
+			_collections.IsInRepository(pluginId),
+			out string icon,
+			out Vector4 color
+		);
+
+		ImGui.PushStyleColor(ImGuiCol.Text, color);
+		ImGui.Text(icon);
+		ImGui.PopStyleColor();
+
+		ImGui.SameLine();
+		ImGui.Text(_collections.GetPluginName(pluginId));
+
+		ImGui.SameLine();
+		ImGui.Text(_collections.GetPluginVersion(pluginId));
+	}
+
+	private void ErrorText(string text)
+	{
+		ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(1, 0, 0, 1));
+		ImGui.Text(text);
+		ImGui.PopStyleColor();
 	}
 	#endregion
 

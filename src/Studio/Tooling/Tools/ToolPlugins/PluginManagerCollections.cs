@@ -90,7 +90,7 @@ public class PluginManagerCollections
 		return _repository.Plugins.ContainsKey(plugin_id);
 	}
 
-	public bool IsDependencyError(PluginManagerPlugin plugin)
+	public bool IsDependencyError(PluginManagerPlugin plugin, bool dependenciesMustBeInstalled)
 	{
 		foreach (string dependency in plugin.Dependencies)
 		{
@@ -98,7 +98,12 @@ public class PluginManagerCollections
 			{
 				continue;
 			}
-                
+
+			if (dependenciesMustBeInstalled)
+			{
+				return true;
+			}
+
 			if(_repository.Plugins.ContainsKey(dependency))
 			{
 				continue;
@@ -109,22 +114,37 @@ public class PluginManagerCollections
 
 		return false;
 	}
-
-	public string GetPluginNameAndVersion(string plugin_id)
+	
+	public string GetPluginName(string plugin_id)
 	{
 		if (IsInProject(plugin_id))
 		{
-			return $"{_project.Plugins[plugin_id].Name} ({_project.Plugins[plugin_id].Version})";
+			return _project.Plugins[plugin_id].Name;
 		}
 
 		if (IsInRepository(plugin_id))
 		{
-			return $"{_repository.Plugins[plugin_id].Name} ({_repository.Plugins[plugin_id].Version})";
+			return _repository.Plugins[plugin_id].Name;
 		}
 
 		return plugin_id;
 	}
 
+	public string GetPluginVersion(string plugin_id)
+	{
+		if (IsInProject(plugin_id))
+		{
+			return _project.Plugins[plugin_id].Version;
+		}
+
+		if (IsInRepository(plugin_id))
+		{
+			return _repository.Plugins[plugin_id].Version;
+		}
+
+		return "";
+	}
+	
 	public void CopyDependenciesFromRepositoryToProject(PluginManagerPlugin plugin, PluginManagerSettings settings)
 	{
 		List<string> installed_dependencies = new List<string>();

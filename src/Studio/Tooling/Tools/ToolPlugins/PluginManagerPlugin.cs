@@ -4,16 +4,16 @@ namespace Mine.Studio;
 public class PluginManagerPlugin
 {
     // JSON serialized data
-    public string       Id;
-    public string       Name;
-    public string       Description;
-    public string       Version;
-    public List<string> Dependencies;
-    public List<string> GlobalDefines;
+    public string        Id;
+    public string        Name;
+    public string        Description;
+    public string        Version;
+    public List<string>? Dependencies;
+    public List<string>? GlobalDefines;
         
     // non serialized data
-    [NonSerialized] public string PathToPlugin;
-    [NonSerialized] public string Error;
+    [NonSerialized] public string  PathToPlugin;
+    [NonSerialized] public string? Error;
         
     public SimplePluginManagerVersion ParseVersion => new SimplePluginManagerVersion(Version);
 
@@ -44,6 +44,11 @@ public class PluginManagerPlugin
 
     private void AddGlobalDefines()
     {
+        if (GlobalDefines == null)
+        {
+            return;
+        }
+
         foreach (string global_define in GlobalDefines)
         {
             SimplePluginManagerUnityUtils.AddGlobalDefine(global_define);
@@ -52,6 +57,11 @@ public class PluginManagerPlugin
         
     private void RemoveGlobalDefines()
     {
+        if (GlobalDefines == null)
+        {
+            return;
+        }
+
         foreach (string global_define in GlobalDefines)
         {
             SimplePluginManagerUnityUtils.RemoveGlobalDefine(global_define);

@@ -22,8 +22,13 @@ public sealed class PluginManagerSettings
     public string? ErrorMessage   => _errorMessage;
     public bool    IsError        => _errorMessage != null;
 
-    public PluginManagerSettings(ProjectModel projectModel)
+    public void Refresh(ProjectModel projectModel)
     {
+        _repositoryPluginsPaths.Clear();
+        _repositoryPath = null;
+        _projectPath    = null;
+        _errorMessage   = null;
+        
         byte[]? settingsResource = Engine.Resources.ReadResource(StudioPluginsSettingsPath);
         if (settingsResource == null)
         {
