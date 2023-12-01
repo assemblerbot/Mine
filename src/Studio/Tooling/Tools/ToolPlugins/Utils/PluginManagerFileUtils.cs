@@ -2,7 +2,7 @@ using RedHerring.Studio.Models.ViewModels.Console;
 
 namespace Mine.Studio;
 
-public static class SimplePluginManagerFileUtils
+public static class PluginManagerFileUtils
 {
     public static void Log(string message)
     {

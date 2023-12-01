@@ -12,14 +12,14 @@ public class PluginManagerPlugin
     public List<string>? GlobalDefines;
         
     // non serialized data
-    [NonSerialized] public string  PathToPlugin;
+    [NonSerialized] public string  PathToPlugin = null!;
     [NonSerialized] public string? Error;
         
-    public SimplePluginManagerVersion ParseVersion => new SimplePluginManagerVersion(Version);
+    public PluginManagerVersion ParseVersion => new PluginManagerVersion(Version);
 
     public void CopyFromRepositoryToProject(PluginManagerSettings settings)
     {
-        SimplePluginManagerFileUtils.CopyPlugin(
+        PluginManagerFileUtils.CopyPlugin(
             PathToPlugin,
             settings.RepositoryPath!,
             settings.ProjectPath!
@@ -29,7 +29,7 @@ public class PluginManagerPlugin
 
     public void CopyFromProjectToRepository(PluginManagerSettings settings)
     {
-        SimplePluginManagerFileUtils.CopyPlugin(
+        PluginManagerFileUtils.CopyPlugin(
             PathToPlugin,
             settings.ProjectPath!,
             settings.RepositoryPath!
@@ -38,7 +38,7 @@ public class PluginManagerPlugin
 
     public void RemoveFromProject()
     {
-        SimplePluginManagerFileUtils.DeletePlugin(PathToPlugin);
+        PluginManagerFileUtils.DeletePlugin(PathToPlugin);
         RemoveGlobalDefines();
     }
 
@@ -51,7 +51,7 @@ public class PluginManagerPlugin
 
         foreach (string global_define in GlobalDefines)
         {
-            SimplePluginManagerUnityUtils.AddGlobalDefine(global_define);
+            PluginManagerUnityUtils.AddGlobalDefine(global_define);
         }
     }
         
@@ -64,7 +64,7 @@ public class PluginManagerPlugin
 
         foreach (string global_define in GlobalDefines)
         {
-            SimplePluginManagerUnityUtils.RemoveGlobalDefine(global_define);
+            PluginManagerUnityUtils.RemoveGlobalDefine(global_define);
         }
     }
 }

@@ -1,4 +1,3 @@
-
 using System.Numerics;
 using Mine.Framework;
 
@@ -6,89 +5,89 @@ namespace Mine.Studio;
 
 public static class PluginManagerStatusIcons
 {
-    public static readonly string  IconUpToDate      = FontAwesome6.SquareCheck;
-    public static          Vector4 IconUpToDateColor = new Vector4(0, 1, 0, 1);
+	private const           string  _iconUpToDate      = FontAwesome6.SquareCheck;
+	private static readonly Vector4 _iconUpToDateColor = new (0, 1, 0, 1);
 
-    public static string  IconCanUpgrade    = FontAwesome6.SquarePlus;
-    public static Vector4 IconCanUpgradeColor = new Vector4(1, 1, 0, 1);
-    
-    public static readonly string  IconCanDowngradeOrOverwrite      = FontAwesome6.SquareMinus;
-    public static          Vector4 IconCanDowngradeOrOverwriteColor = new Vector4(1, 0.5f, 0, 1);
+	private const           string  _iconCanUpgrade      = FontAwesome6.SquarePlus;
+	private static readonly Vector4 _iconCanUpgradeColor = new (1, 1, 0, 1);
 
-    public static readonly string  IconNotInstalled      = FontAwesome6.Square;
-    public static          Vector4 IconNotInstalledColor = new Vector4(0.5f, 0.5f, 0.5f, 1);
-    
-    public static string  IconError      = FontAwesome6.SquareXmark;
-    public static Vector4 IconErrorColor = new Vector4(1, 0, 0, 1);
+	private const           string  _iconCanDowngradeOrOverwrite      = FontAwesome6.SquareMinus;
+	private static readonly Vector4 _iconCanDowngradeOrOverwriteColor = new (1, 0.5f, 0, 1);
 
-    public static void GetPluginStatusIcon(PluginManagerPlugin? repositoryPlugin, PluginManagerPlugin? projectPlugin, out string icon, out Vector4 color)
-    {
-        if (projectPlugin == null)
-        {
-            icon  = IconNotInstalled;
-            color = IconNotInstalledColor;
-            return;
-        }
+	private const           string  _iconNotInstalled      = FontAwesome6.Square;
+	private static readonly Vector4 _iconNotInstalledColor = new (0.5f, 0.5f, 0.5f, 1);
 
-        if (projectPlugin.Error != null)
-        {
-            icon  = IconError;
-            color = IconErrorColor;
-            return;
-        }
+	private const           string  _iconError      = FontAwesome6.SquareXmark;
+	private static readonly Vector4 _iconErrorColor = new (1, 0, 0, 1);
 
-        if (repositoryPlugin == null)
-        {
-            icon  = IconCanDowngradeOrOverwrite;
-            color = IconCanDowngradeOrOverwriteColor;
-            return;
-        }
+	public static void GetPluginStatusIcon(PluginManagerPlugin? repositoryPlugin, PluginManagerPlugin? projectPlugin, out string icon, out Vector4 color)
+	{
+		if (projectPlugin == null)
+		{
+			icon  = _iconNotInstalled;
+			color = _iconNotInstalledColor;
+			return;
+		}
 
-        if (repositoryPlugin.Error != null)
-        {
-            icon  = IconError;
-            color = IconErrorColor;
-            return;
-        }
+		if (projectPlugin.Error != null)
+		{
+			icon  = _iconError;
+			color = _iconErrorColor;
+			return;
+		}
+
+		if (repositoryPlugin == null)
+		{
+			icon  = _iconCanDowngradeOrOverwrite;
+			color = _iconCanDowngradeOrOverwriteColor;
+			return;
+		}
+
+		if (repositoryPlugin.Error != null)
+		{
+			icon  = _iconError;
+			color = _iconErrorColor;
+			return;
+		}
         
-        SimplePluginManagerVersion repository_version_number = repositoryPlugin.ParseVersion;
-        SimplePluginManagerVersion project_version_number    = projectPlugin.ParseVersion;
+		PluginManagerVersion repositoryVersionNumber = repositoryPlugin.ParseVersion;
+		PluginManagerVersion projectVersionNumber    = projectPlugin.ParseVersion;
 
-        if (repository_version_number == project_version_number)
-        {
-            icon  = IconUpToDate;
-            color = IconUpToDateColor;
-            return;
-        }
+		if (repositoryVersionNumber == projectVersionNumber)
+		{
+			icon  = _iconUpToDate;
+			color = _iconUpToDateColor;
+			return;
+		}
             
-        if (repository_version_number > project_version_number)
-        {
-            icon  = IconCanUpgrade;
-            color = IconCanUpgradeColor;
-            return;
-        }
+		if (repositoryVersionNumber > projectVersionNumber)
+		{
+			icon  = _iconCanUpgrade;
+			color = _iconCanUpgradeColor;
+			return;
+		}
 
-        icon  = IconCanDowngradeOrOverwrite;
-        color = IconCanDowngradeOrOverwriteColor;
-    }
+		icon  = _iconCanDowngradeOrOverwrite;
+		color = _iconCanDowngradeOrOverwriteColor;
+	}
 
-    public static void GetDependencyStatusIcon(bool project_contains_dependency, bool repository_contains_dependency, out string icon, out Vector4 color)
-    {
-        if (project_contains_dependency)
-        {
-            icon  = IconUpToDate;
-            color = IconUpToDateColor;
-            return;
-        }
+	public static void GetDependencyStatusIcon(bool project_contains_dependency, bool repository_contains_dependency, out string icon, out Vector4 color)
+	{
+		if (project_contains_dependency)
+		{
+			icon  = _iconUpToDate;
+			color = _iconUpToDateColor;
+			return;
+		}
 
-        if (repository_contains_dependency)
-        {
-            icon  = IconNotInstalled;
-            color = IconNotInstalledColor;
-            return;
-        }
+		if (repository_contains_dependency)
+		{
+			icon  = _iconNotInstalled;
+			color = _iconNotInstalledColor;
+			return;
+		}
 
-        icon  = IconError;
-        color = IconErrorColor;
-    }
+		icon  = _iconError;
+		color = _iconErrorColor;
+	}
 }

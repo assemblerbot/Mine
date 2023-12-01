@@ -1,23 +1,19 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Text.Json;
-using System.Text.RegularExpressions;
 using RedHerring.Studio.Models.ViewModels.Console;
 
 namespace Mine.Studio;
 
-public class SimplePluginManagerCollection
+public class PluginManagerCollection
 {
-    private const string c_PluginFileName  = "plugin.json";
-    private const string c_PackageFileName = "package.json";
+    private const string _pluginFileName  = "plugin.json";
+    private const string _packageFileName = "package.json";
         
-    private Dictionary<string, PluginManagerPlugin> m_Plugins;
-    public  Dictionary<string, PluginManagerPlugin> Plugins => m_Plugins;
+    private Dictionary<string, PluginManagerPlugin> _plugins = null!;
+    public  Dictionary<string, PluginManagerPlugin> Plugins => _plugins;
         
     public string? Init(string path)
     {
-        m_Plugins = new Dictionary<string, PluginManagerPlugin>();
+        _plugins = new Dictionary<string, PluginManagerPlugin>();
             
         if (!Directory.Exists(path))
         {
@@ -28,7 +24,7 @@ public class SimplePluginManagerCollection
             
         // plugins
         {
-            string[] descriptors = Directory.GetFiles(path, c_PluginFileName, SearchOption.AllDirectories);
+            string[] descriptors = Directory.GetFiles(path, _pluginFileName, SearchOption.AllDirectories);
             foreach (string descriptor in descriptors)
             {
                 PluginManagerPlugin plugin = ReadPlugin(descriptor);
@@ -41,14 +37,14 @@ public class SimplePluginManagerCollection
 
     private void AddPlugin(PluginManagerPlugin plugin, ref string error_message)
     {
-        if (m_Plugins.ContainsKey(plugin.Id))
+        if (_plugins.ContainsKey(plugin.Id))
         {
             ConsoleViewModel.Log($"Duplicate plugin id '{plugin.Id}' detected! Is there a wrong path in config file?", ConsoleItemType.Error);
             error_message = "One or more duplicate plugin ids detected! See log for details.";
             return;
         }
             
-        m_Plugins.Add(plugin.Id, plugin);
+        _plugins.Add(plugin.Id, plugin);
     }
         
     private PluginManagerPlugin ReadPlugin(string path)

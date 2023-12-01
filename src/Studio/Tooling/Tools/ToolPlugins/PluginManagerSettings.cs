@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.IO;
 using System.Xml;
 using Mine.Framework;
 using RedHerring.Studio.Models.Project;

@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using RedHerring.Studio.Models.ViewModels.Console;
 
 namespace Mine.Studio;
@@ -17,8 +13,8 @@ public class PluginManagerCollections
 		public string Name => RepositoryPlugin?.Name ?? ProjectPlugin!.Name;
 	}
 
-	private SimplePluginManagerCollection _repository = null!;
-	private SimplePluginManagerCollection _project = null!;
+	private PluginManagerCollection _repository = null!;
+	private PluginManagerCollection _project = null!;
 
 	private string? _errorMessage;
 	public  bool    IsError      => _errorMessage != null;
@@ -32,62 +28,62 @@ public class PluginManagerCollections
 			return;
 		}
 
-		_repository  = new SimplePluginManagerCollection();
+		_repository  = new PluginManagerCollection();
 		_errorMessage = _repository.Init(settings.RepositoryPath!);
 		if (_errorMessage != null)
 		{
 			return;
 		}
 
-		_project     = new SimplePluginManagerCollection();
+		_project     = new PluginManagerCollection();
 		_errorMessage = _project.Init(settings.ProjectPath!);
 	}
         
 	public List<CPluginsPair> BuildListOfPlugins()
 	{
-		List<CPluginsPair> list_of_plugins = new ();
+		List<CPluginsPair> listOfPlugins = new ();
 
-		foreach (PluginManagerPlugin repository_plugin in _repository.Plugins.Values)
+		foreach (PluginManagerPlugin repositoryPlugin in _repository.Plugins.Values)
 		{
-			PluginManagerPlugin project_plugin = null;
-			_project.Plugins?.TryGetValue(repository_plugin.Id, out project_plugin);
-			list_of_plugins.Add(new CPluginsPair {RepositoryPlugin = repository_plugin, ProjectPlugin = project_plugin});
+			PluginManagerPlugin? projectPlugin = null;
+			_project.Plugins?.TryGetValue(repositoryPlugin.Id, out projectPlugin);
+			listOfPlugins.Add(new CPluginsPair {RepositoryPlugin = repositoryPlugin, ProjectPlugin = projectPlugin});
 		}
 
-		foreach (PluginManagerPlugin project_plugin in _project.Plugins.Values)
+		foreach (PluginManagerPlugin projectPlugin in _project.Plugins!.Values)
 		{
-			PluginManagerPlugin repository_plugin = null;
-			_repository.Plugins?.TryGetValue(project_plugin.Id, out repository_plugin);
+			PluginManagerPlugin? repositoryPlugin = null;
+			_repository.Plugins?.TryGetValue(projectPlugin.Id, out repositoryPlugin);
 
-			if (repository_plugin == null)
+			if (repositoryPlugin == null)
 			{
 				// this plugin exists in project only
-				list_of_plugins.Add(new CPluginsPair {RepositoryPlugin = null, ProjectPlugin = project_plugin});
+				listOfPlugins.Add(new CPluginsPair {RepositoryPlugin = null, ProjectPlugin = projectPlugin});
 			}
 		}
 
-		list_of_plugins.Sort((x, y) => string.Compare(x.Name, y.Name, StringComparison.InvariantCulture));
-		return list_of_plugins;
+		listOfPlugins.Sort((x, y) => string.Compare(x.Name, y.Name, StringComparison.InvariantCulture));
+		return listOfPlugins;
 	}
 
-	public bool IsAnyProjectPluginDependentOn(string plugin_id)
+	public bool IsAnyProjectPluginDependentOn(string pluginId)
 	{
-		return _project.Plugins.Any(x => x.Value.Dependencies != null && x.Value.Dependencies.Contains(plugin_id));
+		return _project.Plugins.Any(x => x.Value.Dependencies != null && x.Value.Dependencies.Contains(pluginId));
 	}
 
-	public List<PluginManagerPlugin> GetAllProjectPluginsDependentOn(string plugin_id)
+	public List<PluginManagerPlugin> GetAllProjectPluginsDependentOn(string pluginId)
 	{
-		return _project.Plugins.Values.ToList().FindAll(x => x.Dependencies != null && x.Dependencies.Contains(plugin_id));
+		return _project.Plugins.Values.ToList().FindAll(x => x.Dependencies != null && x.Dependencies.Contains(pluginId));
 	}
 
-	public bool IsInProject(string plugin_id)
+	public bool IsInProject(string pluginId)
 	{
-		return _project.Plugins.ContainsKey(plugin_id);
+		return _project.Plugins.ContainsKey(pluginId);
 	}
 
-	public bool IsInRepository(string plugin_id)
+	public bool IsInRepository(string pluginId)
 	{
-		return _repository.Plugins.ContainsKey(plugin_id);
+		return _repository.Plugins.ContainsKey(pluginId);
 	}
 
 	public bool IsDependencyError(PluginManagerPlugin plugin, bool dependenciesMustBeInstalled)
@@ -115,31 +111,31 @@ public class PluginManagerCollections
 		return false;
 	}
 	
-	public string GetPluginName(string plugin_id)
+	public string GetPluginName(string pluginId)
 	{
-		if (IsInProject(plugin_id))
+		if (IsInProject(pluginId))
 		{
-			return _project.Plugins[plugin_id].Name;
+			return _project.Plugins[pluginId].Name;
 		}
 
-		if (IsInRepository(plugin_id))
+		if (IsInRepository(pluginId))
 		{
-			return _repository.Plugins[plugin_id].Name;
+			return _repository.Plugins[pluginId].Name;
 		}
 
-		return plugin_id;
+		return pluginId;
 	}
 
-	public string GetPluginVersion(string plugin_id)
+	public string GetPluginVersion(string pluginId)
 	{
-		if (IsInProject(plugin_id))
+		if (IsInProject(pluginId))
 		{
-			return _project.Plugins[plugin_id].Version;
+			return _project.Plugins[pluginId].Version;
 		}
 
-		if (IsInRepository(plugin_id))
+		if (IsInRepository(pluginId))
 		{
-			return _repository.Plugins[plugin_id].Version;
+			return _repository.Plugins[pluginId].Version;
 		}
 
 		return "";
@@ -147,20 +143,20 @@ public class PluginManagerCollections
 	
 	public void CopyDependenciesFromRepositoryToProject(PluginManagerPlugin plugin, PluginManagerSettings settings)
 	{
-		List<string> installed_dependencies = new List<string>();
+		List<string> installedDependencies = new List<string>();
 	        
 		foreach (string dependency in plugin.Dependencies)
 		{
 			if (IsInProject(dependency))
 			{
-				continue; // valid
+				continue; // already installed
 			}
 
 			if (IsInRepository(dependency))
 			{
 				// can be installed
 				_repository.Plugins[dependency].CopyFromRepositoryToProject(settings);
-				installed_dependencies.Add(dependency);
+				installedDependencies.Add(dependency);
 			}
 		}
 
@@ -173,9 +169,9 @@ public class PluginManagerCollections
 		}
 
 		// recursively install dependencies of new installed dependencies
-		foreach (string installed_dependency in installed_dependencies)
+		foreach (string installedDependency in installedDependencies)
 		{
-			CopyDependenciesFromRepositoryToProject(_repository.Plugins[installed_dependency], settings);
+			CopyDependenciesFromRepositoryToProject(_repository.Plugins[installedDependency], settings);
 		}
 	}
 }

@@ -9,7 +9,7 @@ namespace Mine.Studio;
 [Tool(ToolName)]
 public class ToolPlugins : Tool
 {
-	public const       string ToolName = "Plugins";
+	public const       string ToolName = FontAwesome6.Plug + " Plugins";
 	protected override string Name => ToolName;
 
 	private readonly StudioModel _studioModel;

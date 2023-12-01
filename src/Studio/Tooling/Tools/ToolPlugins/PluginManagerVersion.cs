@@ -2,7 +2,7 @@ using System.Text.RegularExpressions;
 
 namespace Mine.Studio;
 
-public readonly struct SimplePluginManagerVersion
+public readonly struct PluginManagerVersion
 {
 	private readonly struct StringIntVariant
 	{
@@ -91,7 +91,7 @@ public readonly struct SimplePluginManagerVersion
 	private readonly StringIntVariant[] Identifiers;
 	public           bool               IsError => Identifiers == null;
 
-	public SimplePluginManagerVersion(string version)
+	public PluginManagerVersion(string version)
 	{
 		// capture major, minor, patch and pre-release identifiers as single string, meta is ignored
 		string pattern = @"^([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?(?:\+(?:[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$";
@@ -122,7 +122,7 @@ public readonly struct SimplePluginManagerVersion
 		}
 	}
 
-	public static bool IsApiBreak(SimplePluginManagerVersion v1, SimplePluginManagerVersion v2)
+	public static bool IsApiBreak(PluginManagerVersion v1, PluginManagerVersion v2)
 	{
 		if (v1.Identifiers == null || v2.Identifiers == null)
 		{
@@ -138,7 +138,7 @@ public readonly struct SimplePluginManagerVersion
 	}
 
 	// comparison operators
-	public static bool operator ==(SimplePluginManagerVersion v1, SimplePluginManagerVersion v2)
+	public static bool operator ==(PluginManagerVersion v1, PluginManagerVersion v2)
 	{
 		if (v1.Identifiers == null || v2.Identifiers == null)
 		{
@@ -161,12 +161,12 @@ public readonly struct SimplePluginManagerVersion
 		return true;
 	}
 
-	public static bool operator !=(SimplePluginManagerVersion v1, SimplePluginManagerVersion v2)
+	public static bool operator !=(PluginManagerVersion v1, PluginManagerVersion v2)
 	{
 		return !(v1 == v2);
 	}
 
-	public static bool operator <(SimplePluginManagerVersion v1, SimplePluginManagerVersion v2)
+	public static bool operator <(PluginManagerVersion v1, PluginManagerVersion v2)
 	{
 		if (v1.Identifiers == null || v2.Identifiers == null)
 		{
@@ -203,7 +203,7 @@ public readonly struct SimplePluginManagerVersion
 		return v1.Identifiers.Length < v2.Identifiers.Length;
 	}
 
-	public static bool operator >(SimplePluginManagerVersion v1, SimplePluginManagerVersion v2)
+	public static bool operator >(PluginManagerVersion v1, PluginManagerVersion v2)
 	{
 		if (v1.Identifiers == null || v2.Identifiers == null)
 		{
@@ -240,14 +240,14 @@ public readonly struct SimplePluginManagerVersion
 		return v1.Identifiers.Length > v2.Identifiers.Length;
 	}
 
-	public bool Equals(SimplePluginManagerVersion other)
+	public bool Equals(PluginManagerVersion other)
 	{
 		return Equals(Identifiers, other.Identifiers);
 	}
 
 	public override bool Equals(object obj)
 	{
-		return obj is SimplePluginManagerVersion other && Equals(other);
+		return obj is PluginManagerVersion other && Equals(other);
 	}
 
 	public override int GetHashCode()
