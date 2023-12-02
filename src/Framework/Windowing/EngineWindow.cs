@@ -8,7 +8,8 @@ namespace Mine.Framework;
 public class EngineWindow
 {
 	private readonly IWindow _window;
-	public           IView View => _window;
+	public           IWindow NativeWindow => _window;
+	public           IView   View         => _window;
 
 	public Action?                OnLoadCallback;
 	public Action<Vector2D<int>>? OnResizeCallback;

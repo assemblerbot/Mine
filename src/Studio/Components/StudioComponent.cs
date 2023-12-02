@@ -53,8 +53,10 @@ public sealed class StudioComponent : Component, IUpdatable
 		// int       index5 = test.FindInsertionIndexBinary(x => x.CompareTo(12));
 		//
 		// int d=0;
+		
+		//Engine.Window.
 	}
-	
+
 	public override void BeforeRemovedFromScene()
 	{
 		_studioModel.Close();

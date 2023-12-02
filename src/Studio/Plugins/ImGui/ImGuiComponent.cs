@@ -10,11 +10,9 @@ public sealed class ImGuiComponent : Component, IUpdatable, IRenderable
 {
 	public static readonly string DefaultFontFile = "Plugins/ImGui/Roboto-Regular.ttf";
 	public static readonly string FontFARegular   = "Plugins/ImGui/fa-regular-400.ttf";
-	public static readonly string FontFASolid   = "Plugins/ImGui/fa-solid-900.ttf";
+	public static readonly string FontFASolid     = "Plugins/ImGui/fa-solid-900.ttf";
 	public const           int    Size            = 16;
 
-	private static ushort[] GlyphRange = { FontAwesome6.IconMin, FontAwesome6.IconMax, 0 };
-	
 	public int UpdateOrder = Int32.MinValue;
 	public int GetUpdateOrder() => UpdateOrder;
 	
@@ -28,7 +26,7 @@ public sealed class ImGuiComponent : Component, IUpdatable, IRenderable
 	
 	public ImGuiComponent()
 	{
-		Vector2D<int> windowSize = Engine.Window.View.Size;
+		Vector2D<int> windowSize = Engine.Window.Size;
 		
 		_imGuiInputSnapshot = new ImGuiInputSnapshot();
 		
