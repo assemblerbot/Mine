@@ -102,7 +102,6 @@ public sealed class Engine
 
 		if (_exitRequested)
 		{
-			_config.Save();
 			_instance._window.Close();
 		}
 	}
@@ -115,6 +114,7 @@ public sealed class Engine
 
 	private void OnExit()
 	{
+		_config?.Save();
 		_onExit?.Invoke();
 
 		_scene?.Dispose();
