@@ -39,6 +39,8 @@ public sealed class StudioComponent : Component, IUpdatable
 		_projectSettings  = new ObjectDialog("Project settings", _studioModel.CommandHistory, _studioModel.Project.ProjectSettings);
 		_studioSettings   = new ObjectDialog("Studio settings",  _studioModel.CommandHistory, _studioModel.StudioSettings);
 		_newProjectDialog = new NewProjectDialog();
+
+		LoadSettings();
 		
 		Engine.Scene.Add(new GameObject("Test Object").AddComponent<TestRenderComponent>().GameObject);
 
@@ -59,6 +61,8 @@ public sealed class StudioComponent : Component, IUpdatable
 
 	public override void BeforeRemovedFromScene()
 	{
+		SaveSettings();
+		
 		_studioModel.Close();
 		Engine.Scene.UnregisterUpdatable(this);
 	}
@@ -178,6 +182,31 @@ public sealed class StudioComponent : Component, IUpdatable
 	private void OnDebugImporterTestClicked()
 	{
 //		ImporterTests.Test();
+	}
+	#endregion
+
+	#region Settings
+	private void SaveSettings()
+	{
+		_studioModel.StudioSettings.StoreToolWindows(Tool.UniqueToolIdGeneratorState, _toolManager.ExportActiveTools());
+		
+		_studioModel.StudioSettings.UiLayout = ImGui.SaveIniSettingsToMemory();
+		_studioModel.SaveStudioSettings();
+	}
+
+	private void LoadSettings()
+	{
+		_studioModel.LoadStudioSettings();
+
+		Tool.SetUniqueIdGenerator(_studioModel.StudioSettings.ToolUniqueIdGeneratorState);
+		_toolManager.ImportActiveTools(_studioModel.StudioSettings.ActiveToolWindows);
+		
+		if (_studioModel.StudioSettings.UiLayout != null)
+		{
+			ImGui.LoadIniSettingsFromMemory(_studioModel.StudioSettings.UiLayout);
+		}
+
+		//_studioModel.StudioSettings.ApplyTheme();
 	}
 	#endregion
 }

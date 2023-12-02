@@ -1,4 +1,5 @@
 ﻿using Migration;
+using Mine.Framework;
 using RedHerring.Studio.Tools;
 using RedHerring.Studio.UserInterface.Attributes;
 
@@ -9,11 +10,7 @@ public sealed class StudioSettings
 {
 	public const string DefaultTheme = "Crimson Rivers";
 	
-	[NonSerialized] public static string? HomeDirectory = (Environment.OSVersion.Platform == PlatformID.Unix || Environment.OSVersion.Platform == PlatformID.MacOSX)
-		? (Environment.GetEnvironmentVariable("XDG_CONFIG_HOME") ?? "~/Library/Application Support")
-		: Environment.ExpandEnvironmentVariables("%APPDATA%");
-	
-	public string SettingsPath => Path.Join(HomeDirectory, "RedHerring", "options.json");
+	public string SettingsPath => Path.Join(Engine.ApplicationDataPath, "studio_settings.json");
 	
 	public int WorkerThreadsCount = 4;
 

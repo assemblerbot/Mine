@@ -37,7 +37,7 @@ public sealed class Engine
 			: Environment.ExpandEnvironmentVariables("%APPDATA%");
 
 	private readonly string? _dataPath;
-	public static    string  DataPath => _instance._dataPath ?? "";
+	public static    string  ApplicationDataPath => _instance._dataPath ?? "";
 	#endregion
 	
 	private Action? _onLoad;
@@ -50,7 +50,7 @@ public sealed class Engine
 		_instance = this;
 		
 		_dataPath = Path.Join(HomeDirectory, applicationName);
-		Console.WriteLine(DataPath);
+		Console.WriteLine(ApplicationDataPath);
 
 		ParseArguments(applicationArguments);
 		

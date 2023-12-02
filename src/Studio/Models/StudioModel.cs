@@ -71,22 +71,22 @@ public class StudioModel
 		}
 	}
 
-	public async Task SaveStudioSettingsAsync()
+	public void SaveStudioSettings()
 	{
-		byte[] json = await MigrationSerializer.SerializeAsync(StudioSettings, SerializedDataFormat.JSON, Assembly);
+		byte[] json = MigrationSerializer.SerializeAsync(StudioSettings, SerializedDataFormat.JSON, Assembly).GetAwaiter().GetResult();
 		Directory.CreateDirectory(Path.GetDirectoryName(StudioSettings.SettingsPath)!);
-		await File.WriteAllBytesAsync(StudioSettings.SettingsPath, json);
+		File.WriteAllBytes(StudioSettings.SettingsPath, json);
 	}
 
-	public async Task LoadStudioSettingsAsync()
+	public void LoadStudioSettings()
 	{
 		if(!File.Exists(StudioSettings.SettingsPath))
 		{
 			return;
 		}
 		
-		byte[] json = await File.ReadAllBytesAsync(StudioSettings.SettingsPath);
-		StudioSettings settings = await MigrationSerializer.DeserializeAsync<StudioSettings, IStudioSettingsMigratable>(_migrationManager.TypesHash, json, SerializedDataFormat.JSON, _migrationManager, false, Assembly);
+		byte[] json = File.ReadAllBytes(StudioSettings.SettingsPath);
+		StudioSettings settings = MigrationSerializer.DeserializeAsync<StudioSettings, IStudioSettingsMigratable>(_migrationManager.TypesHash, json, SerializedDataFormat.JSON, _migrationManager, false, Assembly).GetAwaiter().GetResult();
 		_studioSettings = settings;
 	}
 }

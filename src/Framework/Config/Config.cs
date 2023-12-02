@@ -7,7 +7,7 @@ namespace Mine.Framework;
 public sealed class Config
 {
 	private const string ConfigFileName = "engine_config.json";
-	private       string ConfigFilePath => Path.Combine(Engine.DataPath, ConfigFileName);
+	private       string ConfigFilePath => Path.Combine(Engine.ApplicationDataPath, ConfigFileName);
 	
 	public void Load()
 	{
@@ -47,9 +47,9 @@ public sealed class Config
 	
 	public void Save()
 	{
-		if (!Directory.Exists(Engine.DataPath))
+		if (!Directory.Exists(Engine.ApplicationDataPath))
 		{
-			Directory.CreateDirectory(Engine.DataPath);
+			Directory.CreateDirectory(Engine.ApplicationDataPath);
 		}
 
 		ConfigData data = new()
