@@ -1,6 +1,7 @@
 ﻿using Mine.Framework;
 using Mine.ImGuiPlugin;
 using RedHerring.Studio.Models;
+using RedHerring.Studio.Models.ViewModels;
 using RedHerring.Studio.UserInterface;
 using RedHerring.Studio.UserInterface.Attributes;
 using Gui = ImGuiNET.ImGui;
@@ -12,13 +13,19 @@ public sealed class ToolInspector : Tool
 {
 	public const       string    ToolName = FontAwesome6.CircleInfo + " Inspector";
 	protected override string    Name => ToolName;
+
+	private readonly StudioModel _studioModel;
+	
 	private readonly   Inspector _inspector;
 
 	private List<object> _tests = new(){new InspectorTest2(), new InspectorTest()}; // TODO debug
 
+	private bool _subscribedToChange = false;
+
 	public ToolInspector(StudioModel studioModel, int uniqueId) : base(studioModel, uniqueId)
 	{
-		_inspector = new Inspector(studioModel.CommandHistory);
+		_studioModel = studioModel;
+		_inspector        = new Inspector(studioModel.CommandHistory);
 		_inspector.Init(_tests);
 	}
 	
@@ -32,13 +39,47 @@ public sealed class ToolInspector : Tool
 		bool isOpen = true;
 		if (Gui.Begin(NameId, ref isOpen))
 		{
+			if (!_subscribedToChange)
+			{
+				SubscribeToChange();
+			}
+
 			_inspector.Update();
 			Gui.End();
+		}
+		else
+		{
+			if (_subscribedToChange)
+			{
+				UnsubscribeFromChange();
+			}
 		}
 
 		return !isOpen;
 	}
+	
+	#region Event handlers
+
+	private void SubscribeToChange()
+	{
+		_studioModel.EventAggregator.Register<SelectionViewModel.SelectionChanged>(OnSelectionChanged);
+		_subscribedToChange = true;
+	}
+
+	private void UnsubscribeFromChange()
+	{
+		_studioModel.EventAggregator.Unregister<SelectionViewModel.SelectionChanged>(OnSelectionChanged);
+		_subscribedToChange = false;
+	}
+
+	private void OnSelectionChanged(SelectionViewModel.SelectionChanged e)
+	{
+		_inspector.Init(StudioModel.Selection.GetAllSelectedTargets());
+	}
+
+	#endregion
 }
+
 
 
 

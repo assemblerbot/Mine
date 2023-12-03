@@ -30,7 +30,7 @@ public class StudioModel
 	private readonly ConsoleViewModel _console = new();
 	public           ConsoleViewModel Console => _console;
 	
-	private readonly SelectionViewModel _selection = new();
+	private readonly SelectionViewModel _selection;
 	public SelectionViewModel Selection => _selection;
 
 	private readonly TaskProcessor _taskProcessor = new(_threadsCount);
@@ -42,7 +42,8 @@ public class StudioModel
 
 	public StudioModel()
 	{
-		_project = new ProjectModel(_migrationManager, _eventAggregator);
+		_project   = new ProjectModel(_migrationManager, _eventAggregator);
+		_selection = new(_eventAggregator);
 	}
 
 	public void Close()
