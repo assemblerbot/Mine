@@ -1,11 +1,11 @@
-﻿using SKey = Silk.NET.Input.Key;
+using SKey = Silk.NET.Input.Key;
 using VKey = Veldrid.Key;
 
-namespace Mine.Framework;
+namespace Mine.ImGuiPlugin;
 
-public static class InputExtensions
+public static class ImGuiInputExtensions
 {
-	public static VKey ToVeldridKey(this SKey key)
+		public static VKey ToVeldridKey(this SKey key)
 	{
 		return key switch
 		{

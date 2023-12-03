@@ -1,5 +1,6 @@
 ﻿using ImGuiNET;
 using Mine.Framework;
+using Mine.ImGuiPlugin;
 using RedHerring.Studio.Models;
 using RedHerring.Studio.Models.Project.FileSystem;
 using Gui = ImGuiNET.ImGui;

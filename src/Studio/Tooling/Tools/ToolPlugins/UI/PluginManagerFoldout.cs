@@ -1,6 +1,7 @@
 using System.Numerics;
 using ImGuiNET;
 using Mine.Framework;
+using Mine.ImGuiPlugin;
 
 namespace Mine.Studio;
 

@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using Mine.Framework;
 using Silk.NET.Input;
 using Veldrid;
 using SMouseButton = Silk.NET.Input.MouseButton;
@@ -6,7 +7,7 @@ using VMouseButton = Veldrid.MouseButton;
 using SKey = Silk.NET.Input.Key;
 using VKey = Veldrid.Key;
 
-namespace Mine.Framework;
+namespace Mine.ImGuiPlugin;
 
 public class ImGuiInputSnapshot : InputSnapshot
 {

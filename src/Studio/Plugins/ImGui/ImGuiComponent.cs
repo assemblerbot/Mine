@@ -1,17 +1,18 @@
-using System.Numerics;
 using ImGuiNET;
+using Mine.Framework;
 using Silk.NET.Maths;
 using Veldrid;
 
-namespace Mine.Framework;
+namespace Mine.ImGuiPlugin;
 
 // built-in game object component
 public sealed class ImGuiComponent : Component, IUpdatable, IRenderable
 {
-	public static readonly string DefaultFontFile = "Plugins/ImGui/Roboto-Regular.ttf";
-	public static readonly string FontFARegular   = "Plugins/ImGui/fa-regular-400.ttf";
-	public static readonly string FontFASolid     = "Plugins/ImGui/fa-solid-900.ttf";
-	public const           int    Size            = 16;
+	public const string AssetsFolder    = "Plugins/ImGuiAssets/";
+	public const string DefaultFontFile = AssetsFolder + "Roboto-Regular.ttf";
+	public const string FontFARegular   = AssetsFolder + "fa-regular-400.ttf";
+	public const string FontFASolid     = AssetsFolder + "fa-solid-900.ttf";
+	public const int    Size            = 16;
 
 	public int UpdateOrder = Int32.MinValue;
 	public int GetUpdateOrder() => UpdateOrder;

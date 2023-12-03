@@ -1,4 +1,5 @@
 using System.Reflection;
+using EventAggregatorPlugin;
 using Migration;
 using RedHerring.Studio.Commands;
 using RedHerring.Studio.Models.Project;
@@ -34,10 +35,14 @@ public class StudioModel
 
 	private readonly TaskProcessor _taskProcessor = new(_threadsCount);
 	public           TaskProcessor TaskProcessor => _taskProcessor;
+	
+	// events
+	private readonly StudioModelEventAggregator          _eventAggregator = new();
+	public           IStudioModelEventAggregatorReadOnly EventAggregator => _eventAggregator;
 
 	public StudioModel()
 	{
-		_project = new ProjectModel(_migrationManager);
+		_project = new ProjectModel(_migrationManager, _eventAggregator);
 	}
 
 	public void Close()
@@ -49,7 +54,7 @@ public class StudioModel
 	public async Task OpenProjectAsync(string path)
 	{
 		Selection.DeselectAll();
-		Project.CloseAsync().GetAwaiter().GetResult();;
+		Project.CloseAsync().GetAwaiter().GetResult();
 		
 		try
 		{

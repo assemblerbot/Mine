@@ -7,12 +7,23 @@ namespace RedHerring.Studio.Models.Project;
 
 public sealed class ProjectModel
 {
+	#region Events
+	public struct OpenedEvent : IStudioModelEvent
+	{
+	}
+
+	public struct ClosedEvent : IStudioModelEvent
+	{
+	}
+	#endregion
+	
 	private const string _assetsFolderName = "Assets";
 	private const string _settingsFileName = "Project.json";
 
 	public static Assembly Assembly => typeof(ProjectModel).Assembly; 
 
-	private readonly MigrationManager _migrationManager;
+	private readonly MigrationManager           _migrationManager;
+	private readonly StudioModelEventAggregator _eventAggregator;
 	
 	private ProjectFolderNode? _assetsFolder;
 	public  ProjectFolderNode? AssetsFolder => _assetsFolder;
@@ -20,9 +31,10 @@ public sealed class ProjectModel
 	private ProjectSettings? _projectSettings;
 	public  ProjectSettings? ProjectSettings => _projectSettings;
 	
-	public ProjectModel(MigrationManager migrationManager)
+	public ProjectModel(MigrationManager migrationManager, StudioModelEventAggregator eventAggregator)
 	{
 		_migrationManager = migrationManager;
+		_eventAggregator  = eventAggregator;
 	}
 	
 	#region Open/close
@@ -30,6 +42,7 @@ public sealed class ProjectModel
 	{
 		await SaveSettingsAsync();
 		_assetsFolder = null;
+		_eventAggregator.Trigger(new ClosedEvent());
 	}
 	
 	public async Task OpenAsync(string projectPath)
@@ -44,6 +57,7 @@ public sealed class ProjectModel
 			// error
 			ConsoleViewModel.Log($"Assets folder not found on path {assetsPath}", ConsoleItemType.Error);
 			await assetsFolder.InitMetaRecursive(_migrationManager); // create meta for at least root
+			_eventAggregator.Trigger(new OpenedEvent());
 			return;
 		}
 		

@@ -1,4 +1,5 @@
 ﻿using Mine.Framework;
+using Mine.ImGuiPlugin;
 using RedHerring.Studio.Models;
 using RedHerring.Studio.UserInterface;
 using RedHerring.Studio.UserInterface.Attributes;

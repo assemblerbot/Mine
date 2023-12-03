@@ -1,5 +1,6 @@
 using Mine.Framework;
 using ImGuiNET;
+using Mine.ImGuiPlugin;
 using NativeFileDialogSharp;
 using RedHerring.Studio.Models;
 using RedHerring.Studio.Models.Project.Importers;

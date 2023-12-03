@@ -1,7 +1,9 @@
 using System.Numerics;
 using ImGuiNET;
 using Mine.Framework;
+using Mine.ImGuiPlugin;
 using RedHerring.Studio.Models;
+using RedHerring.Studio.Models.Project;
 using RedHerring.Studio.Tools;
 
 namespace Mine.Studio;
@@ -18,6 +20,7 @@ public class ToolPlugins : Tool
 	private readonly PluginManagerCollections                 _pluginCollections;
 	private readonly Dictionary<string, PluginManagerFoldout> _pluginFoldouts = new();
 
+	private bool _eventsRegistered = false;
 	private bool _refreshRequested = false;
 
 	public ToolPlugins(StudioModel studioModel, int uniqueId) : base(studioModel, uniqueId)
@@ -25,6 +28,7 @@ public class ToolPlugins : Tool
 		_studioModel       = studioModel;
 		_settings          = new PluginManagerSettings();
 		_pluginCollections = new PluginManagerCollections();
+		
 		Refresh();
 	}
 	
@@ -68,6 +72,11 @@ public class ToolPlugins : Tool
 		bool isOpen = true;
 		if (ImGui.Begin(NameId, ref isOpen))
 		{
+			if (!_eventsRegistered)
+			{
+				RegisterEvents();
+			}
+
 			if (_refreshRequested)
 			{
 				_refreshRequested = false;
@@ -81,6 +90,11 @@ public class ToolPlugins : Tool
 		}
 		else
 		{
+			if (_eventsRegistered)
+			{
+				UnregisterEvents();
+			}
+
 			RequestRefresh();
 		}
 
@@ -157,6 +171,32 @@ public class ToolPlugins : Tool
 
 			ImGui.EndTable();
 		}
+	}
+	#endregion
+	
+	#region Event handlers
+	private void RegisterEvents()
+	{
+		_studioModel.EventAggregator.Register<ProjectModel.OpenedEvent>(OnProjectOpened);
+		_studioModel.EventAggregator.Register<ProjectModel.ClosedEvent>(OnProjectClosed);
+		_eventsRegistered = true;
+	}
+	
+	private void UnregisterEvents()
+	{
+		_studioModel.EventAggregator.Unregister<ProjectModel.OpenedEvent>(OnProjectOpened);
+		_studioModel.EventAggregator.Unregister<ProjectModel.ClosedEvent>(OnProjectClosed);
+		_eventsRegistered = false;
+	}
+
+	private void OnProjectOpened(ProjectModel.OpenedEvent e)
+	{
+		RequestRefresh();
+	}
+	
+	private void OnProjectClosed(ProjectModel.ClosedEvent e)
+	{
+		RequestRefresh();
 	}
 	#endregion
 }

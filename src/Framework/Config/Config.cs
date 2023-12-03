@@ -6,7 +6,7 @@ namespace Mine.Framework;
 
 public sealed class Config
 {
-	private const string ConfigFileName = "engine_config.json";
+	private const string ConfigFileName = "engine_settings.json";
 	private       string ConfigFilePath => Path.Combine(Engine.ApplicationDataPath, ConfigFileName);
 	
 	public void Load()
