@@ -1,6 +1,5 @@
 using System.Numerics;
 using ImGuiNET;
-using Mine.Framework;
 using Mine.ImGuiPlugin;
 using RedHerring.Studio.Models;
 using RedHerring.Studio.Models.Project;
@@ -144,7 +143,7 @@ public class ToolPlugins : Tool
 			RequestRefresh();
 		}
 	}
-
+	
 	private void PluginsUI()
 	{
 		if (_pluginCollections.IsError)

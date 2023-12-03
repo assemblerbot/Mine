@@ -2,19 +2,17 @@
 
 namespace RedHerring.Studio.UserInterface;
 
-public sealed class InspectorModifyValueCommand : Command
+// TODO - refactor, copy pasted
+public class InspectorDeleteClassCommand : Command
 {
-	private readonly object?                _value;
 	private readonly List<InspectorBinding> _bindings;
 	private readonly object?[]              _previousValues;
 	
-	public InspectorModifyValueCommand(List<InspectorBinding> bindings, object? value)
+	public InspectorDeleteClassCommand(List<InspectorBinding> bindings)
 	{
-		_value = value;
-		
 		_bindings = new List<InspectorBinding>();
-		_bindings.AddRange(bindings); // hmm, it is safe to just keep reference to the list?
-		
+		_bindings.AddRange(bindings);
+
 		_previousValues = new object[_bindings.Count];
 		for(int i=0;i <_bindings.Count; ++i)
 		{
@@ -27,7 +25,7 @@ public sealed class InspectorModifyValueCommand : Command
 			_previousValues[i] = previousValue;
 		}
 	}
-	
+
 	public override void Do()
 	{
 		foreach (InspectorBinding binding in _bindings)
@@ -37,7 +35,7 @@ public sealed class InspectorModifyValueCommand : Command
 				continue;
 			}
 
-			binding.SetValue(_value);
+			binding.SetValue(null);
 		}
 	}
 

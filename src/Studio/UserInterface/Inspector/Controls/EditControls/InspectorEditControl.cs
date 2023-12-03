@@ -1,33 +1,32 @@
 ﻿using System.Reflection;
 using ImGuiNET;
-using RedHerring.Studio.UserInterface.Attributes;
 using Gui = ImGuiNET.ImGui;
 
 namespace RedHerring.Studio.UserInterface;
 
-public abstract class AnInspectorEditControl<T> : AnInspectorControl
+public abstract class InspectorEditControl<T> : InspectorControl
 {
 	private const string MultipleValuesButtonLabel = "Edit multiple";
 
 	protected T? Value;
 	
 	protected        bool    _multipleValues = false;
-	private readonly string? _multipleValuesLabel;
+	private readonly string? _multipleValuesLabelId;
 	
 	protected bool _isReadOnly = false;
 	
-	protected AnInspectorEditControl(Inspector inspector, string id) : base(inspector, id)
+	protected InspectorEditControl(Inspector inspector, string id) : base(inspector, id)
 	{
-		_multipleValuesLabel = MultipleValuesButtonLabel + Id;
+		_multipleValuesLabelId = $"{MultipleValuesButtonLabel}##{Id}";
 	}
 
-	public override void InitFromSource(object? sourceOwner, object source, FieldInfo? sourceField = null)
+	public override void InitFromSource(object? sourceOwner, object source, FieldInfo? sourceField = null, int sourceIndex = -1)
 	{
-		base.InitFromSource(sourceOwner, source, sourceField);
+		base.InitFromSource(sourceOwner, source, sourceField, sourceIndex);
 
-		_multipleValues = false;
-		_isReadOnly     = sourceField != null && (sourceField.IsInitOnly || sourceField.GetCustomAttribute<ReadOnlyInInspectorAttribute>() != null);
-		Value          = (T?)sourceField?.GetValue(source);
+		_multipleValues =  false;
+		_isReadOnly     |= Bindings.Any(x => x.IsUnbound || x.IsReadOnly);
+		UpdateValue();
 	}
 
 	public override void AdaptToSource(object? sourceOwner, object source, FieldInfo? sourceField = null)
@@ -35,7 +34,7 @@ public abstract class AnInspectorEditControl<T> : AnInspectorControl
 		base.AdaptToSource(sourceOwner, source, sourceField);
 
 		_multipleValues = GetValue() == MultipleValues;
-		_isReadOnly     = _isReadOnly || ValueBindings.Any(x => x.SourceField != null && (x.SourceField.IsInitOnly || x.SourceField.GetCustomAttribute<ReadOnlyInInspectorAttribute>() != null));
+		_isReadOnly     |= Bindings.Any(x => x.IsUnbound || x.IsReadOnly);
 	}
 	
 	#region Value manipulation
@@ -80,7 +79,7 @@ public abstract class AnInspectorEditControl<T> : AnInspectorControl
 	protected bool GuiMultiEditButton()
 	{
 		Gui.BeginDisabled(_isReadOnly);
-		bool buttonClicked = Gui.Button(_multipleValuesLabel);
+		bool buttonClicked = Gui.Button(_multipleValuesLabelId);
 		Gui.EndDisabled();
 		Gui.SameLine();
 		Gui.AlignTextToFramePadding();
@@ -100,7 +99,7 @@ public abstract class AnInspectorEditControl<T> : AnInspectorControl
 	{
 		if (_isReadOnly)
 		{
-			Gui.PushStyleVar(ImGuiStyleVar.Alpha, 1.0f); // workaround to readonly input style
+			Gui.PopStyleVar();
 		}
 	}
 	#endregion

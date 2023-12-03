@@ -3,11 +3,11 @@ using Gui = ImGuiNET.ImGui;
 
 namespace RedHerring.Studio.UserInterface;
 
-public sealed class InspectorButtonControl : AnInspectorControl
+public sealed class InspectorButtonControl : InspectorControl
 {
 	private readonly struct Binding
 	{
-		public readonly object     Source;
+		public readonly object Source;
 
 		public Binding(object source, MethodInfo method)
 		{
@@ -23,13 +23,13 @@ public sealed class InspectorButtonControl : AnInspectorControl
 	public InspectorButtonControl(Inspector inspector, string id, string label, object source, MethodInfo method) : base(inspector, id)
 	{
 		Label   = label;
-		LabelId = $"{Label}{Id}";
+		LabelId = $"{Label}##{Id}";
 		_bindings.Add(new Binding(source, method));
 	}
 
-	public void AddBinding(object boundObject, MethodInfo method)
+	public void AddBinding(object sourceFieldValue, MethodInfo method)
 	{
-		_bindings.Add(new Binding(boundObject, method));
+		_bindings.Add(new Binding(sourceFieldValue, method));
 	}
 	
 	public override void Update()
