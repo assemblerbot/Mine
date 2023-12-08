@@ -14,7 +14,6 @@ public sealed class StudioComponent : Component, IUpdatable
 	public int GetUpdateOrder() => 0;
 
 	private StudioModel    _studioModel = new();
-	private ImporterThread _importerThread;
 
 	private ToolManager _toolManager = new();
 	
@@ -128,8 +127,7 @@ public sealed class StudioComponent : Component, IUpdatable
 			return;
 		}
 		
-		_studioModel.OpenProjectAsync(result.Path).GetAwaiter().GetResult();
-		//_importerThread.Continue();
+		_studioModel.OpenProject(result.Path);
 	}
 
 	private void OnExitClicked()

@@ -49,18 +49,18 @@ public class StudioModel
 	public void Close()
 	{
 		_taskProcessor.Cancel();
-		Project.CloseAsync().GetAwaiter().GetResult();
+		Project.Close();
 	}
 
-	public async Task OpenProjectAsync(string path)
+	public void OpenProject(string path)
 	{
 		Selection.DeselectAll();
-		Project.CloseAsync().GetAwaiter().GetResult();
+		Project.Close();
 		
 		try
 		{
 			ConsoleViewModel.Log($"Opening project from {path}", ConsoleItemType.Info);
-			await Project.OpenAsync(path);
+			Project.Open(path);
 			ConsoleViewModel.Log($"Project opened", ConsoleItemType.Success);
 		}
 		catch (Exception e)

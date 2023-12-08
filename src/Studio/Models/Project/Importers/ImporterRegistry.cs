@@ -7,13 +7,9 @@ public sealed class ImporterRegistry
 	private Dictionary<string, Importer> _importers        = new();
 	private Importer                     _fallbackImporter = new CopyImporter();
 
-	private Dictionary<Type, List<ImporterProcessor>?> _processors         = new();
-	private List<ImporterProcessor>                    _fallbackProcessors = new() {new CopyImporterProcessor()};
-
 	public ImporterRegistry()
 	{
 		ScanImporters();
-		ScanImporterProcessors();
 	}
 
 	public Importer GetImporter(string extension)
@@ -26,16 +22,6 @@ public sealed class ImporterRegistry
 		return _fallbackImporter;
 	}
 	
-	public List<ImporterProcessor> GetProcessors(Type type)
-	{
-		if(_processors.TryGetValue(type, out List<ImporterProcessor>? processors))
-		{
-			return processors!;
-		}
-		
-		return _fallbackProcessors;
-	}
-
 	private void ScanImporters()
 	{
 		Engine.Types.ForEachAttribute<ImporterAttribute>(
@@ -46,17 +32,6 @@ public sealed class ImporterRegistry
 				{
 					_importers.Add(extension, importer);
 				}
-			}
-		);
-	}
-
-	private void ScanImporterProcessors()
-	{
-		Engine.Types.ForEachAttribute<ImporterProcessorAttribute>(
-			(attribute, type) => 
-			{
-				ImporterProcessor importerProcessor = (ImporterProcessor) Activator.CreateInstance(type)!;
-				(_processors[attribute.ProcessedType] ??= new ()).Add(importerProcessor);
 			}
 		);
 	}

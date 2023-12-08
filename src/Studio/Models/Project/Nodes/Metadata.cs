@@ -7,8 +7,8 @@ namespace RedHerring.Studio.Models.Project.FileSystem;
 [Serializable, SerializedClassId("metadata-class-id")]
 public class Metadata
 {
-	[ReadOnlyInInspector] public string? Guid = null;
-	[ReadOnlyInInspector] public string? Hash = null;
+	[ReadOnlyInInspector] public string? Guid    = null;
+	[HideInInspector] public string? Hash    = null;
 	
 	[AllowDeleteReference] public ImporterSettings? ImporterSettings = null;
 
