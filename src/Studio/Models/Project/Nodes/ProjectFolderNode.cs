@@ -7,13 +7,24 @@ public class ProjectFolderNode : ProjectNode
 {
 	public ObservableCollection<ProjectNode> Children { get; init; } = new();
 	
-	public ProjectFolderNode(string name, string path, string relativePath) : base(name, path, relativePath)
+	public ProjectFolderNode(string name, string path, string relativePath, bool hasMetaFile) : base(name, path, relativePath, hasMetaFile)
 	{
 	}
 
 	public override void InitMeta(MigrationManager migrationManager, CancellationToken cancellationToken)
 	{
-		CreateMetaFile(migrationManager, null);
+		if (HasMetaFile)
+		{
+			CreateMetaFile(migrationManager, null);
+		}
+		else
+		{
+			Meta = new Metadata
+			       {
+				       Guid = RelativePath,
+				       Hash = ""
+			       };
+		}
 	}
 
 	public override void TraverseRecursive(Action<ProjectNode> process, TraverseFlags flags, CancellationToken cancellationToken)

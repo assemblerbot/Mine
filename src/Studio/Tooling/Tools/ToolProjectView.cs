@@ -35,6 +35,7 @@ public sealed class ToolProjectView : Tool
 		if (Gui.Begin(NameId, ref isOpen))
 		{
 			UpdateFolder(StudioModel.Project.AssetsFolder);
+			UpdateFolder(StudioModel.Project.ScriptsGameLibraryFolder);
 			Gui.End();
 		}
 
@@ -55,7 +56,6 @@ public sealed class ToolProjectView : Tool
 		}
 
 		bool nodeExpanded = UpdateNode(node, TreeInternalNodeFlags);
-
 		if (nodeExpanded)
 		{
 			foreach (ProjectNode child in node.Children)
@@ -64,9 +64,9 @@ public sealed class ToolProjectView : Tool
 				{
 					UpdateFolder(folder);
 				}
-				else if (child is ProjectFileNode file)
+				else if (child is ProjectAssetFileNode or ProjectScriptFileNode)
 				{
-					UpdateFile(file);
+					UpdateFile(child);
 				}
 			}
             
@@ -74,13 +74,18 @@ public sealed class ToolProjectView : Tool
 		}
 	}
     
-	private void UpdateFile(ProjectFileNode node)
+	private void UpdateFile(ProjectNode node)
 	{
 		UpdateNode(node, TreeLeafNodeFlags);
 	}
 	
 	private bool UpdateNode(ProjectNode node, ImGuiTreeNodeFlags flags)
 	{
+		if (node.Meta == null)
+		{
+			return false;
+		}
+
 		string id = node.Meta.Guid!;
 
 		if (StudioModel.Selection.IsSelected(id))

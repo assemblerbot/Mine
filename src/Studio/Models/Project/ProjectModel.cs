@@ -18,9 +18,10 @@ public sealed class ProjectModel
 	}
 	#endregion
 	
-	private const string _assetsFolderName = "Assets";
-	private const string _settingsFileName = "Project.json";
-
+	private const string _assetsFolderName             = "Assets";
+	private const string _scriptsGameLibraryFolderName = "GameLibrary";
+	private const string _settingsFileName             = "Project.json";
+	
 	public static Assembly Assembly => typeof(ProjectModel).Assembly; 
 
 	private readonly MigrationManager           _migrationManager;
@@ -29,6 +30,9 @@ public sealed class ProjectModel
 	
 	private ProjectFolderNode? _assetsFolder;
 	public  ProjectFolderNode? AssetsFolder => _assetsFolder;
+
+	private ProjectFolderNode? _scriptsGameLibraryFolder;
+	public  ProjectFolderNode? ScriptsGameLibraryFolder => _scriptsGameLibraryFolder; 
 
 	private ProjectSettings? _projectSettings;
 	public  ProjectSettings ProjectSettings => _projectSettings!;
@@ -58,49 +62,64 @@ public sealed class ProjectModel
 	
 	public void Open(string projectPath)
 	{
-		LoadSettings(projectPath);
-
+		// create roots
 		string            assetsPath   = Path.Join(projectPath, _assetsFolderName);
 		ProjectFolderNode assetsFolder = new ProjectRootNode(_assetsFolderName, assetsPath);
+		_assetsFolder = assetsFolder;
+		
+		string            scriptsGameLibraryPath   = Path.Join(projectPath, _scriptsGameLibraryFolderName);
+		ProjectFolderNode scriptsGameLibraryFolder = new ProjectRootNode(_scriptsGameLibraryFolderName, scriptsGameLibraryPath);
+		_scriptsGameLibraryFolder = scriptsGameLibraryFolder;
 
+		// check
 		if (!Directory.Exists(assetsPath))
 		{
 			// error
-			Console.WriteLine($"Assets folder not found on path {assetsPath}");
-			_assetsFolder = assetsFolder;
+			ConsoleViewModel.LogError($"Assets folder not found on path {assetsPath}");
 			InitMeta();
 			_eventAggregator.Trigger(new OpenedEvent());
 			return;
 		}
-		
-		//Console.WriteLine($"Scan project path {projectPath}");
 
+		// load / create settings
+		LoadSettings(projectPath);
+
+		// read assets
 		try
 		{
-			RecursiveScan(assetsPath, "", assetsFolder);
+			RecursiveAssetScan(assetsPath, "", assetsFolder);
 		}
 		catch (Exception e)
 		{
-			Console.WriteLine($"Exception: {e}");
+			ConsoleViewModel.LogException($"Exception: {e}");
+		}
+		
+		// read scripts
+		try
+		{
+			RecursiveScriptScan(scriptsGameLibraryPath, "", scriptsGameLibraryFolder);
+		}
+		catch (Exception e)
+		{
+			ConsoleViewModel.LogException($"Exception: {e}");
 		}
 
-		_assetsFolder = assetsFolder;
 		InitMeta();
 		ImportAll();
 		_eventAggregator.Trigger(new OpenedEvent());
 	}
 
-	private void RecursiveScan(string path, string relativePath, ProjectFolderNode root)
+	private void RecursiveAssetScan(string path, string relativePath, ProjectFolderNode root)
 	{
 		// scan directories
 		foreach (string directoryPath in Directory.EnumerateDirectories(path))
 		{
 			string            directory             = Path.GetFileName(directoryPath);
 			string            relativeDirectoryPath = Path.Combine(relativePath, directory);
-			ProjectFolderNode folderNode            = new(directory, directoryPath, relativeDirectoryPath);
+			ProjectFolderNode folderNode            = new(directory, directoryPath, relativeDirectoryPath, true);
 			root.Children.Add(folderNode);
 			
-			RecursiveScan(directoryPath, relativeDirectoryPath, folderNode);
+			RecursiveAssetScan(directoryPath, relativeDirectoryPath, folderNode);
 		}
 
 		// scan files except meta
@@ -113,14 +132,43 @@ public sealed class ProjectModel
 			}
 
 			string          relativeFilePath = Path.Combine(relativePath, fileName);
-			ProjectFileNode fileNode         = new(fileName, filePath, relativeFilePath);
-			root.Children.Add(fileNode);
+			ProjectAssetFileNode assetFileNode         = new(fileName, filePath, relativeFilePath);
+			root.Children.Add(assetFileNode);
+		}
+	}
+
+	private void RecursiveScriptScan(string path, string relativePath, ProjectFolderNode root)
+	{
+		// scan directories
+		foreach (string directoryPath in Directory.EnumerateDirectories(path))
+		{
+			string            directory             = Path.GetFileName(directoryPath);
+			string            relativeDirectoryPath = Path.Combine(relativePath, directory);
+			ProjectFolderNode folderNode            = new(directory, directoryPath, relativeDirectoryPath, false);
+			root.Children.Add(folderNode);
+			
+			RecursiveScriptScan(directoryPath, relativeDirectoryPath, folderNode);
+		}
+
+		// scan all files
+		foreach (string filePath in Directory.EnumerateFiles(path))
+		{
+			string fileName = Path.GetFileName(filePath);
+			string               relativeFilePath = Path.Combine(relativePath, fileName);
+			ProjectScriptFileNode assetFileNode    = new(fileName, filePath, relativeFilePath);
+			root.Children.Add(assetFileNode);
 		}
 	}
 
 	private void InitMeta()
 	{
 		_assetsFolder!.TraverseRecursive(
+			node => _thread.Enqueue(new ProjectTask(cancellationToken => node.InitMeta(_migrationManager, cancellationToken))),
+			TraverseFlags.Directories | TraverseFlags.Files,
+			default
+		);
+
+		_scriptsGameLibraryFolder!.TraverseRecursive(
 			node => _thread.Enqueue(new ProjectTask(cancellationToken => node.InitMeta(_migrationManager, cancellationToken))),
 			TraverseFlags.Directories | TraverseFlags.Files,
 			default

@@ -1,21 +1,24 @@
 using Migration;
+using RedHerring.Studio.UserInterface.Attributes;
 
 namespace RedHerring.Studio.Models.Project.FileSystem;
 
 public abstract class ProjectNode
 {
-	public          string   Name { get; }
-	public readonly string   Path;
-	public readonly string   RelativePath; // relative path inside Assets directory
-	public          Metadata Meta = null!;
+	public          string    Name { get; }
+	public readonly string    Path;
+	public readonly string    RelativePath; // relative path inside Assets directory
+	[ReadOnlyInInspector] public          bool      HasMetaFile;
+	public          Metadata? Meta;
 
 	public string Extension => System.IO.Path.GetExtension(Path).ToLower();	// cache if needed
 
-	protected ProjectNode(string name, string path, string relativePath)
+	protected ProjectNode(string name, string path, string relativePath, bool hasMetaFile)
 	{
 		Name         = name;
 		Path         = path;
 		RelativePath = relativePath;
+		HasMetaFile  = hasMetaFile;
 	}
 
 	public abstract void InitMeta(MigrationManager migrationManager, CancellationToken cancellationToken);

@@ -3,11 +3,11 @@ using Migration;
 
 namespace RedHerring.Studio.Models.Project.FileSystem;
 
-public sealed class ProjectFileNode : ProjectNode
+public sealed class ProjectAssetFileNode : ProjectNode
 {
 	private static readonly HashAlgorithm _hashAlgorithm = SHA1.Create();
 	
-	public ProjectFileNode(string name, string path, string relativePath) : base(name, path, relativePath)
+	public ProjectAssetFileNode(string name, string path, string relativePath) : base(name, path, relativePath, true)
 	{
 	}
 	
