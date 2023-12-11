@@ -93,7 +93,7 @@ public sealed class ToolProjectView : Tool
 			flags |= ImGuiTreeNodeFlags.Selected;
 		}
 		
-		if(!_nodeLabels.TryGetValue(node, out string? label))
+		if(!_nodeLabels.TryGetValue(node, out string? label)) // TODO - should react to node.Type change
 		{
 			// if (node is ProjectFolderNode folder)
 			// {
@@ -103,8 +103,8 @@ public sealed class ToolProjectView : Tool
 			// {
 			// 	label = $"{Icon.FileIconText(node.Path)} {node.Name}";
 			// }
-			label = node.Name;
-
+			//label = node.Name;
+			label = $"{node.Type.ToIcon()} {node.Name}";
 			_nodeLabels.Add(node, label);
 		}
 		

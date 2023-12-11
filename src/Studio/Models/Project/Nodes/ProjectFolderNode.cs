@@ -7,8 +7,9 @@ public class ProjectFolderNode : ProjectNode
 {
 	public ObservableCollection<ProjectNode> Children { get; init; } = new();
 	
-	public ProjectFolderNode(string name, string path, string relativePath, bool hasMetaFile) : base(name, path, relativePath, hasMetaFile)
+	public ProjectFolderNode(string name, string path, string relativePath, bool hasMetaFile, ProjectNodeType type) : base(name, path, relativePath, hasMetaFile)
 	{
+		Type = type;
 	}
 
 	public override void InitMeta(MigrationManager migrationManager, CancellationToken cancellationToken)

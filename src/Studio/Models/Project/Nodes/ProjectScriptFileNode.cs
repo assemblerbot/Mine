@@ -17,7 +17,7 @@ public class ProjectScriptFileNode : ProjectNode
 
 	public ProjectScriptFileNode(string name, string path, string relativePath) : base(name, path, relativePath, false)
 	{
-		
+		Type = ProjectNodeType.ScriptFile;
 	}
 
 	public override void InitMeta(MigrationManager migrationManager, CancellationToken cancellationToken)
@@ -60,6 +60,7 @@ public class ProjectScriptFileNode : ProjectNode
 					if (fileId != null)
 					{
 						guid = fileId.Guid;
+						Type = ProjectNodeType.ScriptDefinitionTemplate;
 					}
 				}
 			}

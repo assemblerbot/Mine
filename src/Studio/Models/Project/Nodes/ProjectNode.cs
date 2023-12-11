@@ -5,13 +5,17 @@ namespace RedHerring.Studio.Models.Project.FileSystem;
 
 public abstract class ProjectNode
 {
-	public          string    Name { get; }
-	public readonly string    Path;
-	public readonly string    RelativePath; // relative path inside Assets directory
-	[ReadOnlyInInspector] public          bool      HasMetaFile;
-	public          Metadata? Meta;
+	[ReadOnlyInInspector] public ProjectNodeType Type = ProjectNodeType.Uninitialized;
 
-	public string Extension => System.IO.Path.GetExtension(Path).ToLower();	// cache if needed
+	public          string Name { get; }
+	public readonly string Path;
+	public readonly string RelativePath; // relative path inside Assets directory
+	
+	[ReadOnlyInInspector] public bool HasMetaFile;
+	
+	public Metadata? Meta;
+
+	public string Extension => System.IO.Path.GetExtension(Path).ToLower(); // cache if needed
 
 	protected ProjectNode(string name, string path, string relativePath, bool hasMetaFile)
 	{

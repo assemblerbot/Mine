@@ -62,7 +62,7 @@ public abstract class InspectorEditControl<T> : InspectorControl
 
 	protected void SubmitOrUpdateValue(bool submitted, bool controlIsActive)
 	{
-		if (submitted)
+		if (!_isReadOnly && submitted)
 		{
 			SetValue(Value);
 			return;

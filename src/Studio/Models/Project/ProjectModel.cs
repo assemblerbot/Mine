@@ -64,11 +64,11 @@ public sealed class ProjectModel
 	{
 		// create roots
 		string            assetsPath   = Path.Join(projectPath, _assetsFolderName);
-		ProjectFolderNode assetsFolder = new ProjectRootNode(_assetsFolderName, assetsPath);
+		ProjectFolderNode assetsFolder = new ProjectRootNode(_assetsFolderName, assetsPath, ProjectNodeType.AssetFolder);
 		_assetsFolder = assetsFolder;
 		
 		string            scriptsGameLibraryPath   = Path.Join(projectPath, _scriptsGameLibraryFolderName);
-		ProjectFolderNode scriptsGameLibraryFolder = new ProjectRootNode(_scriptsGameLibraryFolderName, scriptsGameLibraryPath);
+		ProjectFolderNode scriptsGameLibraryFolder = new ProjectRootNode(_scriptsGameLibraryFolderName, scriptsGameLibraryPath, ProjectNodeType.ScriptFolder);
 		_scriptsGameLibraryFolder = scriptsGameLibraryFolder;
 
 		// check
@@ -116,7 +116,7 @@ public sealed class ProjectModel
 		{
 			string            directory             = Path.GetFileName(directoryPath);
 			string            relativeDirectoryPath = Path.Combine(relativePath, directory);
-			ProjectFolderNode folderNode            = new(directory, directoryPath, relativeDirectoryPath, true);
+			ProjectFolderNode folderNode            = new(directory, directoryPath, relativeDirectoryPath, true, ProjectNodeType.AssetFolder);
 			root.Children.Add(folderNode);
 			
 			RecursiveAssetScan(directoryPath, relativeDirectoryPath, folderNode);
@@ -144,7 +144,7 @@ public sealed class ProjectModel
 		{
 			string            directory             = Path.GetFileName(directoryPath);
 			string            relativeDirectoryPath = Path.Combine(relativePath, directory);
-			ProjectFolderNode folderNode            = new(directory, directoryPath, relativeDirectoryPath, false);
+			ProjectFolderNode folderNode            = new(directory, directoryPath, relativeDirectoryPath, false, ProjectNodeType.ScriptFolder);
 			root.Children.Add(folderNode);
 			
 			RecursiveScriptScan(directoryPath, relativeDirectoryPath, folderNode);
@@ -193,6 +193,7 @@ public sealed class ProjectModel
 				{
 					Importer importer = _importerRegistry.GetImporter(node.Extension);
 					node.Meta.ImporterSettings ??= importer.CreateSettings();
+					node.Type = node.Meta.ImporterSettings.NodeType;
 
 					string resourcePath = Path.Combine(_projectSettings!.AbsoluteResourcesPath, node.RelativePath);
 
