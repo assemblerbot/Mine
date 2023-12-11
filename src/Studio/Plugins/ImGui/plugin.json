@@ -2,7 +2,7 @@
   "Id":"ImGui",
   "Name":"ImGui component",
   "Description" : "Component that enabled ImGui library in the project. Also contains FontAwesome binding.\n\n Required nuget packages:\n    Veldrid.ImGui",
-  "Version":"0.0.0",
+  "Version":"0.0.1",
   "Dependencies":["ImGuiAssets"],
   "Target":"Scripts"
 }

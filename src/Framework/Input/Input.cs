@@ -32,6 +32,8 @@ public sealed class Input : IDisposable
 		RegisterKeyboardCallbacks(_keyboard);
 		RegisterMouseCallbacks(_mouse);
 		RegisterGamepadCallbacks(_gamepad);
+		
+		
 	}
 
 	public void EndOfFrame()
@@ -71,6 +73,9 @@ public sealed class Input : IDisposable
 				_gamepad = isConnected ? gamepad : FirstGamepad();
 				RegisterGamepadCallbacks(_gamepad);
 				return;
+			default:
+				Console.WriteLine(device.GetType().Name);
+				break;
 		}
 	}
 	
@@ -173,6 +178,16 @@ public sealed class Input : IDisposable
 	private void OnMouseUp(IMouse mouse, MouseButton button)
 	{
 		MouseEvents.Add(new InputMouseEvent(button, false));
+	}
+	#endregion
+	
+	#region Cursor
+	public void SetCursor(StandardCursor cursor)
+	{
+		if (_mouse != null)
+		{
+			_mouse.Cursor.StandardCursor = cursor;
+		}
 	}
 	#endregion
 	

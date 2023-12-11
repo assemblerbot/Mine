@@ -1,5 +1,6 @@
 using ImGuiNET;
 using Mine.Framework;
+using Silk.NET.Input;
 using Silk.NET.Maths;
 using Veldrid;
 
@@ -135,6 +136,7 @@ public sealed class ImGuiComponent : Component, IUpdatable, IRenderable
 
 	public void Update(double timeDelta)
 	{
+		UpdateCursor();
 		_imGuiInputSnapshot.Update();
 		_renderer?.Update((float)timeDelta, _imGuiInputSnapshot);
 	}
@@ -151,5 +153,26 @@ public sealed class ImGuiComponent : Component, IUpdatable, IRenderable
 	public void WindowResized(Vector2Int size)
 	{
 		_renderer?.WindowResized(size.x, size.y);
+	}
+	
+	private void UpdateCursor()
+	{
+		StandardCursor cursor = ImGui.GetMouseCursor() switch
+		{
+			ImGuiMouseCursor.None       => StandardCursor.Default,
+			ImGuiMouseCursor.Arrow      => StandardCursor.Default,
+			ImGuiMouseCursor.TextInput  => StandardCursor.IBeam,
+			ImGuiMouseCursor.ResizeAll  => StandardCursor.Default,
+			ImGuiMouseCursor.ResizeNS   => StandardCursor.VResize,
+			ImGuiMouseCursor.ResizeEW   => StandardCursor.HResize,
+			ImGuiMouseCursor.ResizeNESW => StandardCursor.Default,
+			ImGuiMouseCursor.ResizeNWSE => StandardCursor.Default,
+			ImGuiMouseCursor.Hand       => StandardCursor.Hand,
+			ImGuiMouseCursor.NotAllowed => StandardCursor.Default,
+			ImGuiMouseCursor.COUNT      => StandardCursor.Default,
+			_                           => throw new ArgumentOutOfRangeException()
+		};
+
+		Engine.Input.SetCursor(cursor);
 	}
 }
