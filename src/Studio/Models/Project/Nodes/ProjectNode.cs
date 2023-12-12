@@ -34,6 +34,11 @@ public abstract class ProjectNode
 		File.WriteAllBytes(metaPath, json);
 	}
 
+	public void SetNodeType(ProjectNodeType type)
+	{
+		Type = type;
+	}
+
 	protected void CreateMetaFile(MigrationManager migrationManager, string? hash)
 	{
 		string metaPath = $"{Path}.meta";

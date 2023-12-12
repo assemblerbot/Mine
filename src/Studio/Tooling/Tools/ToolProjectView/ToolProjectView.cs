@@ -18,7 +18,7 @@ public sealed class ToolProjectView : Tool
 	
 	protected override string Name => ToolName;
 
-	private Dictionary<ProjectNode, string> _nodeLabels = new();
+	private Dictionary<(ProjectNode, ProjectNodeType), string> _nodeLabels = new();
     
 	public ToolProjectView(StudioModel studioModel, int uniqueId) : base(studioModel, uniqueId)
 	{
@@ -93,7 +93,7 @@ public sealed class ToolProjectView : Tool
 			flags |= ImGuiTreeNodeFlags.Selected;
 		}
 		
-		if(!_nodeLabels.TryGetValue(node, out string? label)) // TODO - should react to node.Type change
+		if(!_nodeLabels.TryGetValue((node, node.Type), out string? label)) // TODO - should react to node.Type change
 		{
 			// if (node is ProjectFolderNode folder)
 			// {
@@ -105,7 +105,7 @@ public sealed class ToolProjectView : Tool
 			// }
 			//label = node.Name;
 			label = $"{node.Type.ToIcon()} {node.Name}";
-			_nodeLabels.Add(node, label);
+			_nodeLabels.Add((node, node.Type), label);
 		}
 		
 		bool nodeExpanded = Gui.TreeNodeEx(id, flags, label);

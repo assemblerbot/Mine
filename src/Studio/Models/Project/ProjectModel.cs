@@ -193,7 +193,7 @@ public sealed class ProjectModel
 				{
 					Importer importer = _importerRegistry.GetImporter(node.Extension);
 					node.Meta.ImporterSettings ??= importer.CreateSettings();
-					node.Type = node.Meta.ImporterSettings.NodeType;
+					node.SetNodeType(node.Meta.ImporterSettings.NodeType);
 
 					string resourcePath = Path.Combine(_projectSettings!.AbsoluteResourcesPath, node.RelativePath);
 
