@@ -22,11 +22,14 @@ public class ToolPlugins : Tool
 	private bool _eventsRegistered = false;
 	private bool _refreshRequested = false;
 
+	private readonly string _refreshButtonTitleId;
+
 	public ToolPlugins(StudioModel studioModel, int uniqueId) : base(studioModel, uniqueId)
 	{
-		_studioModel       = studioModel;
-		_settings          = new PluginManagerSettings();
-		_pluginCollections = new PluginManagerCollections();
+		_studioModel          = studioModel;
+		_settings             = new PluginManagerSettings();
+		_pluginCollections    = new PluginManagerCollections();
+		_refreshButtonTitleId = $"{FontAwesome6.ArrowsRotate}##{uniqueId}.Refresh";
 		
 		Refresh();
 	}
@@ -138,9 +141,10 @@ public class ToolPlugins : Tool
 
 	private void RefreshButtonUI()
 	{
-		if (ImGui.Button(FontAwesome6.ArrowsRotate))
+		if (ImGui.Button(_refreshButtonTitleId))
 		{
 			RequestRefresh();
+			ImGui.OpenPopup("asdf");
 		}
 	}
 	

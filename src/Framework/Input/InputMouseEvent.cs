@@ -1,13 +1,11 @@
-﻿using Button = Silk.NET.Input.MouseButton;
-
-namespace Mine.Framework;
+﻿namespace Mine.Framework;
 
 public readonly struct InputMouseEvent
 {
-	public readonly Button Button;
-	public readonly bool   Pressed;
+	public readonly Silk.NET.Input.MouseButton Button;
+	public readonly bool                       Pressed;
 
-	public InputMouseEvent(Button button, bool pressed)
+	public InputMouseEvent(Silk.NET.Input.MouseButton button, bool pressed)
 	{
 		Button  = button;
 		Pressed = pressed;

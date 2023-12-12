@@ -93,7 +93,7 @@ public sealed class ToolProjectView : Tool
 			flags |= ImGuiTreeNodeFlags.Selected;
 		}
 		
-		if(!_nodeLabels.TryGetValue((node, node.Type), out string? label)) // TODO - should react to node.Type change
+		if(!_nodeLabels.TryGetValue((node, node.Type), out string? label))
 		{
 			// if (node is ProjectFolderNode folder)
 			// {
@@ -110,11 +110,17 @@ public sealed class ToolProjectView : Tool
 		
 		bool nodeExpanded = Gui.TreeNodeEx(id, flags, label);
 
+		if (Gui.BeginPopupContextItem(id))
+		{
+			Gui.Text("This is popup");
+			Gui.EndPopup();
+		}
+
 		if (Gui.IsItemClicked() && !Gui.IsItemToggledOpen())
 		{
 			HandleSelection(id, node);
 		}
-
+		
 		return nodeExpanded;
 	}
 
@@ -135,7 +141,4 @@ public sealed class ToolProjectView : Tool
 		StudioModel.Selection.DeselectAll();
 		StudioModel.Selection.Select(id, node);
 	}
-
-
-
 }

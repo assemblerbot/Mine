@@ -83,6 +83,8 @@ public sealed class StudioComponent : Component, IUpdatable
 		_newProjectDialog.Update();
 
 		_toolManager.Update();
+
+		//ImGui.ShowDemoWindow();
 	}
 	
 	private void InitImGui()

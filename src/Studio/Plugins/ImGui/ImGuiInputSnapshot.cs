@@ -25,7 +25,7 @@ public class ImGuiInputSnapshot : InputSnapshot
 
 	public bool IsMouseDown(VMouseButton button)
 	{
-		return Engine.Input.Mouse.IsButtonPressed((SMouseButton)(int)button);
+		return Engine.Input.Mouse.IsButtonPressed(button.ToSilkMouseButton());
 	}
 
 	public void Update()
@@ -57,11 +57,7 @@ public class ImGuiInputSnapshot : InputSnapshot
 		{
 			_mouseEvents.Add(
 				new MouseEvent(
-					Engine.Input.MouseEvents[i].Button == SMouseButton.Left
-						? VMouseButton.Left
-						: Engine.Input.MouseEvents[i].Button == SMouseButton.Right
-							? VMouseButton.Right
-							: VMouseButton.Middle,
+					Engine.Input.MouseEvents[i].Button.ToVeldridMouseButton(),
 					Engine.Input.MouseEvents[i].Pressed
 				)
 			);

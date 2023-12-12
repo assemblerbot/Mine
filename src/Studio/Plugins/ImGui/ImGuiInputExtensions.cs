@@ -1,11 +1,13 @@
 using SKey = Silk.NET.Input.Key;
 using VKey = Veldrid.Key;
+using SMouseButton = Silk.NET.Input.MouseButton;
+using VMouseButton = Veldrid.MouseButton;
 
 namespace Mine.ImGuiPlugin;
 
 public static class ImGuiInputExtensions
 {
-		public static VKey ToVeldridKey(this SKey key)
+	public static VKey ToVeldridKey(this SKey key)
 	{
 		return key switch
 		{
@@ -132,5 +134,23 @@ public static class ImGuiInputExtensions
 			SKey.Menu => VKey.Menu,
 			_ => VKey.Unknown
 		};
+	}
+
+	public static VMouseButton ToVeldridMouseButton(this SMouseButton button)
+	{
+		return button == SMouseButton.Left
+			? VMouseButton.Left
+			: button == SMouseButton.Right
+				? VMouseButton.Right
+				: VMouseButton.Middle;
+	}
+
+	public static SMouseButton ToSilkMouseButton(this VMouseButton button)
+	{
+		return button == VMouseButton.Left
+			? SMouseButton.Left
+			: button == VMouseButton.Right
+				? SMouseButton.Right
+				: SMouseButton.Middle;
 	}
 }
