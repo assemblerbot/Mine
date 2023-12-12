@@ -31,14 +31,14 @@ public sealed class ObjectDialog
 		Gui.SetNextWindowPos(center, ImGuiCond.Appearing, new Vector2(0.5f, 0.5f));
 		Gui.SetNextWindowSizeConstraints(new Vector2(400, 200), new Vector2(2000, 2000));
 
-		bool unusedIsOpen = true;
-		if (Gui.BeginPopupModal(_titleId, ref unusedIsOpen))
+		bool isOpen = true;
+		if (Gui.BeginPopupModal(_titleId, ref isOpen))
 		{
 			_inspector.Update();
 			Gui.EndPopup();
 		}
 		
-		if(!unusedIsOpen)
+		if(!isOpen)
 		{
 			_onClose?.Invoke();
 		}

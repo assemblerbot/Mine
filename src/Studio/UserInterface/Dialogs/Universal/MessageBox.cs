@@ -17,8 +17,8 @@ public class MessageBox
 		
 		Gui.SetNextWindowPos(center, ImGuiCond.Appearing, new Vector2(0.5f, 0.5f));
 
-		bool unusedIsOpen = true;
-		if (Gui.BeginPopupModal("MessageBox", ref unusedIsOpen, ImGuiWindowFlags.AlwaysAutoResize))
+		bool isOpen = true;
+		if (Gui.BeginPopupModal("MessageBox", ref isOpen, ImGuiWindowFlags.AlwaysAutoResize))
 		{
 			Gui.Text("All those beautiful files will be deleted.\nThis operation cannot be undone!");
 			Gui.Separator();
