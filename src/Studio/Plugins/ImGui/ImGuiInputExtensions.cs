@@ -138,19 +138,41 @@ public static class ImGuiInputExtensions
 
 	public static VMouseButton ToVeldridMouseButton(this SMouseButton button)
 	{
-		return button == SMouseButton.Left
-			? VMouseButton.Left
-			: button == SMouseButton.Right
-				? VMouseButton.Right
-				: VMouseButton.Middle;
+		return button switch
+		{
+			SMouseButton.Left => VMouseButton.Left,
+			SMouseButton.Middle => VMouseButton.Middle,
+			SMouseButton.Right => VMouseButton.Right,
+			SMouseButton.Button4 => VMouseButton.Button1,
+			SMouseButton.Button5 => VMouseButton.Button2,
+			SMouseButton.Button6 => VMouseButton.Button3,
+			SMouseButton.Button7 => VMouseButton.Button4,
+			SMouseButton.Button8 => VMouseButton.Button5,
+			SMouseButton.Button9 => VMouseButton.Button6,
+			SMouseButton.Button10 => VMouseButton.Button7,
+			SMouseButton.Button11 => VMouseButton.Button8,
+			SMouseButton.Button12 => VMouseButton.Button9,
+			_ => VMouseButton.Left,
+		};
 	}
 
 	public static SMouseButton ToSilkMouseButton(this VMouseButton button)
 	{
-		return button == VMouseButton.Left
-			? SMouseButton.Left
-			: button == VMouseButton.Right
-				? SMouseButton.Right
-				: SMouseButton.Middle;
+		return button switch
+		{
+			VMouseButton.Left => SMouseButton.Left,
+			VMouseButton.Middle => SMouseButton.Middle,
+			VMouseButton.Right => SMouseButton.Right,
+			VMouseButton.Button1 => SMouseButton.Button4,
+			VMouseButton.Button2 => SMouseButton.Button5,
+			VMouseButton.Button3 => SMouseButton.Button6,
+			VMouseButton.Button4 => SMouseButton.Button7,
+			VMouseButton.Button5 => SMouseButton.Button8,
+			VMouseButton.Button6 => SMouseButton.Button9,
+			VMouseButton.Button7 => SMouseButton.Button10,
+			VMouseButton.Button8 => SMouseButton.Button11,
+			VMouseButton.Button9 => SMouseButton.Button12,
+			_ => SMouseButton.Left,
+		};
 	}
 }
