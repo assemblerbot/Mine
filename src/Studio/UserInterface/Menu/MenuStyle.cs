@@ -1,6 +1,7 @@
 namespace RedHerring.Studio.UserInterface;
 
-public abstract class ContextMenuItem
+public enum MenuStyle
 {
-	
+	MainMenu,
+	ContextMenu,
 }

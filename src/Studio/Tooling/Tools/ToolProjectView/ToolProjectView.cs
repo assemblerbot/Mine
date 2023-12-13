@@ -1,8 +1,8 @@
 ﻿using ImGuiNET;
-using Mine.Framework;
 using Mine.ImGuiPlugin;
 using RedHerring.Studio.Models;
 using RedHerring.Studio.Models.Project.FileSystem;
+using RedHerring.Studio.UserInterface;
 using Gui = ImGuiNET.ImGui;
 
 namespace RedHerring.Studio.Tools;
@@ -18,10 +18,14 @@ public sealed class ToolProjectView : Tool
 	
 	protected override string Name => ToolName;
 
-	private Dictionary<(ProjectNode, ProjectNodeType), string> _nodeLabels = new();
+	private readonly Dictionary<(ProjectNode, ProjectNodeType), string> _nodeLabels = new();
+
+	private readonly Menu         _contextMenu            = new(MenuStyle.ContextMenu);
+	private          ProjectNode? _contextMenuActivatedAt = null;
     
 	public ToolProjectView(StudioModel studioModel, int uniqueId) : base(studioModel, uniqueId)
 	{
+		CreateContextMenu();
 	}
 
 	public override void Update(out bool finished)
@@ -112,18 +116,8 @@ public sealed class ToolProjectView : Tool
 
 		if (Gui.BeginPopupContextItem(id))
 		{
-			Gui.MenuItem("Copy");
-			Gui.MenuItem("Paste");
-			Gui.MenuItem("Cut");
-			Gui.MenuItem("Delete");
-			Gui.Separator();
-			if (Gui.BeginMenu("Create"))
-			{
-				Gui.MenuItem("somtehing");
-				Gui.MenuItem("somtehing else");
-				Gui.EndMenu();
-			}
-
+			_contextMenuActivatedAt = node;
+			_contextMenu.Update();
 			Gui.EndPopup();
 		}
 
@@ -152,4 +146,58 @@ public sealed class ToolProjectView : Tool
 		StudioModel.Selection.DeselectAll();
 		StudioModel.Selection.Select(id, node);
 	}
+	
+	#region Context menu
+	private void CreateContextMenu()
+	{
+		_contextMenu.AddItem("Create/DefinitionTemplate", OnCreateDefinitionTemplate, IsCreationUnderContextItemPossible);
+		
+		_contextMenu.AddItem("Edit/Copy",   OnContextMenuEditCopy,   IsChangeOfContextItemPossible);
+		_contextMenu.AddItem("Edit/Paste",  OnContextMenuEditPaste,  IsCreationUnderContextItemPossible);
+		_contextMenu.AddItem("Edit/Cut",    OnContextMenuEditCut,    IsChangeOfContextItemPossible);
+		_contextMenu.AddItem("Edit/Delete", OnContextMenuEditDelete, IsChangeOfContextItemPossible);
+	}
+
+	#region Create
+	private void OnCreateDefinitionTemplate()
+	{
+		
+	}
+	#endregion
+
+	#region Edit
+	private void OnContextMenuEditCopy()
+	{
+		
+	}
+
+	private void OnContextMenuEditPaste()
+	{
+		
+	}
+
+	private void OnContextMenuEditCut()
+	{
+		
+	}
+
+	private void OnContextMenuEditDelete()
+	{
+		
+	}
+	#endregion
+	
+	#region Checks
+	private bool IsChangeOfContextItemPossible()
+	{
+		return _contextMenuActivatedAt != null && _contextMenuActivatedAt is not ProjectRootNode;
+	}
+
+	private bool IsCreationUnderContextItemPossible()
+	{
+		return _contextMenuActivatedAt != null;
+	}
+	#endregion
+	
+	#endregion
 }

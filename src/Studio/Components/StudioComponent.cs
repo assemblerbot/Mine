@@ -1,9 +1,8 @@
-using Mine.Framework;
 using ImGuiNET;
+using Mine.Framework;
 using Mine.ImGuiPlugin;
 using NativeFileDialogSharp;
 using RedHerring.Studio.Models;
-using RedHerring.Studio.Models.Project.Importers;
 using RedHerring.Studio.Tools;
 using RedHerring.Studio.UserInterface;
 
@@ -13,13 +12,13 @@ public sealed class StudioComponent : Component, IUpdatable
 {
 	public int GetUpdateOrder() => 0;
 
-	private StudioModel    _studioModel = new();
+	private StudioModel _studioModel = new();
 
 	private ToolManager _toolManager = new();
 	
 	#region User Interface
 	private readonly DockSpace        _dockSpace        = new();
-	private readonly Menu             _menu             = new();
+	private readonly Menu             _menu             = new(MenuStyle.MainMenu);
 	private readonly StatusBar        _statusBar        = new();
 	private          ObjectDialog     _projectSettings  = null!;
 	private          ObjectDialog     _studioSettings   = null!;
