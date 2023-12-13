@@ -104,10 +104,11 @@ public sealed class StudioComponent : Component, IUpdatable
 		_menu.AddItem("Edit/Project settings..", OnEditProjectSettingsClicked);
 		_menu.AddItem("Edit/Studio settings..",  OnEditStudioSettingsClicked);
 
-		_menu.AddItem("View/Project",   OnViewProjectClicked);
-		_menu.AddItem("View/Console",   OnViewConsoleClicked);
-		_menu.AddItem("View/Inspector", OnViewInspectorClicked);
-		_menu.AddItem("View/Plugins",   OnViewPluginsClicked);
+		_menu.AddItem("View/Project",     OnViewProjectClicked);
+		_menu.AddItem("View/Console",     OnViewConsoleClicked);
+		_menu.AddItem("View/Inspector",   OnViewInspectorClicked);
+		_menu.AddItem("View/Plugins",     OnViewPluginsClicked);
+		_menu.AddItem("View/Definitions", OnViewDefinitionsClicked);
 
 		_menu.AddItem("Debug/Modal window",        () => ImGui.OpenPopup("MessageBox"));
 		_menu.AddItem("Debug/Task processor test", OnDebugTaskProcessorTestClicked);
@@ -166,6 +167,11 @@ public sealed class StudioComponent : Component, IUpdatable
 		_toolManager.Activate(ToolPlugins.ToolName);
 	}
 	
+	private void OnViewDefinitionsClicked()
+	{
+		_toolManager.Activate(ToolDefinitions.ToolName);
+	}
+
 	private void OnDebugTaskProcessorTestClicked()
 	{
 		// for(int i=0;i <20;++i)

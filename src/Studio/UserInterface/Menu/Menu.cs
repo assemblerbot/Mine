@@ -1,6 +1,4 @@
-﻿using Gui = ImGuiNET.ImGui;
-
-namespace RedHerring.Studio.UserInterface;
+﻿namespace RedHerring.Studio.UserInterface;
 
 public sealed class Menu
 {
