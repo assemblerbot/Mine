@@ -112,7 +112,18 @@ public sealed class ToolProjectView : Tool
 
 		if (Gui.BeginPopupContextItem(id))
 		{
-			Gui.Text("This is popup");
+			Gui.MenuItem("Copy");
+			Gui.MenuItem("Paste");
+			Gui.MenuItem("Cut");
+			Gui.MenuItem("Delete");
+			Gui.Separator();
+			if (Gui.BeginMenu("Create"))
+			{
+				Gui.MenuItem("somtehing");
+				Gui.MenuItem("somtehing else");
+				Gui.EndMenu();
+			}
+
 			Gui.EndPopup();
 		}
 
