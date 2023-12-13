@@ -150,7 +150,8 @@ public sealed class ToolProjectView : Tool
 	#region Context menu
 	private void CreateContextMenu()
 	{
-		_contextMenu.AddItem("Create/DefinitionTemplate", OnCreateDefinitionTemplate, IsCreationUnderContextItemPossible);
+		_contextMenu.AddItem("Create/DefinitionTemplate", OnCreateDefinitionTemplate, CanCreateDefinitionTemplate);
+		_contextMenu.AddItem("Create/DefinitionData", OnCreateDefinitionData, CanCreateDefinitionData);
 		
 		_contextMenu.AddItem("Edit/Copy",   OnContextMenuEditCopy,   IsChangeOfContextItemPossible);
 		_contextMenu.AddItem("Edit/Paste",  OnContextMenuEditPaste,  IsCreationUnderContextItemPossible);
@@ -163,27 +164,42 @@ public sealed class ToolProjectView : Tool
 	{
 		
 	}
+
+	private bool CanCreateDefinitionTemplate()
+	{
+		return _contextMenuActivatedAt != null && _contextMenuActivatedAt.Type.IsScriptsRelated();
+	}
+
+	private void OnCreateDefinitionData()
+	{
+		// TODO
+	}
+
+	private bool CanCreateDefinitionData()
+	{
+		return _contextMenuActivatedAt != null && _contextMenuActivatedAt.Type.IsAssetsRelated();
+	}
 	#endregion
 
 	#region Edit
 	private void OnContextMenuEditCopy()
 	{
-		
+		// TODO
 	}
 
 	private void OnContextMenuEditPaste()
 	{
-		
+		// TODO
 	}
 
 	private void OnContextMenuEditCut()
 	{
-		
+		// TODO
 	}
 
 	private void OnContextMenuEditDelete()
 	{
-		
+		// TODO
 	}
 	#endregion
 	
