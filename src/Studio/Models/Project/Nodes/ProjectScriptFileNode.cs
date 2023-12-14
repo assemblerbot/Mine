@@ -1,6 +1,4 @@
-using System.Text.Json;
 using Migration;
-using RedHerring.Studio.Models.ViewModels.Console;
 
 namespace RedHerring.Studio.Models.Project.FileSystem;
 
@@ -25,45 +23,11 @@ public class ProjectScriptFileNode : ProjectNode
 		string guid = RelativePath;
 		
 		// try to parse file header
-		using (FileStream file = new(Path, FileMode.Open))
+		ProjectScriptFileHeader.FileId? fileId = ProjectScriptFileHeader.ReadFromFile(Path);
+		if(fileId != null)
 		{
-			if (file.Length > _scriptHeader.Length + 1)
-			{
-				byte[] header = new byte[_scriptHeader.Length];
-				file.ReadExactly(header, 0, _scriptHeader.Length);
-
-				bool equals = true;
-				for (int i = 0; i < _scriptHeader.Length; ++i)
-				{
-					if (header[i] != _scriptHeader[i])
-					{
-						equals = false;
-						break;
-					}
-				}
-
-				if(equals)
-				{
-					byte[] content = new byte[file.Length - _scriptHeader.Length];
-					if (file.ReadAtLeast(content, 1, false) != content.Length)
-					{
-						ConsoleViewModel.LogWarning($"File {Path} cannot be read!");
-					}
-
-					int endOfLine = Array.FindIndex(content, x => x == '\n' || x == '\r');
-					if (endOfLine != -1)
-					{
-						Array.Resize(ref content, endOfLine);
-					}
-
-					FileId? fileId = JsonSerializer.Deserialize<FileId>(content);
-					if (fileId != null)
-					{
-						guid = fileId.Guid;
-						SetNodeType(ProjectNodeType.ScriptDefinitionTemplate);
-					}
-				}
-			}
+			guid = fileId.Guid;
+			SetNodeType(ProjectNodeType.ScriptDefinitionTemplate);
 		}
 
 		Meta = new Metadata
