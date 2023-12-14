@@ -4,6 +4,7 @@ using RedHerring.Studio.Models.Project.FileSystem;
 
 namespace Mine.Studio;
 
+// TODO - move to standalone system/part/something so it's not dependent on Tool
 public sealed class ToolDefinitionsTemplate
 {
 	private const string _typeId    = "DefinitionTemplate";
