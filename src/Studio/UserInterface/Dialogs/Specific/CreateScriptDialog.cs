@@ -1,5 +1,6 @@
 using ImGuiNET;
 using RedHerring.Studio.Commands;
+using RedHerring.Studio.Models.Project;
 using RedHerring.Studio.Models.ViewModels.Console;
 using RedHerring.Studio.UserInterface.Attributes;
 
@@ -9,20 +10,25 @@ public class CreateScriptDialog
 {
 	private readonly ObjectDialog _dialog;
 
-	[ReadOnlyInInspector]                  private string _type;
-	[ShowInInspector, ReadOnlyInInspector] private string _path = "";
-	private                                        string _namespace = "MyNamespace";
-	private                                        string _class = "MyClass";
+	[ReadOnlyInInspector]                  private string _type      = "";
+	[ShowInInspector, ReadOnlyInInspector] private string _path      = "";
+	[ShowInInspector]                      private string _namespace = "MyNamespace";
+	[ShowInInspector]                      private string _class     = "MyClass";
 
-	public CreateScriptDialog()
+	private ProjectModel                    _projectModel;
+	private Action<string, string, string>? _onCreate; // file path, namespace, class name
+
+	public CreateScriptDialog(ProjectModel projectModel)
 	{
-		_dialog = new ObjectDialog("Create script", new CommandHistory(), this);
+		_projectModel = projectModel;
+		_dialog       = new ObjectDialog("Create script", new CommandHistory(), this);
 	}
 
-	public void Open(string type, string path)
+	public void Open(string type, string path, Action<string, string, string> onCreate)
 	{
-		_type = type;
-		_path = path;
+		_type     = type;
+		_path     = path;
+		_onCreate = onCreate;
 		_dialog.Open();
 	}
 
@@ -34,17 +40,26 @@ public class CreateScriptDialog
 	[Button("Create!")]
 	private void Create()
 	{
-		ConsoleViewModel.Log($"Creating new script at {_path}", ConsoleItemType.Info);
-		// try
-		// {
-		// 	TemplateUtility.InstantiateTemplate(_targetPath, _name);
-		// }
-		// catch(Exception e)
-		// {
-		// 	ConsoleViewModel.Log(e.Message,    ConsoleItemType.Exception);
-		// 	ConsoleViewModel.Log(e.StackTrace, ConsoleItemType.Exception);
-		// 	return;
-		// }
+		string filePath = Path.Combine(_projectModel.ProjectSettings.AbsoluteScriptsPath, _path, _class + ".cs");
+		if (File.Exists(filePath))
+		{
+			ConsoleViewModel.LogError($"File at '{filePath}' already exist! Cannot create file!");
+			// TODO - better UI response
+			return;
+		}
+
+		ConsoleViewModel.LogInfo($"Creating new script '{filePath}'");
+		try
+		{
+			_onCreate?.Invoke(filePath, _namespace, _class);
+			ConsoleViewModel.LogInfo("DONE");
+		}
+		catch(Exception e)
+		{
+			ConsoleViewModel.LogException(e.Message   );
+			ConsoleViewModel.LogException(e.StackTrace);
+			return;
+		}
 
 		ImGui.CloseCurrentPopup();
 	}

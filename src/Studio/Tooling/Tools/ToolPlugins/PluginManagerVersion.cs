@@ -245,7 +245,7 @@ public readonly struct PluginManagerVersion
 		return Equals(Identifiers, other.Identifiers);
 	}
 
-	public override bool Equals(object obj)
+	public override bool Equals(object? obj)
 	{
 		return obj is PluginManagerVersion other && Equals(other);
 	}

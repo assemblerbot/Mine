@@ -10,7 +10,8 @@ public abstract class ProjectNode
 	public          string Name { get; }
 	public readonly string Path;
 	public readonly string RelativePath; // relative path inside Assets directory
-	
+	public abstract string RelativeDirectoryPath { get; }
+
 	[ReadOnlyInInspector] public bool HasMetaFile;
 	
 	public Metadata? Meta;

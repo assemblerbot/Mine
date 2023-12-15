@@ -4,7 +4,7 @@ namespace RedHerring.Studio.Models.Project.FileSystem;
 
 public class ProjectScriptFileNode : ProjectNode
 {
-	private const string _scriptHeader = "//Meta"; 
+	public override string RelativeDirectoryPath => RelativePath.Substring(0, RelativePath.Length - Name.Length);
 	
 	[Serializable]
 	private class FileId

@@ -5,6 +5,8 @@ namespace RedHerring.Studio.Models.Project.FileSystem;
 
 public class ProjectFolderNode : ProjectNode
 {
+	public override string RelativeDirectoryPath => RelativePath;
+
 	public ObservableCollection<ProjectNode> Children { get; init; } = new();
 	
 	public ProjectFolderNode(string name, string path, string relativePath, bool hasMetaFile, ProjectNodeType type) : base(name, path, relativePath, hasMetaFile)

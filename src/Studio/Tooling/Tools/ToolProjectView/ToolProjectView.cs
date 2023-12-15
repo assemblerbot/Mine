@@ -24,17 +24,19 @@ public sealed class ToolProjectView : Tool
 	private readonly Menu         _contextMenu            = new(MenuStyle.ContextMenu);
 	private          ProjectNode? _contextMenuActivatedAt = null;
 
-	private readonly CreateScriptDialog _createScriptDialog = new();
+	private readonly CreateScriptDialog _createScriptDialog;
     
 	public ToolProjectView(StudioModel studioModel, int uniqueId) : base(studioModel, uniqueId)
 	{
 		CreateContextMenu();
+		_createScriptDialog = new CreateScriptDialog(studioModel.Project);
 	}
 
 	public override void Update(out bool finished)
 	{
 		UpdateDialogs();
 		finished = UpdateUI();
+		_contextMenu.InvokeClickActions();
 	}
 
 	private void UpdateDialogs()
@@ -171,14 +173,19 @@ public sealed class ToolProjectView : Tool
 	#region Create
 	private void OnCreateDefinitionTemplate()
 	{
-		_createScriptDialog.Open("Definition template", _contextMenuActivatedAt!.RelativePath);
+		_createScriptDialog.Open("Definition template", _contextMenuActivatedAt!.RelativeDirectoryPath, OnCreateDefinitionTemplateFile);
+	}
+	private void OnCreateDefinitionTemplateFile(string path, string namespaceName, string className)
+	{
+		DefinitionTemplate template = new (namespaceName, className);
+		template.Write(path);
 	}
 
 	private void OnCreateDefinitionAsset()
 	{
 		// TODO
 	}
-
+	
 	#endregion
 
 	#region Edit

@@ -16,15 +16,18 @@ public sealed class Menu
 	public void Update()
 	{
 		_menuItemClicked = null;
-
 		_root.Update();
+	}
 
+	public void InvokeClickActions()
+	{
 		if (_menuItemClicked != null)
 		{
 			_onClickActions[_menuItemClicked]?.Invoke();
+			_menuItemClicked = null;
 		}
 	}
-	
+
 	public void AddItem(
 		string path,
 		Action onClick,

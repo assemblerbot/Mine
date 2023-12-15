@@ -75,6 +75,7 @@ public sealed class StudioComponent : Component, IUpdatable
 	{
 		_dockSpace.Update();
 		_menu.Update();
+		_menu.InvokeClickActions();
 		_statusBar.Update();
 		_projectSettings.Update();
 		_studioSettings.Update();

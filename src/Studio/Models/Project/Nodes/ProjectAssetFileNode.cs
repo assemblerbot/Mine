@@ -5,6 +5,8 @@ namespace RedHerring.Studio.Models.Project.FileSystem;
 
 public sealed class ProjectAssetFileNode : ProjectNode
 {
+	public override string RelativeDirectoryPath => RelativePath.Substring(0, RelativePath.Length - Name.Length);
+	
 	private static readonly HashAlgorithm _hashAlgorithm = SHA1.Create();
 	
 	public ProjectAssetFileNode(string name, string path, string relativePath) : base(name, path, relativePath, true)
