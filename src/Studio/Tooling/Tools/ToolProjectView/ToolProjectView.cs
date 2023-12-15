@@ -1,5 +1,6 @@
 ﻿using ImGuiNET;
 using Mine.ImGuiPlugin;
+using Mine.Studio;
 using RedHerring.Studio.Models;
 using RedHerring.Studio.Models.Project.FileSystem;
 using RedHerring.Studio.UserInterface;
@@ -22,6 +23,8 @@ public sealed class ToolProjectView : Tool
 
 	private readonly Menu         _contextMenu            = new(MenuStyle.ContextMenu);
 	private          ProjectNode? _contextMenuActivatedAt = null;
+
+	private readonly CreateScriptDialog _createScriptDialog = new();
     
 	public ToolProjectView(StudioModel studioModel, int uniqueId) : base(studioModel, uniqueId)
 	{
@@ -30,7 +33,13 @@ public sealed class ToolProjectView : Tool
 
 	public override void Update(out bool finished)
 	{
+		UpdateDialogs();
 		finished = UpdateUI();
+	}
+
+	private void UpdateDialogs()
+	{
+		_createScriptDialog.Update();
 	}
 
 	private bool UpdateUI()
@@ -150,8 +159,8 @@ public sealed class ToolProjectView : Tool
 	#region Context menu
 	private void CreateContextMenu()
 	{
-		_contextMenu.AddItem("Create/DefinitionTemplate", OnCreateDefinitionTemplate, CanCreateDefinitionTemplate);
-		_contextMenu.AddItem("Create/DefinitionData", OnCreateDefinitionData, CanCreateDefinitionData);
+		_contextMenu.AddItem("Create/DefinitionTemplate", OnCreateDefinitionTemplate, CanCreateScript);
+		_contextMenu.AddItem("Create/DefinitionAsset", OnCreateDefinitionAsset, CanCreateAsset);
 		
 		_contextMenu.AddItem("Edit/Copy",   OnContextMenuEditCopy,   IsChangeOfContextItemPossible);
 		_contextMenu.AddItem("Edit/Paste",  OnContextMenuEditPaste,  IsCreationUnderContextItemPossible);
@@ -162,23 +171,14 @@ public sealed class ToolProjectView : Tool
 	#region Create
 	private void OnCreateDefinitionTemplate()
 	{
-		
+		_createScriptDialog.Open("Definition template", _contextMenuActivatedAt!.RelativePath);
 	}
 
-	private bool CanCreateDefinitionTemplate()
-	{
-		return _contextMenuActivatedAt != null && _contextMenuActivatedAt.Type.IsScriptsRelated();
-	}
-
-	private void OnCreateDefinitionData()
+	private void OnCreateDefinitionAsset()
 	{
 		// TODO
 	}
 
-	private bool CanCreateDefinitionData()
-	{
-		return _contextMenuActivatedAt != null && _contextMenuActivatedAt.Type.IsAssetsRelated();
-	}
 	#endregion
 
 	#region Edit
@@ -212,6 +212,16 @@ public sealed class ToolProjectView : Tool
 	private bool IsCreationUnderContextItemPossible()
 	{
 		return _contextMenuActivatedAt != null;
+	}
+
+	private bool CanCreateScript()
+	{
+		return _contextMenuActivatedAt != null && _contextMenuActivatedAt.Type.IsScriptsRelated();
+	}
+	
+	private bool CanCreateAsset()
+	{
+		return _contextMenuActivatedAt != null && _contextMenuActivatedAt.Type.IsAssetsRelated();
 	}
 	#endregion
 	

@@ -4,8 +4,7 @@ using RedHerring.Studio.Models.Project.FileSystem;
 
 namespace Mine.Studio;
 
-// TODO - move to standalone system/part/something so it's not dependent on Tool
-public sealed class ToolDefinitionsTemplate
+public sealed class DefinitionTemplate
 {
 	private const string _typeId    = "DefinitionTemplate";
 	private const int    _version   = 1;
@@ -16,9 +15,9 @@ public sealed class ToolDefinitionsTemplate
 	private string _namespaceName;
 	private string _className;
 
-	private List<ToolDefinitionsTemplateField> _fields = new();
+	private List<DefinitionsTemplateField> _fields = new();
 
-	public ToolDefinitionsTemplate(string namespaceName, string className)
+	public DefinitionTemplate(string namespaceName, string className)
 	{
 		_fileId      = new ProjectScriptFileHeader.FileId (Guid.NewGuid().ToString(), _typeId, _version);
 		_namespaceName = namespaceName;
@@ -40,7 +39,7 @@ public sealed class ToolDefinitionsTemplate
 		stream.WriteLine($"public sealed class {_className}");
 		stream.WriteLine("{");
 		stream.WriteLine("	" + _dataBegin);
-		foreach (ToolDefinitionsTemplateField field in _fields)
+		foreach (DefinitionsTemplateField field in _fields)
 		{
 			stream.WriteLine($"	public {field.Type.Name} {field.Name} {{get; private set;}}");
 		}
@@ -103,7 +102,7 @@ public sealed class ToolDefinitionsTemplate
 				string propertyName = propertyMatch.Groups[2].Captures[0].ToString();
 
 				_fields.Add(
-					new ToolDefinitionsTemplateField
+					new DefinitionsTemplateField
 					{
 						Name = propertyName,
 						Type = typeof(int) // TODO

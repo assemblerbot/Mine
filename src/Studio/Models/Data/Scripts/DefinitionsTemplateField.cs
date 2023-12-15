@@ -1,6 +1,6 @@
 namespace Mine.Studio;
 
-public struct ToolDefinitionsTemplateField
+public struct DefinitionsTemplateField
 {
 	public Type   Type;
 	public string Name;
