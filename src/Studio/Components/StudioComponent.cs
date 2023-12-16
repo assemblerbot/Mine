@@ -37,7 +37,7 @@ public sealed class StudioComponent : Component, IUpdatable
 
 		_projectSettings  = new ObjectDialog("Project settings", _studioModel.CommandHistory, _studioModel.Project.ProjectSettings);
 		_studioSettings   = new ObjectDialog("Studio settings",  _studioModel.CommandHistory, _studioModel.StudioSettings);
-		_newProjectDialog = new NewProjectDialog();
+		_newProjectDialog = new NewProjectDialog(_studioModel);
 
 		LoadSettings();
 		

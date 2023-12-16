@@ -16,6 +16,8 @@ xcopy Template\*.csproj Studio\Template\ /S
 xcopy Template\*.cs Studio\Template\ /S
 
 mkdir Studio\Template\Assets
+mkdir Studio\Template\Assets\Plugins
+mkdir Studio\Template\GameLibrary\Plugins
 mkdir Studio\Template\Resources
 mkdir Studio\Template\Libraries
 

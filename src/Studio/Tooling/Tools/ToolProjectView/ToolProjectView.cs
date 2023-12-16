@@ -162,8 +162,9 @@ public sealed class ToolProjectView : Tool
 	private void CreateContextMenu()
 	{
 		_contextMenu.AddItem("Create/DefinitionTemplate", OnCreateDefinitionTemplate, CanCreateScript);
-		_contextMenu.AddItem("Create/DefinitionAsset", OnCreateDefinitionAsset, CanCreateAsset);
+		_contextMenu.AddItem("Create/DefinitionAsset",    OnCreateDefinitionAsset,    CanCreateAsset);
 		
+		_contextMenu.AddItem("Edit/Rename", OnContextMenuEditRename, IsChangeOfContextItemPossible);
 		_contextMenu.AddItem("Edit/Copy",   OnContextMenuEditCopy,   IsChangeOfContextItemPossible);
 		_contextMenu.AddItem("Edit/Paste",  OnContextMenuEditPaste,  IsCreationUnderContextItemPossible);
 		_contextMenu.AddItem("Edit/Cut",    OnContextMenuEditCut,    IsChangeOfContextItemPossible);
@@ -189,6 +190,11 @@ public sealed class ToolProjectView : Tool
 	#endregion
 
 	#region Edit
+	private void OnContextMenuEditRename()
+	{
+		// TODO
+	}
+
 	private void OnContextMenuEditCopy()
 	{
 		// TODO
