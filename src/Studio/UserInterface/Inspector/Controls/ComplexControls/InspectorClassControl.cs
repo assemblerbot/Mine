@@ -46,7 +46,7 @@ public sealed class InspectorClassControl : InspectorControl
 	#region Build
 	private void Rebuild()
 	{
-		Console.WriteLine($"Rebuild called on class {Id}");
+		//Console.WriteLine($"Rebuild called on class {Id}");
 		
 		RemoveAllControls();
 		if(Bindings.Count == 0)

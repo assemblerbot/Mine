@@ -189,7 +189,7 @@ public sealed class InspectorListControl : InspectorControl
 
 	private void Rebuild()
 	{
-		Console.WriteLine($"Rebuild called on list {Id}");
+		//Console.WriteLine($"Rebuild called on list {Id}");
 		_controls.Clear();
 		
 		if (Bindings.Count > 1)

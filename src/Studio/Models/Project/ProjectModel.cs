@@ -36,6 +36,9 @@ public sealed class ProjectModel
 
 	private ProjectSettings? _projectSettings;
 	public  ProjectSettings ProjectSettings => _projectSettings!;
+
+	private FileSystemWatcher? _assetsWatcher;
+	private FileSystemWatcher? _scriptsWatcher;
 	
 	private readonly ProjectThread _thread = new ();
 	
@@ -53,6 +56,8 @@ public sealed class ProjectModel
 	#region Open/close
 	public void Close()
 	{
+		DisposeWatchers();
+		
 		_thread.ClearQueue();
 		
 		SaveSettings();
@@ -107,6 +112,8 @@ public sealed class ProjectModel
 		InitMeta();
 		ImportAll();
 		_eventAggregator.Trigger(new OpenedEvent());
+
+		CreateWatchers();
 	}
 
 	private void RecursiveAssetScan(string path, string relativePath, ProjectFolderNode root)
@@ -211,6 +218,48 @@ public sealed class ProjectModel
 
 	#endregion
 	
+	#region Folder watchers
+	private void CreateWatchers()
+	{
+		_assetsWatcher                       =  new FileSystemWatcher(_projectSettings!.AbsoluteAssetsPath);
+		_assetsWatcher.NotifyFilter          =  NotifyFilters.DirectoryName | NotifyFilters.FileName;
+		_assetsWatcher.Created               += OnAssetChanged;
+		_assetsWatcher.Deleted               += OnAssetChanged;
+		_assetsWatcher.Renamed               += OnAssetChanged;
+		_assetsWatcher.Filter                =  "";
+		_assetsWatcher.IncludeSubdirectories =  true;
+		_assetsWatcher.EnableRaisingEvents   =  true;
+
+		_scriptsWatcher                       =  new FileSystemWatcher(_projectSettings!.AbsoluteScriptsPath);
+		_scriptsWatcher.NotifyFilter          =  NotifyFilters.DirectoryName | NotifyFilters.FileName;
+		_scriptsWatcher.Created               += OnScriptChanged;
+		_scriptsWatcher.Deleted               += OnScriptChanged;
+		_scriptsWatcher.Renamed               += OnScriptChanged;
+		_scriptsWatcher.Filter                =  "*.cs";
+		_scriptsWatcher.IncludeSubdirectories =  true;
+		_scriptsWatcher.EnableRaisingEvents   =  true;
+	}
+
+	private void OnAssetChanged(object sender, FileSystemEventArgs evt)
+	{
+		ConsoleViewModel.LogInfo($"Asset changed. Name:{evt.Name} Change:{evt.ChangeType} Path:{evt.FullPath}");
+	}
+
+	private void OnScriptChanged(object sender, FileSystemEventArgs evt)
+	{
+		ConsoleViewModel.LogInfo($"Source changed. Name:{evt.Name} Change:{evt.ChangeType} Path:{evt.FullPath}");
+	}
+
+	private void DisposeWatchers()
+	{
+		_assetsWatcher?.Dispose();
+		_assetsWatcher = null;
+		
+		_scriptsWatcher?.Dispose();
+		_scriptsWatcher = null;
+	}
+	#endregion
+	
 	#region Settings
 	public void SaveSettings()
 	{
@@ -220,7 +269,7 @@ public sealed class ProjectModel
 		}
 
 		byte[] json = MigrationSerializer.SerializeAsync(_projectSettings, SerializedDataFormat.JSON, Assembly).GetAwaiter().GetResult();
-		File.WriteAllBytes(Path.Join(_projectSettings.GameFolderPath, _settingsFileName), json);
+		File.WriteAllBytes(Path.Join(_projectSettings.ProjectFolderPath, _settingsFileName), json);
 	}
 
 	public void LoadSettings(string projectPath)
@@ -230,14 +279,14 @@ public sealed class ProjectModel
 		{
 			_projectSettings = new ProjectSettings
                               {
-                                  GameFolderPath = projectPath
+                                  ProjectFolderPath = projectPath
                               };
 			return;
 		}
 		
 		byte[] json = File.ReadAllBytes(path);
 		ProjectSettings settings = MigrationSerializer.DeserializeAsync<ProjectSettings, IStudioSettingsMigratable>(_migrationManager.TypesHash, json, SerializedDataFormat.JSON, _migrationManager, false, Assembly).GetAwaiter().GetResult();
-		settings.GameFolderPath = projectPath;
+		settings.ProjectFolderPath = projectPath;
 		
 		_projectSettings = settings;
 	}
