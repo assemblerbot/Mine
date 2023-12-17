@@ -40,11 +40,15 @@ public sealed class Engine
 	public static    string  ApplicationDataPath => _instance._dataPath ?? "";
 	#endregion
 	
-	private Action? _onLoad;
-	private Action? _onExit;
-	
+	private Action?       _onLoad;
+	private Action?       _onExit;
+
 	private bool _exitRequested = false;
 
+	public        Action<bool>?  OnFocusChanged;
+	private        bool          _hasFocus = true;
+	public  static bool          HasFocus => _instance._hasFocus;
+	
 	public Engine(string[] applicationArguments, string applicationName, Action? onLoad = null, Action? onExit = null)
 	{
 		_instance = this;
@@ -61,11 +65,12 @@ public sealed class Engine
 		
 		_window = new EngineWindow(applicationName, _graphicsBackend);
 
-		_window.OnResizeCallback += OnResize;
-		_window.OnLoadCallback   += OnLoad;
-		_window.OnUpdateCallback += OnUpdate;
-		_window.OnRenderCallback += OnRender;
-		_window.OnCloseCallback  += OnExit;
+		_window.OnResizeCallback  += OnResize;
+		_window.OnLoadCallback    += OnLoad;
+		_window.OnUpdateCallback  += OnUpdate;
+		_window.OnRenderCallback  += OnRender;
+		_window.OnCloseCallback   += OnExit;
+		_window.View.FocusChanged += OnFocusChangedHandler;
 
 		_config.Load();
 	}
@@ -114,6 +119,8 @@ public sealed class Engine
 
 	private void OnExit()
 	{
+		_window.View.FocusChanged -= OnFocusChangedHandler;
+
 		_config?.Save();
 		_onExit?.Invoke();
 
@@ -127,6 +134,12 @@ public sealed class Engine
 		_renderer = null!;
 	}
 
+	private void OnFocusChangedHandler(bool hasFocus)
+	{
+		_hasFocus = hasFocus;
+		OnFocusChanged?.Invoke(hasFocus);
+	}
+	
 	private void ParseArguments(string[] arguments)
 	{
 		for (int i = 0; i < arguments.Length; ++i)

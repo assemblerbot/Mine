@@ -29,6 +29,7 @@ public sealed class StudioComponent : Component, IUpdatable
 	public override void AfterAddedToScene()
 	{
 		Engine.Scene.RegisterUpdatable(this);
+		Engine.Instance.OnFocusChanged += OnFocusChanged;
 		
 		InitImGui();
 		InitMenu();
@@ -64,6 +65,7 @@ public sealed class StudioComponent : Component, IUpdatable
 		
 		_studioModel.Close();
 		Engine.Scene.UnregisterUpdatable(this);
+		Engine.Instance.OnFocusChanged -= OnFocusChanged;
 	}
 
 	public override void Dispose()
@@ -136,6 +138,18 @@ public sealed class StudioComponent : Component, IUpdatable
 	private void OnExitClicked()
 	{
 		Engine.Exit();
+	}
+
+	private void OnFocusChanged(bool hasFocus)
+	{
+		if (hasFocus)
+		{
+			_studioModel.Project.ResumeWatchers();
+		}
+		else
+		{
+			_studioModel.Project.PauseWatchers();
+		}
 	}
 
 	private void OnEditProjectSettingsClicked()

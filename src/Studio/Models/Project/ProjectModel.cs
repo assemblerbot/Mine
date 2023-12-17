@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Reflection;
 using Migration;
 using RedHerring.Studio.Models.Project.FileSystem;
@@ -37,10 +38,12 @@ public sealed class ProjectModel
 	private ProjectSettings? _projectSettings;
 	public  ProjectSettings ProjectSettings => _projectSettings!;
 
-	private FileSystemWatcher? _assetsWatcher;
-	private FileSystemWatcher? _scriptsWatcher;
+	private FileSystemWatcher?           _assetsWatcher;
+	private FileSystemWatcher?           _scriptsWatcher;
+	private bool                         _watchersActive      = true;
+	private ConcurrentQueue<ProjectTask> _waitingWatcherTasks = new();
 	
-	private readonly ProjectThread _thread = new ();
+	private readonly ProjectThread _thread           = new ();
 	
 	public ProjectModel(MigrationManager migrationManager, StudioModelEventAggregator eventAggregator)
 	{
@@ -92,7 +95,9 @@ public sealed class ProjectModel
 		// read assets
 		try
 		{
-			RecursiveAssetScan(assetsPath, "", assetsFolder);
+			List<string> foundMetaFiles = new();
+			RecursiveAssetScan(assetsPath, "", assetsFolder, foundMetaFiles);
+			MetaCleanup(foundMetaFiles);
 		}
 		catch (Exception e)
 		{
@@ -116,7 +121,7 @@ public sealed class ProjectModel
 		CreateWatchers();
 	}
 
-	private void RecursiveAssetScan(string path, string relativePath, ProjectFolderNode root)
+	private void RecursiveAssetScan(string path, string relativePath, ProjectFolderNode root, List<string> foundMetaFiles)
 	{
 		// scan directories
 		foreach (string directoryPath in Directory.EnumerateDirectories(path))
@@ -126,7 +131,7 @@ public sealed class ProjectModel
 			ProjectFolderNode folderNode            = new(directory, directoryPath, relativeDirectoryPath, true, ProjectNodeType.AssetFolder);
 			root.Children.Add(folderNode);
 			
-			RecursiveAssetScan(directoryPath, relativeDirectoryPath, folderNode);
+			RecursiveAssetScan(directoryPath, relativeDirectoryPath, folderNode, foundMetaFiles);
 		}
 
 		// scan files except meta
@@ -135,6 +140,7 @@ public sealed class ProjectModel
 			string fileName = Path.GetFileName(filePath);
 			if (fileName.EndsWith(".meta"))
 			{
+				foundMetaFiles.Add(filePath);
 				continue;
 			}
 
@@ -170,16 +176,31 @@ public sealed class ProjectModel
 	private void InitMeta()
 	{
 		_assetsFolder!.TraverseRecursive(
-			node => _thread.Enqueue(new ProjectTask(cancellationToken => node.InitMeta(_migrationManager, cancellationToken))),
+			node => _thread.Enqueue(CreateInitMetaTask(node)),
 			TraverseFlags.Directories | TraverseFlags.Files,
 			default
 		);
 
 		_scriptsGameLibraryFolder!.TraverseRecursive(
-			node => _thread.Enqueue(new ProjectTask(cancellationToken => node.InitMeta(_migrationManager, cancellationToken))),
+			node => _thread.Enqueue(CreateInitMetaTask(node)),
 			TraverseFlags.Directories | TraverseFlags.Files,
 			default
 		);
+	}
+
+	private void MetaCleanup(List<string> metaFiles)
+	{
+		foreach (string metaFile in metaFiles)
+		{
+			string path = metaFile.Substring(0, metaFile.Length - ".meta".Length);
+			if (Directory.Exists(path) || File.Exists(path))
+			{
+				continue;
+			}
+
+			ConsoleViewModel.LogWarning($"Removing unused meta file: {metaFile}");
+			File.Delete(metaFile);
+		}
 	}
 
 	#endregion
@@ -194,31 +215,30 @@ public sealed class ProjectModel
 
 	private void ImportProjectNode(ProjectNode node)
 	{
-		_thread.Enqueue(
-			new ProjectTask(
-				cancellationToken =>
-				{
-					Importer importer = _importerRegistry.GetImporter(node.Extension);
-					node.Meta.ImporterSettings ??= importer.CreateSettings();
-					node.SetNodeType(node.Meta.ImporterSettings.NodeType);
-
-					string resourcePath = Path.Combine(_projectSettings!.AbsoluteResourcesPath, node.RelativePath);
-
-					using Stream stream = File.OpenRead(node.Path);
-					ImporterResult result = importer.Import(stream, node.Meta.ImporterSettings, resourcePath, cancellationToken);
-
-					if (result == ImporterResult.FinishedSettingsChanged)
-					{
-						node.UpdateMetaFile();
-					}
-				}
-			)
-		);
+		_thread.Enqueue(CreateImportTask(node));
 	}
 
 	#endregion
 	
 	#region Folder watchers
+	public void PauseWatchers()
+	{
+		_watchersActive = false;
+	}
+
+	public void ResumeWatchers()
+	{
+		while (!_waitingWatcherTasks.IsEmpty)
+		{
+			if (_waitingWatcherTasks.TryDequeue(out ProjectTask? task))
+			{
+				_thread.Enqueue(task);
+			}
+		}
+
+		_watchersActive = true;
+	}
+
 	private void CreateWatchers()
 	{
 		_assetsWatcher                       =  new FileSystemWatcher(_projectSettings!.AbsoluteAssetsPath);
@@ -289,6 +309,35 @@ public sealed class ProjectModel
 		settings.ProjectFolderPath = projectPath;
 		
 		_projectSettings = settings;
+	}
+	#endregion
+	
+	#region Tasks
+	private ProjectTask CreateInitMetaTask(ProjectNode node)
+	{
+		return new ProjectTask(cancellationToken => node.InitMeta(_migrationManager, cancellationToken));
+	}
+
+	private ProjectTask CreateImportTask(ProjectNode node)
+	{
+		return new ProjectTask(
+			cancellationToken =>
+			{
+				Importer importer = _importerRegistry.GetImporter(node.Extension);
+				node.Meta!.ImporterSettings ??= importer.CreateSettings();
+				node.SetNodeType(node.Meta.ImporterSettings.NodeType);
+
+				string resourcePath = Path.Combine(_projectSettings!.AbsoluteResourcesPath, node.RelativePath);
+
+				using Stream   stream = File.OpenRead(node.Path);
+				ImporterResult result = importer.Import(stream, node.Meta.ImporterSettings, resourcePath, cancellationToken);
+
+				if (result == ImporterResult.FinishedSettingsChanged)
+				{
+					node.UpdateMetaFile();
+				}
+			}
+		);
 	}
 	#endregion
 }
