@@ -3,6 +3,7 @@ using Mine.ImGuiPlugin;
 using Mine.Studio;
 using RedHerring.Studio.Models;
 using RedHerring.Studio.Models.Project.FileSystem;
+using RedHerring.Studio.Models.ViewModels.Console;
 using RedHerring.Studio.UserInterface;
 using Gui = ImGuiNET.ImGui;
 
@@ -49,8 +50,12 @@ public sealed class ToolProjectView : Tool
 		bool isOpen = true;
 		if (Gui.Begin(NameId, ref isOpen))
 		{
-			UpdateFolder(StudioModel.Project.AssetsFolder);
-			UpdateFolder(StudioModel.Project.ScriptsGameLibraryFolder);
+			lock (StudioModel.Project.ProjectTreeLock)
+			{
+				UpdateFolder(StudioModel.Project.AssetsFolder);
+				UpdateFolder(StudioModel.Project.ScriptsGameLibraryFolder);
+			}
+
 			Gui.End();
 		}
 
@@ -193,6 +198,8 @@ public sealed class ToolProjectView : Tool
 	private void OnContextMenuEditRename()
 	{
 		// TODO
+		ProjectNode? node = StudioModel.Project.AssetsFolder.FindNode("Test/New2\\moonshades.txt");
+		ConsoleViewModel.LogInfo(node == null ? "Not found" : "Found");
 	}
 
 	private void OnContextMenuEditCopy()

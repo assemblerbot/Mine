@@ -1,4 +1,3 @@
-using System.Collections.ObjectModel;
 using Migration;
 
 namespace RedHerring.Studio.Models.Project.FileSystem;
@@ -7,7 +6,7 @@ public class ProjectFolderNode : ProjectNode
 {
 	public override string RelativeDirectoryPath => RelativePath;
 
-	public ObservableCollection<ProjectNode> Children { get; init; } = new();
+	public List<ProjectNode> Children { get; } = new();
 	
 	public ProjectFolderNode(string name, string path, string relativePath, bool hasMetaFile, ProjectNodeType type) : base(name, path, relativePath, hasMetaFile)
 	{
@@ -46,5 +45,32 @@ public class ProjectFolderNode : ProjectNode
 			
 			child.TraverseRecursive(process, flags, cancellationToken);
 		}
+	}
+
+	public override ProjectNode? FindNode(string path)
+	{
+		int index = path.IndexOfAny(new [] {'\\','/'});
+		if (index == -1)
+		{
+			// end of path
+			return Children.FirstOrDefault(node => node.Name == path);
+		}
+
+		string       folderName = path.Substring(0, index);
+		ProjectNode? node       = Children.FirstOrDefault(node => node.Name == folderName);
+
+		if (node == null)
+		{
+			// not found
+			return null;
+		}
+
+		// continue with shorter path
+		return node.FindNode(path.Substring(folderName.Length + 1));
+	}
+
+	public ProjectNode? FindChild(string name)
+	{
+		return Children.FirstOrDefault(child => child.Name == name);
 	}
 }

@@ -44,4 +44,9 @@ public class ProjectScriptFileNode : ProjectNode
 			process(this);
 		}
 	}
+
+	public override ProjectNode? FindNode(string path)
+	{
+		return null;
+	}
 }

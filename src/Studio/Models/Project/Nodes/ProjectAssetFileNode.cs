@@ -17,11 +17,16 @@ public sealed class ProjectAssetFileNode : ProjectNode
 	{
 		// calculate file hash
 		string hash;
-		using(FileStream file = new (Path, FileMode.Open))
+		try
 		{
+			using FileStream file = new(Path, FileMode.Open);
 			hash = Convert.ToBase64String(_hashAlgorithm.ComputeHash(file)); // how to cancel compute hash?
 		}
-		
+		catch (Exception e)
+		{
+			hash = "";
+		}
+
 		// init meta
 		CreateMetaFile(migrationManager, hash);
 	}
@@ -32,5 +37,10 @@ public sealed class ProjectAssetFileNode : ProjectNode
 		{
 			process(this);
 		}
+	}
+
+	public override ProjectNode? FindNode(string path)
+	{
+		return null;
 	}
 }
