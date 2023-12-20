@@ -19,9 +19,10 @@ public sealed class ProjectModel
 	}
 	#endregion
 	
-	private const string _assetsFolderName             = "Assets";
-	private const string _scriptsGameLibraryFolderName = "GameLibrary";
-	private const string _settingsFileName             = "Project.json";
+	private const  string _assetsFolderName             = "Assets";
+	private const  string _scriptsGameLibraryFolderName = "GameLibrary";
+	private const  string _settingsFileName             = "Project.json";
+	private static char[] _slash                        = {'/', '\\'};
 	
 	public static Assembly Assembly => typeof(ProjectModel).Assembly; 
 
@@ -31,11 +32,11 @@ public sealed class ProjectModel
 
 	public readonly object ProjectTreeLock = new(); // synchronization lock
 	
-	private ProjectFolderNode? _assetsFolder;
-	public  ProjectFolderNode? AssetsFolder => _assetsFolder;
+	private ProjectRootNode? _assetsFolder;
+	public  ProjectRootNode? AssetsFolder => _assetsFolder;
 
-	private ProjectFolderNode? _scriptsGameLibraryFolder;
-	public  ProjectFolderNode? ScriptsGameLibraryFolder => _scriptsGameLibraryFolder; 
+	private ProjectRootNode? _scriptsGameLibraryFolder;
+	public  ProjectRootNode? ScriptsGameLibraryFolder => _scriptsGameLibraryFolder; 
 
 	private ProjectSettings? _projectSettings;
 	public  ProjectSettings  ProjectSettings => _projectSettings!;
@@ -76,11 +77,11 @@ public sealed class ProjectModel
 		{
 			// create roots
 			string            assetsPath   = Path.Join(projectPath, _assetsFolderName);
-			ProjectFolderNode assetsFolder = new ProjectRootNode(_assetsFolderName, assetsPath, ProjectNodeType.AssetFolder);
+			ProjectRootNode assetsFolder = new ProjectRootNode(_assetsFolderName, assetsPath, ProjectNodeType.AssetFolder);
 			_assetsFolder = assetsFolder;
 
 			string            scriptsGameLibraryPath   = Path.Join(projectPath, _scriptsGameLibraryFolderName);
-			ProjectFolderNode scriptsGameLibraryFolder = new ProjectRootNode(_scriptsGameLibraryFolderName, scriptsGameLibraryPath, ProjectNodeType.ScriptFolder);
+			ProjectRootNode scriptsGameLibraryFolder = new ProjectRootNode(_scriptsGameLibraryFolderName, scriptsGameLibraryPath, ProjectNodeType.ScriptFolder);
 			_scriptsGameLibraryFolder = scriptsGameLibraryFolder;
 
 			// check
@@ -277,12 +278,15 @@ public sealed class ProjectModel
 			return;
 		}
 
+		// TODO - change from nodes to paths!
+		
+		/*
 		ProjectFolderNode? currentNode = _assetsFolder;
-		char[]             slash       = {'/', '\\'};
-		string             pathToCheck = evt.Name;
+		
+		string pathToCheck = evt.Name;
 		while (pathToCheck.Length > 0 && currentNode != null)
 		{
-			int index = pathToCheck.IndexOfAny(slash);
+			int index = pathToCheck.IndexOfAny(_slash);
 			if (index >= 0)
 			{
 				// folder
@@ -291,17 +295,19 @@ public sealed class ProjectModel
 				if (childNode == null)
 				{
 					// folder is not present - create new
-					ProjectFolderNode newFolderNode = new ProjectFolderNode(
-						folderName,
-						Path.Join(currentNode.Path,         folderName),
-						Path.Join(currentNode.RelativePath, folderName),
-						true,
-						ProjectNodeType.AssetFolder
-					);
+					// ProjectFolderNode newFolderNode = new ProjectFolderNode(
+					// 	folderName,
+					// 	Path.Join(currentNode.Path,         folderName),
+					// 	Path.Join(currentNode.RelativePath, folderName),
+					// 	true,
+					// 	ProjectNodeType.AssetFolder
+					// );
 
 					// enqueue tasks for new node
-					EnqueueProjectTaskFromWatcher(CreateInsertNodeTask(currentNode, newFolderNode));
-					EnqueueProjectTaskFromWatcher(CreateInitMetaTask(newFolderNode));
+					EnqueueProjectTaskFromWatcher(CreateNewFolderNodeTask(_assetsFolder!, currentNode.RelativePath, folderName, true, ProjectNodeType.AssetFolder));
+					EnqueueProjectTaskFromWatcher(CreateInitMetaTask(_assetsFolder!, Path.Join(currentNode.RelativePath, folderName)));
+					//EnqueueProjectTaskFromWatcher(CreateInsertNodeTask(currentNode, newFolderNode));
+					//EnqueueProjectTaskFromWatcher(CreateInitMetaTask(newFolderNode));
 					
 					// next
 					currentNode = newFolderNode;
@@ -339,11 +345,40 @@ public sealed class ProjectModel
 			EnqueueProjectTaskFromWatcher(CreateImportTask(assetFileNode));
 			break;
 		}
+		*/
 	}
 
 	private void OnAssetDeleted(object sender, FileSystemEventArgs evt)
 	{
-		
+		if (evt.Name == null)
+		{
+			return;
+		}
+
+		if (evt.Name.EndsWith(".meta"))
+		{
+			// deleted meta file .. create new
+			string       assetFileName = evt.Name.Substring(0, evt.Name.Length - ".meta".Length);
+			ProjectNode? assetFileNode = _assetsFolder!.FindNode(assetFileName);
+			if (assetFileNode != null)
+			{
+				EnqueueProjectTaskFromWatcher(CreateInitMetaTask(assetFileNode));
+				return;
+			}
+		}
+
+		// deleted folder or file
+		ProjectNode? assetNode = _assetsFolder!.FindNode(evt.Name);
+		if (assetNode != null)
+		{
+			int    index      = evt.Name.LastIndexOfAny(_slash);
+			string parentPath = evt.Name.Substring(0, index);
+			string nodeName   = evt.Name.Substring(index + 1);
+			if (_assetsFolder!.FindNode(parentPath) is ProjectFolderNode parentNode)
+			{
+				EnqueueProjectTaskFromWatcher(CreateDeleteNodeTask(parentNode, nodeName));
+			}
+		}
 	}
 
 	private void OnAssetChanged(object sender, FileSystemEventArgs evt)
@@ -410,6 +445,72 @@ public sealed class ProjectModel
 	#endregion
 	
 	#region Tasks
+	private ProjectTask CreateNewFolderNodeTask(ProjectRootNode root, string parentPath, string name, bool hasMetaFile, ProjectNodeType type)
+	{
+		return new ProjectTask(
+			cancellationToken =>
+			{
+				lock (ProjectTreeLock)
+				{
+					if (root.FindNode(parentPath) is ProjectFolderNode parentNode)
+					{
+						if (parentNode.FindChild(name) == null)
+						{
+							ProjectFolderNode newNode = new(
+								name,
+								Path.Join(parentNode.Path,         name),
+								Path.Join(parentNode.RelativePath, name),
+								hasMetaFile,
+								type
+							);
+
+							parentNode.Children.Add(newNode);
+						}
+					}
+				}
+			}
+		);
+	}
+
+	private ProjectTask CreateNewAssetFileTask(ProjectRootNode root, string parentPath, string name)
+	{
+		return new ProjectTask(
+			cancellationToken =>
+			{
+				lock (ProjectTreeLock)
+				{
+					if (root.FindNode(parentPath) is ProjectFolderNode parentNode)
+					{
+						if (parentNode.FindChild(name) == null)
+						{
+							ProjectAssetFileNode newNode = new(
+								name,
+								Path.Join(parentNode.Path,         name),
+								Path.Join(parentNode.RelativePath, name)
+							);
+
+							parentNode.Children.Add(newNode);
+						}
+					}
+				}
+			}
+		);
+	}
+
+	private ProjectTask CreateInitMetaTask(ProjectRootNode root, string path)
+	{
+		return new ProjectTask(
+			cancellationToken =>
+			{
+				lock (ProjectTreeLock)
+				{
+					ProjectNode? node = root.FindNode(path);
+					node?.InitMeta(_migrationManager, cancellationToken);
+				}
+			}
+		);
+	}
+	
 	private ProjectTask CreateInsertNodeTask(ProjectFolderNode parent, ProjectNode child)
 	{
 		return new ProjectTask(
@@ -417,7 +518,31 @@ public sealed class ProjectModel
 			{
 				lock (ProjectTreeLock)
 				{
-					parent.Children.Add(child);
+					if (parent.FindChild(child.Name) == null)
+					{
+						parent.Children.Add(child);
+					}
+				}
+			}
+		);
+	}
+
+	private ProjectTask CreateDeleteNodeTask(ProjectFolderNode parent, string childName)
+	{
+		return new ProjectTask(
+			cancellationToken =>
+			{
+				lock (ProjectTreeLock)
+				{
+					int index = parent.Children.FindIndex(child => child.Name == childName);
+					if (index == -1)
+					{
+						return;
+					}
+
+					ProjectNode child = parent.Children[index];
+					File.Delete(child.Path + ".meta");
+					parent.Children.RemoveAt(index);
 				}
 			}
 		);
