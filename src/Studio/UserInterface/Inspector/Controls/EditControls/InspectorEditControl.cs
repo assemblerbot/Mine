@@ -91,7 +91,7 @@ public abstract class InspectorEditControl<T> : InspectorControl
 	{
 		if (_isReadOnly)
 		{
-			Gui.PushStyleVar(ImGuiStyleVar.Alpha, 0.5f); // workaround to readonly input style
+			Gui.PushStyleVar(ImGuiStyleVar.Alpha, Gui.GetStyle().DisabledAlpha); // workaround to readonly input style
 		}
 	}
 

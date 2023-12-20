@@ -17,7 +17,7 @@ public sealed class MenuRootNode : MenuInternalNode
 		{
 			if (Gui.BeginMainMenuBar())
 			{
-				foreach (AMenuNode child in _children)
+				foreach (MenuNode child in _children)
 				{
 					child.Update();
 				}
@@ -28,7 +28,7 @@ public sealed class MenuRootNode : MenuInternalNode
 			return;
 		}
 
-		foreach (AMenuNode child in _children)
+		foreach (MenuNode child in _children)
 		{
 			child.Update();
 		}

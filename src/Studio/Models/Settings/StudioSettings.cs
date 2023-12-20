@@ -1,4 +1,5 @@
-﻿using Migration;
+﻿using ImGuiNET;
+using Migration;
 using Mine.Framework;
 using RedHerring.Studio.Tools;
 using RedHerring.Studio.UserInterface.Attributes;
@@ -34,10 +35,20 @@ public sealed class StudioSettings
 		ActiveToolWindows          = openedToolWindows;
 	}
 
-	// public void ApplyTheme()
-	// {
-	// 	Array.Find(_themes, theme => theme.Name == Theme)?.Apply();
-	// }
+	public void ApplyTheme()
+	{
+		ImGuiStylePtr style = ImGui.GetStyle();
+        
+		style.Alpha                     = 1.0f;
+		style.DisabledAlpha             = 0.6f;
+		style.WindowRounding            = 4.0f;
+		style.ChildRounding             = 4.0f;
+		style.PopupRounding             = 4.0f;
+		style.FrameRounding             = 4.0f;
+		style.ScrollbarRounding         = 4.0f;
+		style.GrabRounding              = 4.0f;
+		style.TabRounding               = 4.0f;
+	}
 }
 
 #region Migration

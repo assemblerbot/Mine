@@ -227,7 +227,7 @@ public sealed class StudioComponent : Component, IUpdatable
 			ImGui.LoadIniSettingsFromMemory(_studioModel.StudioSettings.UiLayout);
 		}
 
-		//_studioModel.StudioSettings.ApplyTheme();
+		_studioModel.StudioSettings.ApplyTheme();
 	}
 	#endregion
 }

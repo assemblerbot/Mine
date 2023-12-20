@@ -2,7 +2,7 @@
 
 public sealed class Menu
 {
-	private readonly AMenuNode _root;
+	private readonly MenuNode _root;
 	
 	// on click cache - to avoid calling actions directly from menu items
 	private readonly Dictionary<string, Action?> _onClickActions  = new();

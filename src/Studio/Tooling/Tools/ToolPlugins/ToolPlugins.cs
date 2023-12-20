@@ -105,7 +105,7 @@ public class ToolPlugins : Tool
 
 	private void SettingsUI()
 	{
-		ImGui.PushStyleVar(ImGuiStyleVar.Alpha, 0.5f);
+		ImGui.PushStyleVar(ImGuiStyleVar.Alpha, ImGui.GetStyle().DisabledAlpha);
 		
 		string settingsPath = PluginManagerSettings.StudioPluginsSettingsPath;
 		ImGui.InputText("Settings file", ref settingsPath, (uint)settingsPath.Length);

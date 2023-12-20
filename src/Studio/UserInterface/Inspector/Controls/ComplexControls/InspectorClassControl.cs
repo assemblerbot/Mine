@@ -269,7 +269,7 @@ public sealed class InspectorClassControl : InspectorControl
 
 		if (_isNullSource)
 		{
-			Gui.PushStyleVar(ImGuiStyleVar.Alpha, 0.5f);
+			Gui.PushStyleVar(ImGuiStyleVar.Alpha, Gui.GetStyle().DisabledAlpha);
 			Gui.Text("[null]");
 			Gui.PopStyleVar();
 			Gui.SameLine();
