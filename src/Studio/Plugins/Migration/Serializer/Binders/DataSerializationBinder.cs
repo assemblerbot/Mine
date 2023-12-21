@@ -5,6 +5,7 @@ using System.Reflection;
 namespace Migration
 {
 	// Maps data classes to latest versions of migratable classes and to lists of them.
+	// Used in transfer between application data and migration data.
 	
 	// For example, class without custom id:
 	//   MyClass       <-> MyClass_003
@@ -56,6 +57,15 @@ namespace Migration
 				}
 			}
 			
+			// non migratable classes
+			{
+				IEnumerable<Type> non_migratable_classes = MigrationManager.GetTypesWithAttribute(assembly, typeof(NonMigratableIdAttribute));
+				foreach (Type non_migratable_class in non_migratable_classes)
+				{
+					mapping.Add(non_migratable_class, non_migratable_class);
+				}
+			}
+
 			// no obsolete classes
 
 			Init(mapping);
