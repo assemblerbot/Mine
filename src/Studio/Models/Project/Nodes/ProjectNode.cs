@@ -8,7 +8,7 @@ public abstract class ProjectNode
 	[ReadOnlyInInspector] public ProjectNodeType Type = ProjectNodeType.Uninitialized;
 
 	public          string Name { get; }
-	public readonly string Path;
+	public readonly string AbsolutePath;
 	public readonly string RelativePath; // relative path inside Assets directory
 	public abstract string RelativeDirectoryPath { get; }
 
@@ -16,12 +16,12 @@ public abstract class ProjectNode
 	
 	public Metadata? Meta;
 
-	public string Extension => System.IO.Path.GetExtension(Path).ToLower(); // cache if needed
+	public string Extension => System.IO.Path.GetExtension(AbsolutePath).ToLower(); // cache if needed
 
-	protected ProjectNode(string name, string path, string relativePath, bool hasMetaFile)
+	protected ProjectNode(string name, string absolutePath, string relativePath, bool hasMetaFile)
 	{
 		Name         = name;
-		Path         = path;
+		AbsolutePath         = absolutePath;
 		RelativePath = relativePath;
 		HasMetaFile  = hasMetaFile;
 	}
@@ -30,7 +30,7 @@ public abstract class ProjectNode
 
 	public void UpdateMetaFile()
 	{
-		string metaPath = $"{Path}.meta";
+		string metaPath = $"{AbsolutePath}.meta";
 		byte[] json     = MigrationSerializer.SerializeAsync(Meta, SerializedDataFormat.JSON, StudioModel.Assembly).GetAwaiter().GetResult();
 		File.WriteAllBytes(metaPath, json);
 	}
@@ -42,7 +42,7 @@ public abstract class ProjectNode
 
 	protected void CreateMetaFile(MigrationManager migrationManager, string? hash)
 	{
-		string metaPath = $"{Path}.meta";
+		string metaPath = $"{AbsolutePath}.meta";
 		
 		// read if possible
 		Metadata? meta = null;

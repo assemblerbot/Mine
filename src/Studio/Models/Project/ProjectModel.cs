@@ -76,11 +76,11 @@ public sealed class ProjectModel
 		lock (ProjectTreeLock)
 		{
 			// create roots
-			string            assetsPath   = Path.Join(projectPath, _assetsFolderName);
+			string          assetsPath   = Path.Join(projectPath, _assetsFolderName);
 			ProjectRootNode assetsFolder = new ProjectRootNode(_assetsFolderName, assetsPath, ProjectNodeType.AssetFolder);
 			_assetsFolder = assetsFolder;
 
-			string            scriptsGameLibraryPath   = Path.Join(projectPath, _scriptsGameLibraryFolderName);
+			string          scriptsGameLibraryPath   = Path.Join(projectPath, _scriptsGameLibraryFolderName);
 			ProjectRootNode scriptsGameLibraryFolder = new ProjectRootNode(_scriptsGameLibraryFolderName, scriptsGameLibraryPath, ProjectNodeType.ScriptFolder);
 			_scriptsGameLibraryFolder = scriptsGameLibraryFolder;
 
@@ -278,74 +278,41 @@ public sealed class ProjectModel
 			return;
 		}
 
-		// TODO - change from nodes to paths!
-		
-		/*
-		ProjectFolderNode? currentNode = _assetsFolder;
-		
-		string pathToCheck = evt.Name;
-		while (pathToCheck.Length > 0 && currentNode != null)
+		string relativePath = "";
+		string path = evt.Name;
+		while (path.Length > 0)
 		{
-			int index = pathToCheck.IndexOfAny(_slash);
+			int index = path.IndexOfAny(_slash);
 			if (index >= 0)
 			{
-				// folder
-				string       folderName = pathToCheck.Substring(0, index);
-				ProjectNode? childNode  = currentNode.FindChild(folderName);
-				if (childNode == null)
-				{
-					// folder is not present - create new
-					// ProjectFolderNode newFolderNode = new ProjectFolderNode(
-					// 	folderName,
-					// 	Path.Join(currentNode.Path,         folderName),
-					// 	Path.Join(currentNode.RelativePath, folderName),
-					// 	true,
-					// 	ProjectNodeType.AssetFolder
-					// );
+				string folderName = path.Substring(0, index);
+				path = path.Substring(index + 1);
 
-					// enqueue tasks for new node
-					EnqueueProjectTaskFromWatcher(CreateNewFolderNodeTask(_assetsFolder!, currentNode.RelativePath, folderName, true, ProjectNodeType.AssetFolder));
-					EnqueueProjectTaskFromWatcher(CreateInitMetaTask(_assetsFolder!, Path.Join(currentNode.RelativePath, folderName)));
-					//EnqueueProjectTaskFromWatcher(CreateInsertNodeTask(currentNode, newFolderNode));
-					//EnqueueProjectTaskFromWatcher(CreateInitMetaTask(newFolderNode));
-					
-					// next
-					currentNode = newFolderNode;
-				}
-				else if (childNode is ProjectFolderNode childFolderNode)
+				string parentRelativePath = relativePath;
+				relativePath = Path.Join(relativePath, folderName);
+
+				// folder
+				EnqueueProjectTaskFromWatcher(CreateNewFolderNodeTask(_assetsFolder!, parentRelativePath, folderName, true, ProjectNodeType.AssetFolder));
+				EnqueueProjectTaskFromWatcher(CreateInitMetaTask(_assetsFolder!, relativePath));
+			}
+			else
+			{
+				if (Directory.Exists(evt.FullPath))
 				{
-					// folder is present - next
-					currentNode = childFolderNode;
+					// created directory
+					EnqueueProjectTaskFromWatcher(CreateNewFolderNodeTask(_assetsFolder!, relativePath, path, true, ProjectNodeType.AssetFolder));
+					EnqueueProjectTaskFromWatcher(CreateInitMetaTask(_assetsFolder!, evt.Name));
 				}
 				else
 				{
-					// file system entity with that name is file, that is not allowed
-					ConsoleViewModel.LogError($"File and folder with the same name on the same path is not allowed! {evt.FullPath}");
-					return;
+					// created file
+					EnqueueProjectTaskFromWatcher(CreateNewAssetFileTask(_assetsFolder!, relativePath, path));
+					EnqueueProjectTaskFromWatcher(CreateInitMetaTask(_assetsFolder!, evt.Name));
+					EnqueueProjectTaskFromWatcher(CreateImportTask(_assetsFolder!, evt.Name));
 				}
-
-				pathToCheck = pathToCheck.Substring(folderName.Length + 1);
-				continue;
-			}
-			
-			// no more subfolders, rest of path is file or folder itself
-			if (Directory.Exists(evt.FullPath))
-			{
-				// it's a folder
-				ProjectFolderNode assetFolderNode = new(pathToCheck, evt.FullPath, evt.Name, true, ProjectNodeType.AssetFolder);
-				EnqueueProjectTaskFromWatcher(CreateInsertNodeTask(currentNode, assetFolderNode));
-				EnqueueProjectTaskFromWatcher(CreateInitMetaTask(assetFolderNode));
 				break;
 			}
-			
-			// it's a file
-			ProjectAssetFileNode assetFileNode = new(pathToCheck, evt.FullPath, evt.Name);
-			EnqueueProjectTaskFromWatcher(CreateInsertNodeTask(currentNode, assetFileNode));
-			EnqueueProjectTaskFromWatcher(CreateInitMetaTask(assetFileNode));
-			EnqueueProjectTaskFromWatcher(CreateImportTask(assetFileNode));
-			break;
 		}
-		*/
 	}
 
 	private void OnAssetDeleted(object sender, FileSystemEventArgs evt)
@@ -458,7 +425,7 @@ public sealed class ProjectModel
 						{
 							ProjectFolderNode newNode = new(
 								name,
-								Path.Join(parentNode.Path,         name),
+								Path.Join(parentNode.AbsolutePath, name),
 								Path.Join(parentNode.RelativePath, name),
 								hasMetaFile,
 								type
@@ -485,7 +452,7 @@ public sealed class ProjectModel
 						{
 							ProjectAssetFileNode newNode = new(
 								name,
-								Path.Join(parentNode.Path,         name),
+								Path.Join(parentNode.AbsolutePath, name),
 								Path.Join(parentNode.RelativePath, name)
 							);
 
@@ -510,6 +477,42 @@ public sealed class ProjectModel
 			}
 		);
 	}
+
+	private ProjectTask CreateImportTask(ProjectRootNode root, string path)
+	{
+		return new ProjectTask(
+			cancellationToken =>
+			{
+				ProjectAssetFileNode? node = root.FindNode(path) as ProjectAssetFileNode;
+				if (node == null)
+				{
+					return;
+				}
+
+				Importer importer = _importerRegistry.GetImporter(node.Extension);
+				node.Meta!.ImporterSettings ??= importer.CreateSettings();
+				node.SetNodeType(node.Meta.ImporterSettings.NodeType);
+
+				string resourcePath = Path.Combine(_projectSettings!.AbsoluteResourcesPath, node.RelativePath);
+
+				try
+				{
+					using Stream   stream = File.OpenRead(node.AbsolutePath);
+					ImporterResult result = importer.Import(stream, node.Meta.ImporterSettings, resourcePath, cancellationToken);
+
+					if (result == ImporterResult.FinishedSettingsChanged)
+					{
+						node.UpdateMetaFile();
+					}
+				}
+				catch (Exception e)
+				{
+					ConsoleViewModel.LogError($"While importing file {node.AbsolutePath} an exception occured: {e}");
+				}
+			}
+		);
+	}
+	
 	
 	private ProjectTask CreateInsertNodeTask(ProjectFolderNode parent, ProjectNode child)
 	{
@@ -541,7 +544,7 @@ public sealed class ProjectModel
 					}
 
 					ProjectNode child = parent.Children[index];
-					File.Delete(child.Path + ".meta");
+					File.Delete(child.AbsolutePath + ".meta");
 					parent.Children.RemoveAt(index);
 				}
 			}
@@ -566,7 +569,7 @@ public sealed class ProjectModel
 
 				try
 				{
-					using Stream   stream = File.OpenRead(node.Path);
+					using Stream   stream = File.OpenRead(node.AbsolutePath);
 					ImporterResult result = importer.Import(stream, node.Meta.ImporterSettings, resourcePath, cancellationToken);
 
 					if (result == ImporterResult.FinishedSettingsChanged)
@@ -576,7 +579,7 @@ public sealed class ProjectModel
 				}
 				catch (Exception e)
 				{
-					ConsoleViewModel.LogError($"While importing file {node.Path} an exception occured: {e}");
+					ConsoleViewModel.LogError($"While importing file {node.AbsolutePath} an exception occured: {e}");
 				}
 			}
 		);

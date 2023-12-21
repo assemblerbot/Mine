@@ -13,7 +13,7 @@ public class ProjectScriptFileNode : ProjectNode
 		public string Type { get; set; } // TODO - constants or something
 	}
 
-	public ProjectScriptFileNode(string name, string path, string relativePath) : base(name, path, relativePath, false)
+	public ProjectScriptFileNode(string name, string absolutePath, string relativePath) : base(name, absolutePath, relativePath, false)
 	{
 		SetNodeType(ProjectNodeType.ScriptFile);
 	}
@@ -23,7 +23,7 @@ public class ProjectScriptFileNode : ProjectNode
 		string guid = RelativePath;
 		
 		// try to parse file header
-		ProjectScriptFileHeader.FileId? fileId = ProjectScriptFileHeader.ReadFromFile(Path);
+		ProjectScriptFileHeader.FileId? fileId = ProjectScriptFileHeader.ReadFromFile(AbsolutePath);
 		if(fileId != null)
 		{
 			guid = fileId.Guid;

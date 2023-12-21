@@ -9,7 +9,7 @@ public sealed class ProjectAssetFileNode : ProjectNode
 	
 	private static readonly HashAlgorithm _hashAlgorithm = SHA1.Create();
 	
-	public ProjectAssetFileNode(string name, string path, string relativePath) : base(name, path, relativePath, true)
+	public ProjectAssetFileNode(string name, string absolutePath, string relativePath) : base(name, absolutePath, relativePath, true)
 	{
 	}
 	
@@ -19,7 +19,7 @@ public sealed class ProjectAssetFileNode : ProjectNode
 		string hash;
 		try
 		{
-			using FileStream file = new(Path, FileMode.Open);
+			using FileStream file = new(AbsolutePath, FileMode.Open);
 			hash = Convert.ToBase64String(_hashAlgorithm.ComputeHash(file)); // how to cancel compute hash?
 		}
 		catch (Exception e)

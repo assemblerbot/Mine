@@ -8,7 +8,7 @@ public class ProjectFolderNode : ProjectNode
 
 	public List<ProjectNode> Children { get; } = new();
 	
-	public ProjectFolderNode(string name, string path, string relativePath, bool hasMetaFile, ProjectNodeType type) : base(name, path, relativePath, hasMetaFile)
+	public ProjectFolderNode(string name, string absolutePath, string relativePath, bool hasMetaFile, ProjectNodeType type) : base(name, absolutePath, relativePath, hasMetaFile)
 	{
 		SetNodeType(type);
 	}
@@ -49,6 +49,11 @@ public class ProjectFolderNode : ProjectNode
 
 	public override ProjectNode? FindNode(string path)
 	{
+		if (string.IsNullOrEmpty(path))
+		{
+			return this;
+		}
+
 		int index = path.IndexOfAny(new [] {'\\','/'});
 		if (index == -1)
 		{
