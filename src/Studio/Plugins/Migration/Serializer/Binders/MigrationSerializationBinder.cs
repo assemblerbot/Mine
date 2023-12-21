@@ -60,6 +60,9 @@ namespace Migration
 				foreach (Type non_migratable_class in non_migratable_classes)
 				{
 					mapping.Add(non_migratable_class, non_migratable_class);
+
+					Type non_migratable_class_list = list_generic_type.MakeGenericType(non_migratable_class);
+					mapping.Add(non_migratable_class_list, non_migratable_class_list);
 				}
 			}
 			
