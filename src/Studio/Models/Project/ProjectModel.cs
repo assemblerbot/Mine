@@ -127,92 +127,6 @@ public sealed class ProjectModel
 
 		CreateWatchers();
 	}
-
-	private void RecursiveAssetScan(string path, string relativePath, ProjectFolderNode root, List<string> foundMetaFiles)
-	{
-		// scan directories
-		foreach (string directoryPath in Directory.EnumerateDirectories(path))
-		{
-			string            directory             = Path.GetFileName(directoryPath);
-			string            relativeDirectoryPath = Path.Combine(relativePath, directory);
-			ProjectFolderNode folderNode            = new(directory, directoryPath, relativeDirectoryPath, true, ProjectNodeType.AssetFolder);
-			root.Children.Add(folderNode);
-			
-			RecursiveAssetScan(directoryPath, relativeDirectoryPath, folderNode, foundMetaFiles);
-		}
-
-		// scan files except meta
-		foreach (string filePath in Directory.EnumerateFiles(path))
-		{
-			string fileName = Path.GetFileName(filePath);
-			if (fileName.EndsWith(".meta"))
-			{
-				foundMetaFiles.Add(filePath);
-				continue;
-			}
-
-			string               relativeFilePath = Path.Combine(relativePath, fileName);
-			ProjectAssetFileNode assetFileNode    = new(fileName, filePath, relativeFilePath);
-			root.Children.Add(assetFileNode);
-		}
-	}
-
-	private void RecursiveScriptScan(string path, string relativePath, ProjectFolderNode root)
-	{
-		// scan directories
-		foreach (string directoryPath in Directory.EnumerateDirectories(path))
-		{
-			string            directory             = Path.GetFileName(directoryPath);
-			string            relativeDirectoryPath = Path.Combine(relativePath, directory);
-			ProjectFolderNode folderNode            = new(directory, directoryPath, relativeDirectoryPath, false, ProjectNodeType.ScriptFolder);
-			root.Children.Add(folderNode);
-			
-			RecursiveScriptScan(directoryPath, relativeDirectoryPath, folderNode);
-		}
-
-		// scan all files
-		foreach (string filePath in Directory.EnumerateFiles(path))
-		{
-			string                fileName         = Path.GetFileName(filePath);
-			string                relativeFilePath = Path.Combine(relativePath, fileName);
-			ProjectScriptFileNode assetFileNode    = new(fileName, filePath, relativeFilePath);
-			root.Children.Add(assetFileNode);
-		}
-	}
-
-	private void InitMeta()
-	{
-		lock (ProjectTreeLock)
-		{
-			_assetsFolder!.TraverseRecursive(
-				node => _thread.Enqueue(CreateInitMetaTask(node)),
-				TraverseFlags.Directories | TraverseFlags.Files,
-				default
-			);
-
-			_scriptsGameLibraryFolder!.TraverseRecursive(
-				node => _thread.Enqueue(CreateInitMetaTask(node)),
-				TraverseFlags.Directories | TraverseFlags.Files,
-				default
-			);
-		}
-	}
-
-	private void MetaCleanup(List<string> metaFiles)
-	{
-		foreach (string metaFile in metaFiles)
-		{
-			string path = metaFile.Substring(0, metaFile.Length - ".meta".Length);
-			if (Directory.Exists(path) || File.Exists(path))
-			{
-				continue;
-			}
-
-			ConsoleViewModel.LogWarning($"Removing unused meta file: {metaFile}");
-			File.Delete(metaFile);
-		}
-	}
-
 	#endregion
 	
 	#region Import
@@ -220,13 +134,13 @@ public sealed class ProjectModel
 	{
 		lock (ProjectTreeLock)
 		{
-			_assetsFolder!.TraverseRecursive(ImportProjectNode, TraverseFlags.Files, default);
+			_assetsFolder!.TraverseRecursive(ImportProjectAssetNode, TraverseFlags.Files, default);
 		}
 	}
 
-	private void ImportProjectNode(ProjectNode node)
+	private void ImportProjectAssetNode(ProjectNode node)
 	{
-		_thread.Enqueue(CreateImportTask(node));
+		_thread.Enqueue(CreateImportTask(_assetsFolder!, node.RelativePath));
 	}
 
 	#endregion
@@ -256,63 +170,29 @@ public sealed class ProjectModel
 		_assetsWatcher.NotifyFilter          =  NotifyFilters.DirectoryName | NotifyFilters.FileName;
 		_assetsWatcher.Created               += OnAssetCreated;
 		_assetsWatcher.Deleted               += OnAssetDeleted;
-		_assetsWatcher.Renamed               += OnAssetChanged;
+		_assetsWatcher.Renamed               += OnAssetRenamed;
 		_assetsWatcher.Filter                =  "";
 		_assetsWatcher.IncludeSubdirectories =  true;
 		_assetsWatcher.EnableRaisingEvents   =  true;
 
 		_scriptsWatcher                       =  new FileSystemWatcher(_projectSettings!.AbsoluteScriptsPath);
 		_scriptsWatcher.NotifyFilter          =  NotifyFilters.DirectoryName | NotifyFilters.FileName;
-		_scriptsWatcher.Created               += OnScriptChanged;
-		_scriptsWatcher.Deleted               += OnScriptChanged;
-		_scriptsWatcher.Renamed               += OnScriptChanged;
-		_scriptsWatcher.Filter                =  "*.cs";
+		_scriptsWatcher.Created               += OnScriptCreated;
+		_scriptsWatcher.Deleted               += OnScriptDeleted;
+		_scriptsWatcher.Renamed               += OnScriptRenamed;
+		_scriptsWatcher.Filter                =  "";
 		_scriptsWatcher.IncludeSubdirectories =  true;
 		_scriptsWatcher.EnableRaisingEvents   =  true;
 	}
 
 	private void OnAssetCreated(object sender, FileSystemEventArgs evt)
 	{
-		if (evt.Name == null || evt.Name.EndsWith(".meta"))
+		if (evt.Name == null)
 		{
 			return;
 		}
 
-		string relativePath = "";
-		string path = evt.Name;
-		while (path.Length > 0)
-		{
-			int index = path.IndexOfAny(_slash);
-			if (index >= 0)
-			{
-				string folderName = path.Substring(0, index);
-				path = path.Substring(index + 1);
-
-				string parentRelativePath = relativePath;
-				relativePath = Path.Join(relativePath, folderName);
-
-				// folder
-				EnqueueProjectTaskFromWatcher(CreateNewFolderNodeTask(_assetsFolder!, parentRelativePath, folderName, true, ProjectNodeType.AssetFolder));
-				EnqueueProjectTaskFromWatcher(CreateInitMetaTask(_assetsFolder!, relativePath));
-			}
-			else
-			{
-				if (Directory.Exists(evt.FullPath))
-				{
-					// created directory
-					EnqueueProjectTaskFromWatcher(CreateNewFolderNodeTask(_assetsFolder!, relativePath, path, true, ProjectNodeType.AssetFolder));
-					EnqueueProjectTaskFromWatcher(CreateInitMetaTask(_assetsFolder!, evt.Name));
-				}
-				else
-				{
-					// created file
-					EnqueueProjectTaskFromWatcher(CreateNewAssetFileTask(_assetsFolder!, relativePath, path));
-					EnqueueProjectTaskFromWatcher(CreateInitMetaTask(_assetsFolder!, evt.Name));
-					EnqueueProjectTaskFromWatcher(CreateImportTask(_assetsFolder!, evt.Name));
-				}
-				break;
-			}
-		}
+		OnAssetCreated(evt.FullPath, evt.Name);
 	}
 
 	private void OnAssetDeleted(object sender, FileSystemEventArgs evt)
@@ -322,40 +202,57 @@ public sealed class ProjectModel
 			return;
 		}
 
-		if (evt.Name.EndsWith(".meta"))
-		{
-			// deleted meta file .. create new
-			string       assetFileName = evt.Name.Substring(0, evt.Name.Length - ".meta".Length);
-			ProjectNode? assetFileNode = _assetsFolder!.FindNode(assetFileName);
-			if (assetFileNode != null)
-			{
-				EnqueueProjectTaskFromWatcher(CreateInitMetaTask(assetFileNode));
-				return;
-			}
-		}
-
-		// deleted folder or file
-		ProjectNode? assetNode = _assetsFolder!.FindNode(evt.Name);
-		if (assetNode != null)
-		{
-			int    index      = evt.Name.LastIndexOfAny(_slash);
-			string parentPath = evt.Name.Substring(0, index);
-			string nodeName   = evt.Name.Substring(index + 1);
-			if (_assetsFolder!.FindNode(parentPath) is ProjectFolderNode parentNode)
-			{
-				EnqueueProjectTaskFromWatcher(CreateDeleteNodeTask(parentNode, nodeName));
-			}
-		}
+		OnAssetDeleted(evt.FullPath, evt.Name);
 	}
 
-	private void OnAssetChanged(object sender, FileSystemEventArgs evt)
+	private void OnAssetRenamed(object sender, RenamedEventArgs evt)
 	{
-		ConsoleViewModel.LogInfo($"Asset changed. Name:{evt.Name} Change:{evt.ChangeType} Path:{evt.FullPath}");
-	}
+		if (evt.Name == null || evt.OldName == null)
+		{
+			return;
+		}
 
-	private void OnScriptChanged(object sender, FileSystemEventArgs evt)
+		OnAssetDeleted(evt.OldFullPath, evt.OldName);
+		OnAssetCreated(evt.FullPath,    evt.Name);
+	}
+ 
+	private void OnScriptCreated(object sender, FileSystemEventArgs evt)
 	{
-		ConsoleViewModel.LogInfo($"Source changed. Name:{evt.Name} Change:{evt.ChangeType} Path:{evt.FullPath}");
+		if (evt.Name == null)
+		{
+			return;
+		}
+
+		if (!Directory.Exists(evt.FullPath) && !evt.Name.EndsWith(".cs"))
+		{
+			return;
+		}
+
+		OnScriptCreated(evt.FullPath, evt.Name);
+	}
+	private void OnScriptDeleted(object sender, FileSystemEventArgs evt)
+	{
+		if (evt.Name == null)
+		{
+			return;
+		}
+
+		OnScriptDeleted(evt.FullPath, evt.Name);
+	}
+	private void OnScriptRenamed(object sender, RenamedEventArgs evt)
+	{
+		if (evt.Name == null || evt.OldName == null)
+		{
+			return;
+		}
+
+		if (!Directory.Exists(evt.FullPath) && !evt.Name.EndsWith(".cs"))
+		{
+			return;
+		}
+		
+		OnScriptDeleted(evt.OldFullPath, evt.OldName);
+		OnScriptCreated(evt.FullPath, evt.Name);
 	}
 
 	private void DisposeWatchers()
@@ -408,6 +305,204 @@ public sealed class ProjectModel
 		settings.ProjectFolderPath = projectPath;
 		
 		_projectSettings = settings;
+	}
+	#endregion
+	
+	#region Asset manipulation
+	private void RecursiveAssetScan(string path, string relativePath, ProjectFolderNode root, List<string> foundMetaFiles)
+	{
+		// scan directories
+		foreach (string directoryPath in Directory.EnumerateDirectories(path))
+		{
+			string            directory             = Path.GetFileName(directoryPath);
+			string            relativeDirectoryPath = Path.Combine(relativePath, directory);
+			ProjectFolderNode folderNode            = new(directory, directoryPath, relativeDirectoryPath, true, ProjectNodeType.AssetFolder);
+			root.Children.Add(folderNode);
+			
+			RecursiveAssetScan(directoryPath, relativeDirectoryPath, folderNode, foundMetaFiles);
+		}
+
+		// scan files except meta
+		foreach (string filePath in Directory.EnumerateFiles(path))
+		{
+			string fileName = Path.GetFileName(filePath);
+			if (fileName.EndsWith(".meta"))
+			{
+				foundMetaFiles.Add(filePath);
+				continue;
+			}
+
+			string               relativeFilePath = Path.Combine(relativePath, fileName);
+			ProjectAssetFileNode assetFileNode    = new(fileName, filePath, relativeFilePath);
+			root.Children.Add(assetFileNode);
+		}
+	}
+	
+	private void InitMeta()
+	{
+		lock (ProjectTreeLock)
+		{
+			_assetsFolder!.TraverseRecursive(
+				node => _thread.Enqueue(CreateInitMetaTask(_assetsFolder!, node.RelativePath)),
+				TraverseFlags.Directories | TraverseFlags.Files,
+				default
+			);
+
+			_scriptsGameLibraryFolder!.TraverseRecursive(
+				node => _thread.Enqueue(CreateInitMetaTask(_scriptsGameLibraryFolder!, node.RelativePath)),
+				TraverseFlags.Directories | TraverseFlags.Files,
+				default
+			);
+		}
+	}
+
+	private void OnAssetCreated(string eventAbsolutePath, string eventRelativePath)
+	{
+		if (eventRelativePath.EndsWith(".meta"))
+		{
+			return;
+		}
+
+		string relativePath = "";
+		string path         = eventRelativePath;
+		while (path.Length > 0)
+		{
+			int index = path.IndexOfAny(_slash);
+			if (index >= 0)
+			{
+				string folderName = path.Substring(0, index);
+				path = path.Substring(index + 1);
+
+				string parentRelativePath = relativePath;
+				relativePath = Path.Join(relativePath, folderName);
+
+				// folder
+				EnqueueProjectTaskFromWatcher(CreateNewFolderNodeTask(_assetsFolder!, parentRelativePath, folderName, true, ProjectNodeType.AssetFolder));
+				EnqueueProjectTaskFromWatcher(CreateInitMetaTask(_assetsFolder!, relativePath));
+			}
+			else
+			{
+				if (Directory.Exists(eventAbsolutePath))
+				{
+					// created directory
+					EnqueueProjectTaskFromWatcher(CreateNewFolderNodeTask(_assetsFolder!, relativePath, path, true, ProjectNodeType.AssetFolder));
+					EnqueueProjectTaskFromWatcher(CreateInitMetaTask(_assetsFolder!, eventRelativePath));
+				}
+				else
+				{
+					// created file
+					EnqueueProjectTaskFromWatcher(CreateNewAssetFileTask(_assetsFolder!, relativePath, path));
+					EnqueueProjectTaskFromWatcher(CreateInitMetaTask(_assetsFolder!, eventRelativePath));
+					EnqueueProjectTaskFromWatcher(CreateImportTask(_assetsFolder!, eventRelativePath));
+				}
+				break;
+			}
+		}
+	}
+
+	private void OnAssetDeleted(string eventAbsolutePath, string eventRelativePath)
+	{
+		if (eventRelativePath.EndsWith(".meta"))
+		{
+			// deleted meta file .. create new
+			string       assetRelativeFilePath = eventRelativePath.Substring(0, eventRelativePath.Length - ".meta".Length);
+			EnqueueProjectTaskFromWatcher(CreateInitMetaTask(_assetsFolder!, assetRelativeFilePath));
+			return;
+		}
+
+		// deleted folder or file
+		{
+			int    index      = eventRelativePath.LastIndexOfAny(_slash);
+			string parentPath = eventRelativePath.Substring(0, index);
+			string nodeName   = eventRelativePath.Substring(index + 1);
+			EnqueueProjectTaskFromWatcher(CreateDeleteNodeTask(_assetsFolder!, parentPath, nodeName));
+		}
+	}
+
+	private void MetaCleanup(List<string> metaFiles)
+	{
+		foreach (string metaFile in metaFiles)
+		{
+			string path = metaFile.Substring(0, metaFile.Length - ".meta".Length);
+			if (Directory.Exists(path) || File.Exists(path))
+			{
+				continue;
+			}
+
+			ConsoleViewModel.LogWarning($"Removing unused meta file: {metaFile}");
+			File.Delete(metaFile);
+		}
+	}
+	#endregion
+	
+	#region Script manipulation
+	private void RecursiveScriptScan(string path, string relativePath, ProjectFolderNode root)
+	{
+		// scan directories
+		foreach (string directoryPath in Directory.EnumerateDirectories(path))
+		{
+			string            directory             = Path.GetFileName(directoryPath);
+			string            relativeDirectoryPath = Path.Combine(relativePath, directory);
+			ProjectFolderNode folderNode            = new(directory, directoryPath, relativeDirectoryPath, false, ProjectNodeType.ScriptFolder);
+			root.Children.Add(folderNode);
+			
+			RecursiveScriptScan(directoryPath, relativeDirectoryPath, folderNode);
+		}
+
+		// scan all files
+		foreach (string filePath in Directory.EnumerateFiles(path))
+		{
+			string                fileName         = Path.GetFileName(filePath);
+			string                relativeFilePath = Path.Combine(relativePath, fileName);
+			ProjectScriptFileNode assetFileNode    = new(fileName, filePath, relativeFilePath);
+			root.Children.Add(assetFileNode);
+		}
+	}
+
+	private void OnScriptCreated(string eventAbsolutePath, string eventRelativePath)
+	{
+		string relativePath = "";
+		string path         = eventRelativePath;
+		while (path.Length > 0)
+		{
+			int index = path.IndexOfAny(_slash);
+			if (index >= 0)
+			{
+				string folderName = path.Substring(0, index);
+				path = path.Substring(index + 1);
+
+				string parentRelativePath = relativePath;
+				relativePath = Path.Join(relativePath, folderName);
+
+				// folder
+				EnqueueProjectTaskFromWatcher(CreateNewFolderNodeTask(_scriptsGameLibraryFolder!, parentRelativePath, folderName, false, ProjectNodeType.ScriptFolder));
+			}
+			else
+			{
+				if (Directory.Exists(eventAbsolutePath))
+				{
+					// created directory
+					EnqueueProjectTaskFromWatcher(CreateNewFolderNodeTask(_scriptsGameLibraryFolder!, relativePath, path, false, ProjectNodeType.ScriptFolder));
+				}
+				else
+				{
+					// created file
+					EnqueueProjectTaskFromWatcher(CreateNewScriptFileTask(_scriptsGameLibraryFolder!, relativePath, path));
+					EnqueueProjectTaskFromWatcher(CreateInitMetaTask(_scriptsGameLibraryFolder!, eventRelativePath));
+				}
+				break;
+			}
+		}
+	}
+
+	private void OnScriptDeleted(string eventAbsolutePath, string eventRelativePath)
+	{
+		{
+			int    index      = eventRelativePath.LastIndexOfAny(_slash);
+			string parentPath = eventRelativePath.Substring(0, index);
+			string nodeName   = eventRelativePath.Substring(index + 1);
+			EnqueueProjectTaskFromWatcher(CreateDeleteNodeTask(_scriptsGameLibraryFolder!, parentPath, nodeName));
+		}
 	}
 	#endregion
 	
@@ -464,6 +559,31 @@ public sealed class ProjectModel
 		);
 	}
 
+	private ProjectTask CreateNewScriptFileTask(ProjectRootNode root, string parentPath, string name)
+	{
+		return new ProjectTask(
+			cancellationToken =>
+			{
+				lock (ProjectTreeLock)
+				{
+					if (root.FindNode(parentPath) is ProjectFolderNode parentNode)
+					{
+						if (parentNode.FindChild(name) == null)
+						{
+							ProjectScriptFileNode newNode = new(
+								name,
+								Path.Join(parentNode.AbsolutePath, name),
+								Path.Join(parentNode.RelativePath, name)
+							);
+
+							parentNode.Children.Add(newNode);
+						}
+					}
+				}
+			}
+		);
+	}
+	
 	private ProjectTask CreateInitMetaTask(ProjectRootNode root, string path)
 	{
 		return new ProjectTask(
@@ -472,7 +592,10 @@ public sealed class ProjectModel
 				lock (ProjectTreeLock)
 				{
 					ProjectNode? node = root.FindNode(path);
-					node?.InitMeta(_migrationManager, cancellationToken);
+					if (node != null && node.Exists)
+					{
+						node.InitMeta(_migrationManager, cancellationToken);
+					}
 				}
 			}
 		);
@@ -513,73 +636,26 @@ public sealed class ProjectModel
 		);
 	}
 	
-	
-	private ProjectTask CreateInsertNodeTask(ProjectFolderNode parent, ProjectNode child)
+	private ProjectTask CreateDeleteNodeTask(ProjectRootNode root, string parentPath, string name)
 	{
 		return new ProjectTask(
 			cancellationToken =>
 			{
 				lock (ProjectTreeLock)
 				{
-					if (parent.FindChild(child.Name) == null)
+					ProjectFolderNode? parent = root.FindNode(parentPath) as ProjectFolderNode;
+					if (parent != null)
 					{
-						parent.Children.Add(child);
+						int index = parent.Children.FindIndex(child => child.Name == name);
+						if (index == -1)
+						{
+							return;
+						}
+
+						ProjectNode child = parent.Children[index];
+						File.Delete(child.AbsolutePath + ".meta");
+						parent.Children.RemoveAt(index);
 					}
-				}
-			}
-		);
-	}
-
-	private ProjectTask CreateDeleteNodeTask(ProjectFolderNode parent, string childName)
-	{
-		return new ProjectTask(
-			cancellationToken =>
-			{
-				lock (ProjectTreeLock)
-				{
-					int index = parent.Children.FindIndex(child => child.Name == childName);
-					if (index == -1)
-					{
-						return;
-					}
-
-					ProjectNode child = parent.Children[index];
-					File.Delete(child.AbsolutePath + ".meta");
-					parent.Children.RemoveAt(index);
-				}
-			}
-		);
-	}
-
-	private ProjectTask CreateInitMetaTask(ProjectNode node)
-	{
-		return new ProjectTask(cancellationToken => node.InitMeta(_migrationManager, cancellationToken));
-	}
-
-	private ProjectTask CreateImportTask(ProjectNode node)
-	{
-		return new ProjectTask(
-			cancellationToken =>
-			{
-				Importer importer = _importerRegistry.GetImporter(node.Extension);
-				node.Meta!.ImporterSettings ??= importer.CreateSettings();
-				node.SetNodeType(node.Meta.ImporterSettings.NodeType);
-
-				string resourcePath = Path.Combine(_projectSettings!.AbsoluteResourcesPath, node.RelativePath);
-
-				try
-				{
-					using Stream   stream = File.OpenRead(node.AbsolutePath);
-					ImporterResult result = importer.Import(stream, node.Meta.ImporterSettings, resourcePath, cancellationToken);
-
-					if (result == ImporterResult.FinishedSettingsChanged)
-					{
-						node.UpdateMetaFile();
-					}
-				}
-				catch (Exception e)
-				{
-					ConsoleViewModel.LogError($"While importing file {node.AbsolutePath} an exception occured: {e}");
 				}
 			}
 		);

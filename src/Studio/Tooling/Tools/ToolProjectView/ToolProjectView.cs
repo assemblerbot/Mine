@@ -183,8 +183,12 @@ public sealed class ToolProjectView : Tool
 	}
 	private void OnCreateDefinitionTemplateFile(string path, string namespaceName, string className)
 	{
-		DefinitionTemplate template = new (namespaceName, className);
+		StudioModel.Project.PauseWatchers();
+		
+		DefinitionTemplate template = new(namespaceName, className);
 		template.Write(path);
+
+		StudioModel.Project.ResumeWatchers();
 	}
 
 	private void OnCreateDefinitionAsset()
@@ -198,8 +202,8 @@ public sealed class ToolProjectView : Tool
 	private void OnContextMenuEditRename()
 	{
 		// TODO
-		ProjectNode? node = StudioModel.Project.AssetsFolder.FindNode("Test/New2\\moonshades.txt");
-		ConsoleViewModel.LogInfo(node == null ? "Not found" : "Found");
+		//ProjectNode? node = StudioModel.Project.AssetsFolder.FindNode("Test/New2\\moonshades.txt");
+		//ConsoleViewModel.LogInfo(node == null ? "Not found" : "Found");
 	}
 
 	private void OnContextMenuEditCopy()

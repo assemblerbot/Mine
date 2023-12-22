@@ -5,6 +5,7 @@ namespace RedHerring.Studio.Models.Project.FileSystem;
 public class ProjectFolderNode : ProjectNode
 {
 	public override string RelativeDirectoryPath => RelativePath;
+	public override bool   Exists                => Directory.Exists(AbsolutePath);
 
 	public List<ProjectNode> Children { get; } = new();
 	

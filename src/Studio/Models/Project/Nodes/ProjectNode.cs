@@ -16,7 +16,8 @@ public abstract class ProjectNode
 	
 	public Metadata? Meta;
 
-	public string Extension => System.IO.Path.GetExtension(AbsolutePath).ToLower(); // cache if needed
+	public          string Extension => System.IO.Path.GetExtension(AbsolutePath).ToLower(); // cache if needed
+	public abstract bool   Exists    { get; }
 
 	protected ProjectNode(string name, string absolutePath, string relativePath, bool hasMetaFile)
 	{

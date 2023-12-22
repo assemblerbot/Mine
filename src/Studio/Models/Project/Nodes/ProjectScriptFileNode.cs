@@ -5,6 +5,7 @@ namespace RedHerring.Studio.Models.Project.FileSystem;
 public class ProjectScriptFileNode : ProjectNode
 {
 	public override string RelativeDirectoryPath => RelativePath.Substring(0, RelativePath.Length - Name.Length);
+	public override bool   Exists                => File.Exists(AbsolutePath);
 	
 	[Serializable]
 	private class FileId
