@@ -19,10 +19,10 @@ public sealed class ProjectModel
 	}
 	#endregion
 	
-	private const  string _assetsFolderName             = "Assets";
-	private const  string _scriptsGameLibraryFolderName = "GameLibrary";
-	private const  string _settingsFileName             = "Project.json";
-	private static char[] _slash                        = {'/', '\\'};
+	private const           string _assetsFolderName  = "Assets";
+	private const           string _scriptsFolderName = "GameLibrary";
+	private const           string _settingsFileName  = "Project.json";
+	private static readonly char[] _slash             = {'/', '\\'};
 	
 	public static Assembly Assembly => typeof(ProjectModel).Assembly; 
 
@@ -35,16 +35,16 @@ public sealed class ProjectModel
 	private ProjectRootNode? _assetsFolder;
 	public  ProjectRootNode? AssetsFolder => _assetsFolder;
 
-	private ProjectRootNode? _scriptsGameLibraryFolder;
-	public  ProjectRootNode? ScriptsGameLibraryFolder => _scriptsGameLibraryFolder; 
+	private ProjectRootNode? _scriptsFolder;
+	public  ProjectRootNode? ScriptsFolder => _scriptsFolder; 
 
 	private ProjectSettings? _projectSettings;
 	public  ProjectSettings  ProjectSettings => _projectSettings!;
 
-	private FileSystemWatcher?           _assetsWatcher;
-	private FileSystemWatcher?           _scriptsWatcher;
-	private bool                         _watchersActive      = true;
-	private ConcurrentQueue<ProjectTask> _waitingWatcherTasks = new();
+	private          FileSystemWatcher?           _assetsWatcher;
+	private          FileSystemWatcher?           _scriptsWatcher;
+	private          bool                         _watchersActive      = true;
+	private readonly ConcurrentQueue<ProjectTask> _waitingWatcherTasks = new();
 	
 	private readonly ProjectThread _thread = new ();
 	
@@ -80,9 +80,9 @@ public sealed class ProjectModel
 			ProjectRootNode assetsFolder = new ProjectRootNode(_assetsFolderName, assetsPath, ProjectNodeType.AssetFolder);
 			_assetsFolder = assetsFolder;
 
-			string          scriptsGameLibraryPath   = Path.Join(projectPath, _scriptsGameLibraryFolderName);
-			ProjectRootNode scriptsGameLibraryFolder = new ProjectRootNode(_scriptsGameLibraryFolderName, scriptsGameLibraryPath, ProjectNodeType.ScriptFolder);
-			_scriptsGameLibraryFolder = scriptsGameLibraryFolder;
+			string          scriptsGameLibraryPath   = Path.Join(projectPath, _scriptsFolderName);
+			ProjectRootNode scriptsGameLibraryFolder = new ProjectRootNode(_scriptsFolderName, scriptsGameLibraryPath, ProjectNodeType.ScriptFolder);
+			_scriptsFolder = scriptsGameLibraryFolder;
 
 			// check
 			if (!Directory.Exists(assetsPath))
@@ -213,7 +213,7 @@ public sealed class ProjectModel
 		}
 
 		OnAssetDeleted(evt.OldFullPath, evt.OldName);
-		OnAssetCreated(evt.FullPath,    evt.Name);
+		OnAssetCreated(evt.FullPath, evt.Name);
 	}
  
 	private void OnScriptCreated(object sender, FileSystemEventArgs evt)
@@ -348,8 +348,8 @@ public sealed class ProjectModel
 				default
 			);
 
-			_scriptsGameLibraryFolder!.TraverseRecursive(
-				node => _thread.Enqueue(CreateInitMetaTask(_scriptsGameLibraryFolder!, node.RelativePath)),
+			_scriptsFolder!.TraverseRecursive(
+				node => _thread.Enqueue(CreateInitMetaTask(_scriptsFolder!, node.RelativePath)),
 				TraverseFlags.Directories | TraverseFlags.Files,
 				default
 			);
@@ -405,7 +405,7 @@ public sealed class ProjectModel
 		if (eventRelativePath.EndsWith(".meta"))
 		{
 			// deleted meta file .. create new
-			string       assetRelativeFilePath = eventRelativePath.Substring(0, eventRelativePath.Length - ".meta".Length);
+			string assetRelativeFilePath = eventRelativePath.Substring(0, eventRelativePath.Length - ".meta".Length);
 			EnqueueProjectTaskFromWatcher(CreateInitMetaTask(_assetsFolder!, assetRelativeFilePath));
 			return;
 		}
@@ -475,20 +475,20 @@ public sealed class ProjectModel
 				relativePath = Path.Join(relativePath, folderName);
 
 				// folder
-				EnqueueProjectTaskFromWatcher(CreateNewFolderNodeTask(_scriptsGameLibraryFolder!, parentRelativePath, folderName, false, ProjectNodeType.ScriptFolder));
+				EnqueueProjectTaskFromWatcher(CreateNewFolderNodeTask(_scriptsFolder!, parentRelativePath, folderName, false, ProjectNodeType.ScriptFolder));
 			}
 			else
 			{
 				if (Directory.Exists(eventAbsolutePath))
 				{
 					// created directory
-					EnqueueProjectTaskFromWatcher(CreateNewFolderNodeTask(_scriptsGameLibraryFolder!, relativePath, path, false, ProjectNodeType.ScriptFolder));
+					EnqueueProjectTaskFromWatcher(CreateNewFolderNodeTask(_scriptsFolder!, relativePath, path, false, ProjectNodeType.ScriptFolder));
 				}
 				else
 				{
 					// created file
-					EnqueueProjectTaskFromWatcher(CreateNewScriptFileTask(_scriptsGameLibraryFolder!, relativePath, path));
-					EnqueueProjectTaskFromWatcher(CreateInitMetaTask(_scriptsGameLibraryFolder!, eventRelativePath));
+					EnqueueProjectTaskFromWatcher(CreateNewScriptFileTask(_scriptsFolder!, relativePath, path));
+					EnqueueProjectTaskFromWatcher(CreateInitMetaTask(_scriptsFolder!, eventRelativePath));
 				}
 				break;
 			}
@@ -501,7 +501,7 @@ public sealed class ProjectModel
 			int    index      = eventRelativePath.LastIndexOfAny(_slash);
 			string parentPath = eventRelativePath.Substring(0, index);
 			string nodeName   = eventRelativePath.Substring(index + 1);
-			EnqueueProjectTaskFromWatcher(CreateDeleteNodeTask(_scriptsGameLibraryFolder!, parentPath, nodeName));
+			EnqueueProjectTaskFromWatcher(CreateDeleteNodeTask(_scriptsFolder!, parentPath, nodeName));
 		}
 	}
 	#endregion

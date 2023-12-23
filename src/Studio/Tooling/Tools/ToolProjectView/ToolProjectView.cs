@@ -53,7 +53,7 @@ public sealed class ToolProjectView : Tool
 			lock (StudioModel.Project.ProjectTreeLock)
 			{
 				UpdateFolder(StudioModel.Project.AssetsFolder);
-				UpdateFolder(StudioModel.Project.ScriptsGameLibraryFolder);
+				UpdateFolder(StudioModel.Project.ScriptsFolder);
 			}
 
 			Gui.End();
