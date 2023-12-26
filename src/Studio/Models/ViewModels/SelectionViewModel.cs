@@ -14,28 +14,27 @@ public sealed class SelectionViewModel
 		_eventAggregator = eventAggregator;
 	}
 
-
-	public void Select(string path, object target)
+	public void Select(string id, object target)
 	{
-		_selection[path] = new WeakReference<object>(target);
+		_selection[id] = new WeakReference<object>(target);
 		_eventAggregator.Trigger(new SelectionChanged());
 	}
 	
-	public void Deselect(string path)
+	public void Deselect(string id)
 	{
-		_selection.Remove(path);
+		_selection.Remove(id);
 		_eventAggregator.Trigger(new SelectionChanged());
 	}
 
-	public void Flip(string path, object target)
+	public void Flip(string id, object target)
 	{
-		if (_selection.ContainsKey(path))
+		if (_selection.ContainsKey(id))
 		{
-			Deselect(path);
+			Deselect(id);
 		}
 		else
 		{
-			Select(path, target);
+			Select(id, target);
 		}
 	}
 
@@ -45,18 +44,36 @@ public sealed class SelectionViewModel
 		_eventAggregator.Trigger(new SelectionChanged());
 	}
 
-	public bool IsSelected(string item)
+	public bool IsSelected(string id)
 	{
-		return _selection.ContainsKey(item);
+		return _selection.TryGetValue(id, out WeakReference<object>? targetRef) && targetRef.TryGetTarget(out _);
 	}
 
-	public object? SelectedTarget(string item)
+	public object? SelectedTarget(string id)
 	{
-		return _selection.TryGetValue(item, out WeakReference<object>? targetRef) ? (targetRef.TryGetTarget(out object? target) ? target : null) : null;
+		return _selection.TryGetValue(id, out WeakReference<object>? targetRef) ? (targetRef.TryGetTarget(out object? target) ? target : null) : null;
 	}
 	
 	public IReadOnlyList<object> GetAllSelectedTargets()
 	{
 		return _selection.Values.Select(reference => reference.TryGetTarget(out object? target) ? target : null).Where(target => target != null).ToList()!;
+	}
+
+	public object? GetFirstSelectedTarget()
+	{
+		foreach (WeakReference<object> reference in _selection.Values)
+		{
+			if (reference.TryGetTarget(out object? target))
+			{
+				return target;
+			}
+		}
+
+		return null;
+	}
+
+	public int GetSelectedCount()
+	{
+		return GetAllSelectedTargets().Count;
 	}
 }

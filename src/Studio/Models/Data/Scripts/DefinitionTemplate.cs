@@ -1,6 +1,8 @@
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using RedHerring.Studio.Models.Project.FileSystem;
+using RedHerring.Studio.Models.ViewModels.Console;
+using RedHerring.Studio.UserInterface.Attributes;
 
 namespace Mine.Studio;
 
@@ -11,17 +13,27 @@ public sealed class DefinitionTemplate
 	private const string _dataBegin = "//--- data begin ---";
 	private const string _dataEnd   = "//--- data end ---";
 	
-	private ProjectScriptFileHeader.FileId   _fileId;
-	private string _namespaceName;
-	private string _className;
+	private ProjectScriptFileHeader.FileId _fileId;
+	
+	[ShowInInspector] private string                         _namespaceName;
+	[ShowInInspector] private string                         _className;
+	[ShowInInspector] private List<DefinitionTemplateField> _fields = new();
 
-	private List<DefinitionsTemplateField> _fields = new();
+	private DefinitionTemplate()
+	{
+	}
+
+	public static DefinitionTemplate? CreateFromFile(string path)
+	{
+		DefinitionTemplate template = new();
+		return template.Read(path) ? template : null;
+	}
 
 	public DefinitionTemplate(string namespaceName, string className)
 	{
-		_fileId      = new ProjectScriptFileHeader.FileId (Guid.NewGuid().ToString(), _typeId, _version);
+		_fileId        = new ProjectScriptFileHeader.FileId (Guid.NewGuid().ToString(), _typeId, _version);
 		_namespaceName = namespaceName;
-		_className      = className;
+		_className     = className;
 	}
 
 	public void Write(string path)
@@ -39,9 +51,9 @@ public sealed class DefinitionTemplate
 		stream.WriteLine($"public sealed class {_className}");
 		stream.WriteLine("{");
 		stream.WriteLine("	" + _dataBegin);
-		foreach (DefinitionsTemplateField field in _fields)
+		foreach (DefinitionTemplateField field in _fields)
 		{
-			stream.WriteLine($"	public {field.Type.Name} {field.Name} {{get; private set;}}");
+			stream.WriteLine($"	public {field.TypeName} {field.Name} {{get; private set;}}");
 		}
 		stream.WriteLine("	" + _dataEnd);
 		stream.WriteLine("}");
@@ -101,13 +113,15 @@ public sealed class DefinitionTemplate
 				string propertyType = propertyMatch.Groups[1].Captures[0].ToString();
 				string propertyName = propertyMatch.Groups[2].Captures[0].ToString();
 
-				_fields.Add(
-					new DefinitionsTemplateField
-					{
-						Name = propertyName,
-						Type = typeof(int) // TODO
-					}
-				);
+				DefinitionTemplateField? field = DefinitionTemplateField.CreateFromType(propertyType, propertyName);
+				if (field != null)
+				{
+					_fields.Add(field);
+				}
+				else
+				{
+					ConsoleViewModel.LogError($"Cannot instantiate template type: '{propertyType}'");
+				}
 			}
 			else
 			{
