@@ -1,4 +1,3 @@
-using System.Text.Json;
 using System.Text.RegularExpressions;
 using RedHerring.Studio.Models.Project.FileSystem;
 using RedHerring.Studio.Models.ViewModels.Console;
@@ -15,9 +14,9 @@ public sealed class DefinitionTemplate
 	
 	private ProjectScriptFileHeader.FileId _fileId;
 	
-	[ShowInInspector] private string                         _namespaceName;
-	[ShowInInspector] private string                         _className;
-	[ShowInInspector] private List<DefinitionTemplateField> _fields = new();
+	[ShowInInspector] private string                         _namespaceName = null!;
+	[ShowInInspector] private string                         _className     = null!;
+	[ShowInInspector] private List<DefinitionTemplateField?> _fields        = new();
 
 	private DefinitionTemplate()
 	{
@@ -27,6 +26,40 @@ public sealed class DefinitionTemplate
 	{
 		DefinitionTemplate template = new();
 		return template.Read(path) ? template : null;
+	}
+
+	public string? Validate()
+	{
+		if (!IsValidIdentifier(_namespaceName))
+		{
+			return "Invalid namespace!";
+		}
+
+		if (!IsValidIdentifier(_className))
+		{
+			return "Invalid class name!";
+		}
+
+		HashSet<string> names = new();
+		for (int i = 0; i < _fields.Count; ++i)
+		{
+			if (_fields[i] == null)
+			{
+				return $"Field [{i}] is null!";
+			}
+
+			if (!IsValidIdentifier(_fields[i]!.Name))
+			{
+				return $"Invalid name of field [{i}]!";
+			}
+
+			if (!names.Add(_fields[i]!.Name))
+			{
+				return $"Field [{i}] has the same name as previous field!";
+			}
+		}
+
+		return null;
 	}
 
 	public DefinitionTemplate(string namespaceName, string className)
@@ -154,6 +187,26 @@ public sealed class DefinitionTemplate
 					}
 				}
 			}
+		}
+
+		return true;
+	}
+
+	private bool IsValidIdentifier(string identifier)
+	{
+		if (string.IsNullOrEmpty(identifier))
+		{
+			return false;
+		}
+
+		if (identifier.Any(ch => ch <= 32))
+		{
+			return false;
+		}
+
+		if (identifier[0] >= '0' && identifier[0] <= '9')
+		{
+			return false;
 		}
 
 		return true;

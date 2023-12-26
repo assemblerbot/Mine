@@ -10,9 +10,9 @@ public sealed class Inspector
 	private static int _uniqueIdGenerator = 0;
 	private        int _uniqueId          = _uniqueIdGenerator++;
 
-	private CommandHistory _commandHistory;
+	private ICommandHistory _commandHistory;
 
-	public Inspector(CommandHistory commandHistory)
+	public Inspector(ICommandHistory commandHistory)
 	{
 		_commandHistory = commandHistory;
 	}
