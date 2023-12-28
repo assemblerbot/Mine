@@ -25,12 +25,14 @@ public sealed class ToolProjectView : Tool
 	private readonly Menu         _contextMenu            = new(MenuStyle.ContextMenu);
 	private          ProjectNode? _contextMenuActivatedAt = null;
 
-	private readonly CreateScriptDialog _createScriptDialog;
+	private readonly CreateScriptDialog          _createScriptDialog;
+	private readonly CreateDefinitionAssetDialog _createDefinitionAssetDialog;
     
 	public ToolProjectView(StudioModel studioModel, int uniqueId) : base(studioModel, uniqueId)
 	{
 		CreateContextMenu();
-		_createScriptDialog = new CreateScriptDialog(studioModel.Project);
+		_createScriptDialog          = new CreateScriptDialog(studioModel.Project);
+		_createDefinitionAssetDialog = new CreateDefinitionAssetDialog(studioModel.Project);
 	}
 
 	public override void Update(out bool finished)
@@ -43,6 +45,7 @@ public sealed class ToolProjectView : Tool
 	private void UpdateDialogs()
 	{
 		_createScriptDialog.Update();
+		_createDefinitionAssetDialog.Update();
 	}
 
 	private bool UpdateUI()
@@ -193,9 +196,14 @@ public sealed class ToolProjectView : Tool
 
 	private void OnCreateDefinitionAsset()
 	{
+		_createDefinitionAssetDialog.Open(_contextMenuActivatedAt!.RelativeDirectoryPath, OnCreateDefinitionAssetFile);
+	}
+
+	private void OnCreateDefinitionAssetFile(string path, string name)
+	{
 		// TODO
 	}
-	
+
 	#endregion
 
 	#region Edit

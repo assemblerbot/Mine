@@ -6,27 +6,27 @@ using RedHerring.Studio.UserInterface.Attributes;
 
 namespace Mine.Studio;
 
-public class CreateScriptDialog
+public class CreateDefinitionAssetDialog
 {
 	private readonly ProjectModel _projectModel;
 	private readonly ObjectDialog _dialog;
 
-	[ReadOnlyInInspector]                  private string _type      = "";
-	[ShowInInspector, ReadOnlyInInspector] private string _path      = "";
-	[ShowInInspector]                      private string _namespace = "MyNamespace";
-	[ShowInInspector]                      private string _class     = "MyClass";
+	[ShowInInspector, ReadOnlyInInspector] private string _path = "";
+	[ShowInInspector]                      private string _name = "MyDefinition";
 
-	private Action<string, string, string>? _onCreate; // file path, namespace, class name
-
-	public CreateScriptDialog(ProjectModel projectModel)
+	[ShowInInspector, ValueDropdown("_templates")] private string       _template = "";
+	private                                                List<string> _templates        = new() { "aaa", "bbb", "ccc" };
+	
+	private Action<string, string>? _onCreate; // file path, name
+	
+	public CreateDefinitionAssetDialog(ProjectModel projectModel)
 	{
 		_projectModel = projectModel;
-		_dialog       = new ObjectDialog("Create script", new CommandHistory(), this);
+		_dialog       = new ObjectDialog("Create definition", new CommandHistory(), this);
 	}
 
-	public void Open(string type, string path, Action<string, string, string> onCreate)
+	public void Open(string path, Action<string, string> onCreate)
 	{
-		_type     = type;
 		_path     = path;
 		_onCreate = onCreate;
 		_dialog.Open();
@@ -40,7 +40,7 @@ public class CreateScriptDialog
 	[Button("Create!")]
 	private void Create()
 	{
-		string filePath = Path.Combine(_projectModel.ProjectSettings.AbsoluteScriptsPath, _path, _class + ".cs");
+		string filePath = Path.Combine(_projectModel.ProjectSettings.AbsoluteAssetsPath, _path, _name + ".def");
 		if (File.Exists(filePath))
 		{
 			ConsoleViewModel.LogError($"File at '{filePath}' already exist! Cannot create file!");
@@ -48,10 +48,10 @@ public class CreateScriptDialog
 			return;
 		}
 
-		ConsoleViewModel.LogInfo($"Creating new script '{filePath}'");
+		ConsoleViewModel.LogInfo($"Creating new file '{filePath}'");
 		try
 		{
-			_onCreate?.Invoke(filePath, _namespace, _class);
+			_onCreate?.Invoke(filePath, _name);
 			ConsoleViewModel.LogInfo("DONE");
 		}
 		catch(Exception e)

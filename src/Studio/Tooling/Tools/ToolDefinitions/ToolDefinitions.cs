@@ -118,6 +118,7 @@ public sealed class ToolDefinitions : Tool
 
 	private void UpdateAssetEditorUI()
 	{
+
 		// TODO
 	}
 
@@ -154,6 +155,7 @@ public sealed class ToolDefinitions : Tool
 			}
 
 			_definitionAssetNode = assetFileNode;
+			
 			// TODO - parse, setup editor
 			return;
 		}
