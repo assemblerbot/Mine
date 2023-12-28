@@ -1,6 +1,7 @@
 using ImGuiNET;
 using RedHerring.Studio.Commands;
 using RedHerring.Studio.Models.Project;
+using RedHerring.Studio.Models.Project.FileSystem;
 using RedHerring.Studio.Models.ViewModels.Console;
 using RedHerring.Studio.UserInterface.Attributes;
 
@@ -14,10 +15,10 @@ public class CreateDefinitionAssetDialog
 	[ShowInInspector, ReadOnlyInInspector] private string _path = "";
 	[ShowInInspector]                      private string _name = "MyDefinition";
 
-	[ShowInInspector, ValueDropdown("_templates")] private string       _template = "";
-	private                                                List<string> _templates        = new() { "aaa", "bbb", "ccc" };
+	[ShowInInspector, ValueDropdown("_templates")] private string            _template  = "";
+	private                                                List<ProjectScriptFileNode> _templates = new();
 	
-	private Action<string, string>? _onCreate; // file path, name
+	private Action<string, string, ProjectScriptFileNode>? _onCreate; // file path, name, template
 	
 	public CreateDefinitionAssetDialog(ProjectModel projectModel)
 	{
@@ -25,8 +26,9 @@ public class CreateDefinitionAssetDialog
 		_dialog       = new ObjectDialog("Create definition", new CommandHistory(), this);
 	}
 
-	public void Open(string path, Action<string, string> onCreate)
+	public void Open(string path, Action<string, string, ProjectScriptFileNode> onCreate)
 	{
+		InitTemplates();
 		_path     = path;
 		_onCreate = onCreate;
 		_dialog.Open();
@@ -48,10 +50,18 @@ public class CreateDefinitionAssetDialog
 			return;
 		}
 
+		ProjectScriptFileNode? selectedTemplate = _templates.FirstOrDefault(template => template.Name == _template);
+		if (selectedTemplate == null)
+		{
+			ConsoleViewModel.LogError("Invalid template selected! Cannot create file!");
+			// TODO - better UI response
+			return;
+		}
+
 		ConsoleViewModel.LogInfo($"Creating new file '{filePath}'");
 		try
 		{
-			_onCreate?.Invoke(filePath, _name);
+			_onCreate?.Invoke(filePath, _name, selectedTemplate);
 			ConsoleViewModel.LogInfo("DONE");
 		}
 		catch(Exception e)
@@ -62,5 +72,22 @@ public class CreateDefinitionAssetDialog
 		}
 
 		ImGui.CloseCurrentPopup();
+	}
+
+	private void InitTemplates()
+	{
+		_templates.Clear();
+
+		_projectModel.ScriptsFolder!.TraverseRecursive(
+			node =>
+			{
+				if (node.Type == ProjectNodeType.ScriptDefinitionTemplate)
+				{
+					_templates.Add((ProjectScriptFileNode)node);
+				}
+			},
+			TraverseFlags.Files,
+			new CancellationToken()
+		);
 	}
 }

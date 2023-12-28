@@ -70,4 +70,9 @@ public abstract class ProjectNode
 	public abstract void TraverseRecursive(Action<ProjectNode> process, TraverseFlags flags, CancellationToken cancellationToken);
 
 	public abstract ProjectNode? FindNode(string path);
+
+	public override string ToString()
+	{
+		return Name;
+	}
 }

@@ -199,9 +199,11 @@ public sealed class ToolProjectView : Tool
 		_createDefinitionAssetDialog.Open(_contextMenuActivatedAt!.RelativeDirectoryPath, OnCreateDefinitionAssetFile);
 	}
 
-	private void OnCreateDefinitionAssetFile(string path, string name)
+	private void OnCreateDefinitionAssetFile(string path, string name, ProjectScriptFileNode template)
 	{
 		// TODO
+		
+		
 	}
 
 	#endregion
