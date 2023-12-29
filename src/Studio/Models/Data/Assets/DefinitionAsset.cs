@@ -1,22 +1,35 @@
 using Migration;
+using OdinSerializer;
 
 namespace Mine.Studio;
 
-[Serializable, SerializedClassId("definition-asset")]
+[Serializable, SerializedClassId("d38c1f35-e309-41c4-8a99-6f5defad421a")]
 public sealed class DefinitionAsset
 {
-	private List<DefinitionAssetColumn> _columns = new();
-	private List<DefinitionAssetRow>    _rows    = new();
+	[OdinSerialize] private DefinitionTemplate       _template;
+	[OdinSerialize] private List<DefinitionAssetRow> _rows = new();
+
+	public DefinitionAsset(DefinitionTemplate template)
+	{
+		_template = template;
+	}
+
+	public void WriteToFile(string path)
+	{
+		byte[] json = MigrationSerializer.Serialize(this, SerializedDataFormat.JSON);
+		File.WriteAllBytes(path, json);
+	}
 }
 
 #region Migration
+
 [MigratableInterface(typeof(DefinitionAsset))]
-public interface IDefinitionAssetMigratable
-{
-}
+public interface IDefinitionAssetMigratable;
     
 [Serializable, LatestVersion(typeof(DefinitionAsset))]
 public class DefinitionAsset_000 : IDefinitionAssetMigratable
 {
+	public                IDefinitionTemplateMigratable       _template;
+	[MigrateField] public List<IDefinitionAssetRowMigratable> _rows;
 }
 #endregion

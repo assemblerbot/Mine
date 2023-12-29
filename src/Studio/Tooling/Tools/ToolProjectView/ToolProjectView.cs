@@ -187,9 +187,16 @@ public sealed class ToolProjectView : Tool
 	private void OnCreateDefinitionTemplateFile(string path, string namespaceName, string className)
 	{
 		StudioModel.Project.PauseWatchers();
-		
-		DefinitionTemplate template = new(namespaceName, className);
-		template.Write(path);
+
+		try
+		{
+			DefinitionTemplate template = new(namespaceName, className);
+			template.Write(path);
+		}
+		catch (Exception e)
+		{
+			ConsoleViewModel.LogException(e.ToString());
+		}
 
 		StudioModel.Project.ResumeWatchers();
 	}
@@ -199,11 +206,29 @@ public sealed class ToolProjectView : Tool
 		_createDefinitionAssetDialog.Open(_contextMenuActivatedAt!.RelativeDirectoryPath, OnCreateDefinitionAssetFile);
 	}
 
-	private void OnCreateDefinitionAssetFile(string path, string name, ProjectScriptFileNode template)
+	private void OnCreateDefinitionAssetFile(string path, string name, ProjectScriptFileNode templateFileNode)
 	{
-		// TODO
+		StudioModel.Project.PauseWatchers();
 		
-		
+		try
+		{
+			DefinitionTemplate? template = DefinitionTemplate.CreateFromFile(templateFileNode.AbsolutePath);
+			if (template == null)
+			{
+				ConsoleViewModel.LogError($"Cannot read template file: {templateFileNode.AbsolutePath}");
+			}
+			else
+			{
+				DefinitionAsset asset = new (template);
+				asset.WriteToFile(path);
+			}
+		}
+		catch (Exception e)
+		{
+			ConsoleViewModel.LogException(e.ToString());
+		}
+
+		StudioModel.Project.ResumeWatchers();
 	}
 
 	#endregion

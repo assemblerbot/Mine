@@ -17,10 +17,10 @@ public class ProjectScriptFileNode : ProjectNode
 		string guid = RelativePath;
 		
 		// try to parse file header
-		ProjectScriptFileHeader.FileId? fileId = ProjectScriptFileHeader.ReadFromFile(AbsolutePath);
-		if(fileId != null)
+		ProjectScriptFileHeader? header = ProjectScriptFileHeader.CreateFromFile(AbsolutePath);
+		if(header != null)
 		{
-			guid = fileId.Guid;
+			guid = header.Guid;
 			SetNodeType(ProjectNodeType.ScriptDefinitionTemplate);
 		}
 

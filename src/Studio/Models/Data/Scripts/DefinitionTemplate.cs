@@ -1,10 +1,13 @@
 using System.Text.RegularExpressions;
+using Migration;
+using OdinSerializer;
 using RedHerring.Studio.Models.Project.FileSystem;
 using RedHerring.Studio.Models.ViewModels.Console;
 using RedHerring.Studio.UserInterface.Attributes;
 
 namespace Mine.Studio;
 
+[Serializable, SerializedClassId("5dc4705e-0dd6-4ccc-858b-231b6d915ffd")]
 public sealed class DefinitionTemplate
 {
 	private const string _typeId    = "DefinitionTemplate";
@@ -12,11 +15,12 @@ public sealed class DefinitionTemplate
 	private const string _dataBegin = "//--- data begin ---";
 	private const string _dataEnd   = "//--- data end ---";
 	
-	private ProjectScriptFileHeader.FileId _fileId;
+	[OdinSerialize] private ProjectScriptFileHeader _header;
 	
-	[ShowInInspector] private string                         _namespaceName = null!;
-	[ShowInInspector] private string                         _className     = null!;
-	[ShowInInspector] private List<DefinitionTemplateField?> _fields        = new();
+	[ShowInInspector, OdinSerialize] private string _namespaceName = null!;
+	[ShowInInspector, OdinSerialize] private string _className     = null!;
+	
+	[ShowInInspector, OdinSerialize] private List<DefinitionTemplateField?> _fields = new();
 
 	private DefinitionTemplate()
 	{
@@ -64,7 +68,7 @@ public sealed class DefinitionTemplate
 
 	public DefinitionTemplate(string namespaceName, string className)
 	{
-		_fileId        = new ProjectScriptFileHeader.FileId (Guid.NewGuid().ToString(), _typeId, _version);
+		_header        = new ProjectScriptFileHeader(Guid.NewGuid().ToString(), _typeId, _version);
 		_namespaceName = namespaceName;
 		_className     = className;
 	}
@@ -73,7 +77,7 @@ public sealed class DefinitionTemplate
 	{
 		using StreamWriter stream = File.CreateText(path);
 
-		stream.WriteLine(ProjectScriptFileHeader.CreateHeaderString(_fileId));
+		stream.WriteLine(_header.ToHeaderString());
 		stream.WriteLine("//THIS FILE WAS GENERATED! DON'T MODIFY IT. ONLY THE NAMESPACE AND THE CLASS NAME CAN BE MODIFIED SAFELY!");
 
 		if (!string.IsNullOrEmpty(_namespaceName))
@@ -103,13 +107,13 @@ public sealed class DefinitionTemplate
 			return false;
 		}
 
-		ProjectScriptFileHeader.FileId? fileId = ProjectScriptFileHeader.ReadFromStringLine(headerLine);
-		if (fileId == null)
+		ProjectScriptFileHeader? header = ProjectScriptFileHeader.ReadFromStringLine(headerLine);
+		if (header == null)
 		{
 			return false;
 		}
 
-		_fileId = fileId;
+		_header = header;
 
 		// prepare regexes
 		Regex classRegex     = new (@"class\s+(\w+)", RegexOptions.Compiled);
@@ -212,3 +216,19 @@ public sealed class DefinitionTemplate
 		return true;
 	}
 }
+
+#region Migration
+[MigratableInterface(typeof(DefinitionTemplate))]
+public interface IDefinitionTemplateMigratable;
+    
+[Serializable, LatestVersion(typeof(DefinitionTemplate))]
+public class DefinitionTemplate_000 : IDefinitionTemplateMigratable
+{
+	public IProjectScriptFileHeaderMigratable _header;
+	
+	public string _namespaceName;
+	public string _className;
+	
+	[MigrateField] public List<IDefinitionTemplateFieldMigratable?> _fields;
+}
+#endregion
