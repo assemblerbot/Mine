@@ -20,7 +20,8 @@ public sealed class DefinitionTemplate
 	[ShowInInspector, OdinSerialize] private string _namespaceName = null!;
 	[ShowInInspector, OdinSerialize] private string _className     = null!;
 	
-	[ShowInInspector, OdinSerialize] private List<DefinitionTemplateField?> _fields = new();
+	[ShowInInspector, OdinSerialize] private List<DefinitionTemplateField?>          _fields = new();
+	public                                   IReadOnlyList<DefinitionTemplateField?> Fields => _fields;
 
 	private DefinitionTemplate()
 	{

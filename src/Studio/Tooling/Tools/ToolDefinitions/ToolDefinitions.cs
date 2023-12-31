@@ -28,7 +28,7 @@ public sealed class ToolDefinitions : Tool
 	private string?                   _definitionTemplateErrorMessage = null;
 	
 	private ProjectAssetFileNode? _definitionAssetNode = null;
-	private DefinitionAsset       _definitionAsset     = null;
+	private DefinitionAsset?      _definitionAsset     = null;
 
 	public ToolDefinitions(StudioModel studioModel, int uniqueId) : base(studioModel, uniqueId)
 	{
@@ -74,6 +74,14 @@ public sealed class ToolDefinitions : Tool
 
 	private void UpdateTemplateEditorUI()
 	{
+		if (_definitionTemplateNode == null || _definitionTemplate == null)
+		{
+			ImGui.TextColored(new Vector4(1f, 0.5f, 0.5f, 1f), "Select definition template.");
+			return;
+		}
+
+		ImGui.Text(_definitionTemplateNode.RelativePath);
+		
 		bool wasChange = _definitionTemplateHistory?.WasChange ?? false; 
 		if (wasChange)
 		{
@@ -118,8 +126,51 @@ public sealed class ToolDefinitions : Tool
 
 	private void UpdateAssetEditorUI()
 	{
+		if (_definitionTemplate == null || _definitionAssetNode == null || _definitionAsset == null)
+		{
+			ImGui.TextColored(new Vector4(1f, 0.5f, 0.5f, 1f), "Select definition asset.");
+			return;
+		}
 
-		// TODO
+		if (_definitionTemplate.Fields.Count == 0)
+		{
+			ImGui.TextColored(new Vector4(1f, 0.5f, 0.5f, 1f), "Add some fields to definition template.");
+			return;
+		}
+
+		ImGuiTableFlags flags =
+			ImGuiTableFlags.Borders       |
+			ImGuiTableFlags.Resizable     |
+			ImGuiTableFlags.Sortable      |
+			ImGuiTableFlags.Reorderable   |
+			ImGuiTableFlags.BordersInnerH |
+			ImGuiTableFlags.RowBg         |
+			ImGuiTableFlags.ScrollX       |
+			ImGuiTableFlags.ScrollY;
+		
+		
+		IReadOnlyList<DefinitionTemplateField?> fields = _definitionTemplate.Fields;
+		if (ImGui.BeginTable("table", fields.Count, flags))
+		{
+			for (int col = 0; col < fields.Count; ++col)
+			{
+				ImGui.TableSetupColumn(fields[col]?.Name ?? "null");
+			}
+			ImGui.TableSetupScrollFreeze(0, 1);
+			ImGui.TableHeadersRow();
+
+			for (int row = 0; row < 100; ++row)
+			{
+				ImGui.TableNextRow();
+				for (int col = 0; col < fields.Count; ++col)
+				{
+					ImGui.TableSetColumnIndex(col);
+					ImGui.Text("this is some text in the table");
+				}
+			}
+
+			ImGui.EndTable();
+		}
 	}
 
 	private void UpdateNodesFromSelection()
