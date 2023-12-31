@@ -7,11 +7,21 @@ namespace Mine.Studio;
 public sealed class DefinitionAsset
 {
 	[OdinSerialize] private DefinitionTemplate       _template;
-	[OdinSerialize] private List<DefinitionAssetRow> _rows = new();
+	public                  DefinitionTemplate       Template => _template;
+	
+	[OdinSerialize] private List<DefinitionAssetRow>          _rows = new();
+	public                  IReadOnlyList<DefinitionAssetRow> Rows => _rows;
 
 	public DefinitionAsset(DefinitionTemplate template)
 	{
 		_template = template;
+	}
+
+	public static DefinitionAsset? CreateFromFile(string path, MigrationManager migrationManager)
+	{
+		byte[] json = File.ReadAllBytes(path);
+		DefinitionAsset asset = MigrationSerializer.Deserialize<DefinitionAsset, IDefinitionAssetMigratable>(migrationManager.TypesHash, json, SerializedDataFormat.JSON, migrationManager);
+		return asset;
 	}
 
 	public void WriteToFile(string path)

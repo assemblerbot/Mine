@@ -16,6 +16,7 @@ public sealed class DefinitionTemplate
 	private const string _dataEnd   = "//--- data end ---";
 	
 	[OdinSerialize] private ProjectScriptFileHeader _header;
+	public                  ProjectScriptFileHeader Header => _header;
 	
 	[ShowInInspector, OdinSerialize] private string _namespaceName = null!;
 	[ShowInInspector, OdinSerialize] private string _className     = null!;
@@ -91,7 +92,7 @@ public sealed class DefinitionTemplate
 		stream.WriteLine("	" + _dataBegin);
 		foreach (DefinitionTemplateField field in _fields)
 		{
-			stream.WriteLine($"	public {field.TypeName} {field.Name} {{get; private set;}}");
+			stream.WriteLine($"	public {field.Type.ToCSharpType()} {field.Name} {{get; private set;}}");
 		}
 		stream.WriteLine("	" + _dataEnd);
 		stream.WriteLine("}");
@@ -151,15 +152,8 @@ public sealed class DefinitionTemplate
 				string propertyType = propertyMatch.Groups[1].Captures[0].ToString();
 				string propertyName = propertyMatch.Groups[2].Captures[0].ToString();
 
-				DefinitionTemplateField? field = DefinitionTemplateField.CreateFromType(propertyType, propertyName);
-				if (field != null)
-				{
-					_fields.Add(field);
-				}
-				else
-				{
-					ConsoleViewModel.LogError($"Cannot instantiate template type: '{propertyType}'");
-				}
+				DefinitionTemplateField  field = new(propertyType.ToTemplateType(), propertyName);
+				_fields.Add(field);
 			}
 			else
 			{

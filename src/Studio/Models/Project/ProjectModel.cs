@@ -436,6 +436,25 @@ public sealed class ProjectModel
 	#endregion
 	
 	#region Script manipulation
+	public ProjectScriptFileNode? FindScriptNodeByGuid(string guid)
+	{
+		ProjectNode? resultNode = null;
+
+		_scriptsFolder!.TraverseRecursive(
+			node =>
+			{
+				if (node.Meta?.Guid == guid)
+				{
+					resultNode = node;
+				}
+			},
+			TraverseFlags.Files,
+			new CancellationToken()
+		);
+
+		return resultNode as ProjectScriptFileNode;
+	}
+	
 	private void RecursiveScriptScan(string path, string relativePath, ProjectFolderNode root)
 	{
 		// scan directories

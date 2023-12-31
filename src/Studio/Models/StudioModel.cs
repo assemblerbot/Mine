@@ -16,6 +16,7 @@ public class StudioModel
 	
 	public static    Assembly         Assembly => typeof(StudioModel).Assembly; 
 	private readonly MigrationManager _migrationManager = new(Assembly);
+	public           MigrationManager MigrationManager => _migrationManager;
 	
 	private readonly ProjectModel _project;
 	public           ProjectModel Project => _project;

@@ -21,6 +21,7 @@ public sealed class ToolDefinitions : Tool
 	private readonly string _definitionTemplateChildId;
 	private readonly string _buttonApplyTemplateChangesNameId;
 
+	private object?                   _prevSelected                   = null;
 	private ProjectScriptFileNode?    _definitionTemplateNode         = null;
 	private DefinitionTemplate?       _definitionTemplate             = null;
 	private Inspector?                _definitionTemplateInspector    = null;
@@ -176,6 +177,12 @@ public sealed class ToolDefinitions : Tool
 	private void UpdateNodesFromSelection()
 	{
 		object? selected = StudioModel.Selection.GetFirstSelectedTarget();
+		if (selected == _prevSelected)
+		{
+			return;
+		}
+		_prevSelected = selected;
+
 		if (selected == null)
 		{
 			_definitionTemplateNode = null;
@@ -191,24 +198,55 @@ public sealed class ToolDefinitions : Tool
 			}
 
 			_definitionTemplateNode      = scriptFileNode;
-			_definitionTemplate          = DefinitionTemplate.CreateFromFile(scriptFileNode.AbsolutePath);
-			_definitionTemplateHistory   = new CommandHistoryWithChange();
-			_definitionTemplateInspector = new Inspector(_definitionTemplateHistory);
-			_definitionTemplateInspector.Init(_definitionTemplate);
-			return;
+		}
+		else
+		{
+			_definitionTemplateNode = null;
 		}
 
 		if (selected is ProjectAssetFileNode assetFileNode)
 		{
-			if(ReferenceEquals(assetFileNode, _definitionAssetNode))
+			if (ReferenceEquals(assetFileNode, _definitionAssetNode))
 			{
 				return;
 			}
 
 			_definitionAssetNode = assetFileNode;
+		}
+		else
+		{
+			_definitionAssetNode = null;
+		}
+
+		if(_definitionAssetNode != null)
+		{
+			DefinitionAsset? asset = DefinitionAsset.CreateFromFile(_definitionAssetNode.AbsolutePath, StudioModel.MigrationManager);
+			if (asset == null)
+			{
+				_definitionAssetNode = null;
+				return;
+			}
+
+			_definitionAsset = asset;
 			
-			// TODO - parse, setup editor
-			return;
+			ProjectScriptFileNode? templateNode = StudioModel.Project.FindScriptNodeByGuid(_definitionAsset.Template.Header.Guid);
+			_definitionTemplateNode = templateNode;
+		}
+
+		if (_definitionTemplateNode != null)
+		{
+			_definitionTemplate          = DefinitionTemplate.CreateFromFile(_definitionTemplateNode.AbsolutePath);
+			if (_definitionTemplate == null)
+			{
+				_definitionAsset        = null;
+				_definitionTemplateNode = null;
+				_definitionAssetNode    = null;
+				return;
+			}
+
+			_definitionTemplateHistory   = new CommandHistoryWithChange();
+			_definitionTemplateInspector = new Inspector(_definitionTemplateHistory);
+			_definitionTemplateInspector.Init(_definitionTemplate);
 		}
 	}
 
