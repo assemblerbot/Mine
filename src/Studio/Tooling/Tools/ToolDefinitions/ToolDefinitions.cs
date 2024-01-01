@@ -22,14 +22,18 @@ public sealed class ToolDefinitions : Tool
 	private readonly string _buttonApplyTemplateChangesNameId;
 
 	private object?                   _prevSelected                   = null;
+	
+	// template editor
 	private ProjectScriptFileNode?    _definitionTemplateNode         = null;
 	private DefinitionTemplate?       _definitionTemplate             = null;
 	private Inspector?                _definitionTemplateInspector    = null;
 	private CommandHistoryWithChange? _definitionTemplateHistory      = null;
 	private string?                   _definitionTemplateErrorMessage = null;
 	
-	private ProjectAssetFileNode? _definitionAssetNode = null;
-	private DefinitionAsset?      _definitionAsset     = null;
+	// asset editor
+	private ProjectAssetFileNode? _definitionAssetNode           = null;
+	private DefinitionAsset?      _definitionAsset               = null;
+	private CommandHistory?       _definitionAssetCommandHistory = null;
 
 	public ToolDefinitions(StudioModel studioModel, int uniqueId) : base(studioModel, uniqueId)
 	{
@@ -139,35 +143,56 @@ public sealed class ToolDefinitions : Tool
 			return;
 		}
 
+		ImGui.Text(_definitionAssetNode.RelativePath);
+
 		ImGuiTableFlags flags =
 			ImGuiTableFlags.Borders       |
 			ImGuiTableFlags.Resizable     |
 			ImGuiTableFlags.Sortable      |
 			ImGuiTableFlags.Reorderable   |
-			ImGuiTableFlags.BordersInnerH |
 			ImGuiTableFlags.RowBg         |
 			ImGuiTableFlags.ScrollX       |
 			ImGuiTableFlags.ScrollY;
 		
-		
 		IReadOnlyList<DefinitionTemplateField?> fields = _definitionTemplate.Fields;
-		if (ImGui.BeginTable("table", fields.Count, flags))
+		if (ImGui.BeginTable("table", 1 + fields.Count, flags))
 		{
+			ImGui.TableSetupColumn(" ", ImGuiTableColumnFlags.WidthFixed | ImGuiTableColumnFlags.NoResize | ImGuiTableColumnFlags.NoReorder, 20f);
+			
 			for (int col = 0; col < fields.Count; ++col)
 			{
-				ImGui.TableSetupColumn(fields[col]?.Name ?? "null");
+				ImGui.TableSetupColumn(fields[col]?.Name ?? "null", ImGuiTableColumnFlags.WidthStretch);
 			}
 			ImGui.TableSetupScrollFreeze(0, 1);
 			ImGui.TableHeadersRow();
 
-			for (int row = 0; row < 100; ++row)
+			for (int row = 0; row < 10; ++row)
 			{
 				ImGui.TableNextRow();
+				
+				ImGui.TableSetColumnIndex(0);
+				if (ImGui.SmallButton(FontAwesome6.Xmark))
+				{
+					// todo - remove row
+				}
+
 				for (int col = 0; col < fields.Count; ++col)
 				{
-					ImGui.TableSetColumnIndex(col);
-					ImGui.Text("this is some text in the table");
+					ImGui.TableSetColumnIndex(col + 1);
+					
+					// int value = 123;
+					// ImGui.InputInt("", ref value);
+
+					ImGui.Text("todo");
 				}
+			}
+
+			// last row is empty, with just a + button
+			ImGui.TableNextRow();
+			ImGui.TableSetColumnIndex(0);
+			if (ImGui.SmallButton(FontAwesome6.Plus))
+			{
+				// todo - add row
 			}
 
 			ImGui.EndTable();
@@ -176,6 +201,7 @@ public sealed class ToolDefinitions : Tool
 
 	private void UpdateNodesFromSelection()
 	{
+		// check selection
 		object? selected = StudioModel.Selection.GetFirstSelectedTarget();
 		if (selected == _prevSelected)
 		{
@@ -190,6 +216,7 @@ public sealed class ToolDefinitions : Tool
 			return;
 		}
 
+		// get script node
 		if (selected is ProjectScriptFileNode scriptFileNode)
 		{
 			if (ReferenceEquals(scriptFileNode, _definitionTemplateNode))
@@ -204,6 +231,7 @@ public sealed class ToolDefinitions : Tool
 			_definitionTemplateNode = null;
 		}
 
+		// get asset node
 		if (selected is ProjectAssetFileNode assetFileNode)
 		{
 			if (ReferenceEquals(assetFileNode, _definitionAssetNode))
@@ -218,6 +246,7 @@ public sealed class ToolDefinitions : Tool
 			_definitionAssetNode = null;
 		}
 
+		// try to read asset node
 		if(_definitionAssetNode != null)
 		{
 			DefinitionAsset? asset = DefinitionAsset.CreateFromFile(_definitionAssetNode.AbsolutePath, StudioModel.MigrationManager);
@@ -233,6 +262,7 @@ public sealed class ToolDefinitions : Tool
 			_definitionTemplateNode = templateNode;
 		}
 
+		// try to read script node
 		if (_definitionTemplateNode != null)
 		{
 			_definitionTemplate          = DefinitionTemplate.CreateFromFile(_definitionTemplateNode.AbsolutePath);

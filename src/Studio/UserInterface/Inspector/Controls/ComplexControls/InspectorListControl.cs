@@ -36,6 +36,7 @@ public sealed class InspectorListControl : InspectorControl
 	private bool _isMultipleValues = false;
 	private bool _isNullSource     = false;
 	private bool _isReadOnly       = false;
+	private bool _isTableStyle     = false;
 	
 	private readonly string                  _buttonCreateElementId;
 	private readonly List<ControlDescriptor> _controls = new();
@@ -53,12 +54,14 @@ public sealed class InspectorListControl : InspectorControl
 	{
 		base.InitFromSource(sourceOwner, source, sourceField, sourceIndex);
 		_isReadOnly = sourceField != null && (sourceField.IsInitOnly || sourceField.GetCustomAttribute<ReadOnlyInInspectorAttribute>() != null);
+		_isTableStyle = sourceField?.GetCustomAttribute<TableListAttribute>() != null;
 	}
 
 	public override void AdaptToSource(object? sourceOwner, object source, FieldInfo? sourceField = null)
 	{
 		base.AdaptToSource(sourceOwner, source, sourceField);
-		_isReadOnly |= sourceField != null && (sourceField.IsInitOnly || sourceField.GetCustomAttribute<ReadOnlyInInspectorAttribute>() != null);
+		_isReadOnly   |= sourceField != null && (sourceField.IsInitOnly || sourceField.GetCustomAttribute<ReadOnlyInInspectorAttribute>() != null);
+		_isTableStyle |= sourceField?.GetCustomAttribute<TableListAttribute>() != null;
 	}
 	
 	public override void Update()
