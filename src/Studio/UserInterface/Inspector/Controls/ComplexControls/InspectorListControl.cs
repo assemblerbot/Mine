@@ -79,27 +79,69 @@ public sealed class InspectorListControl : InspectorControl
 
 		if (_isReadOnly)
 		{
-			if (Gui.TreeNodeEx(LabelId, ImGuiTreeNodeFlags.AllowItemOverlap))
+			if (_isTableStyle)
 			{
-				for(int i = 0; i < _controls.Count; ++i)
-				{
-					if(_controls[i].Control == null)
-					{
-						continue;
-					}
-
-					_controls[i].Control!.Update();
-					
-				}
-				Gui.TreePop();
+				UpdateReadOnlyTableStyle();
 			}
-
+			else
+			{
+				UpdateReadOnlyTreeStyle();
+			}
 			return;
 		}
 		
 		bool createNewElement   = false;
 		int  deleteElementIndex = -1;
 
+		if (_isTableStyle)
+		{
+			UpdateEditableTableStyle(list, ref createNewElement, ref deleteElementIndex);
+		}
+		else
+		{
+			UpdateEditableTreeStyle(list, ref createNewElement, ref deleteElementIndex);
+		}
+
+		if (createNewElement)
+		{
+			//Console.WriteLine("Create new element");
+			_inspector.Commit(new InspectorCreateListElementCommand(Bindings));
+		}
+
+		if (deleteElementIndex != -1)
+		{
+			//Console.WriteLine($"Delete element {deleteElementIndex}");
+			_inspector.Commit(new InspectorDeleteListElementCommand(Bindings, deleteElementIndex));
+		}
+	}
+
+	private void UpdateReadOnlyTreeStyle()
+	{
+		if (Gui.TreeNodeEx(LabelId, ImGuiTreeNodeFlags.AllowItemOverlap))
+		{
+			for(int i = 0; i < _controls.Count; ++i)
+			{
+				if(_controls[i].Control == null)
+				{
+					continue;
+				}
+
+				_controls[i].Control!.Update();
+					
+			}
+			Gui.TreePop();
+		}
+	}
+
+	private void UpdateReadOnlyTableStyle()
+	{
+		// TODO
+		Type? elementType = Bindings[0].GetElementType();
+		int   d           = 0;
+	}
+
+	private void UpdateEditableTreeStyle(IList list, ref bool createNewElement, ref int deleteElementIndex)
+	{
 		if (Gui.TreeNodeEx(LabelId, ImGuiTreeNodeFlags.AllowItemOverlap))
 		{
 			if (!_isReadOnly)
@@ -143,18 +185,11 @@ public sealed class InspectorListControl : InspectorControl
 		{
 			createNewElement = NewElementButtonOnTheSameLine(list.IsFixedSize);
 		}
+	}
 
-		if (createNewElement)
-		{
-			Console.WriteLine("Create new element");
-			_inspector.Commit(new InspectorCreateListElementCommand(Bindings));
-		}
-
-		if (deleteElementIndex != -1)
-		{
-			Console.WriteLine($"Delete element {deleteElementIndex}");
-			_inspector.Commit(new InspectorDeleteListElementCommand(Bindings, deleteElementIndex));
-		}
+	private void UpdateEditableTableStyle(IList list, ref bool createNewElement, ref int deleteElementIndex)
+	{
+		
 	}
 
 	private bool SourceFieldValuesChanged()

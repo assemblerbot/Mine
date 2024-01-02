@@ -18,7 +18,8 @@ public sealed class ToolInspector : Tool
 	
 	private readonly   Inspector _inspector;
 
-	private List<object> _tests = new(){new InspectorTest2(), new InspectorTest()}; // TODO debug
+	//private List<object> _tests = new(){new InspectorTest2(), new InspectorTest()}; // TODO debug
+	private List<object> _tests = new(){new InspectorTest()}; // TODO debug
 
 	private bool _subscribedToChange = false;
 
@@ -105,7 +106,8 @@ public class InspectorTest
 	public                       bool     BoolValue  = true;
 	public                       TestEnum EnumValue  = TestEnum.Def;
 	
-	public InspectorTestSubclass Subclass = new();
+	public InspectorTestSubclass       Subclass = new();
+	[ReadOnlyInInspector, TableList] public List<InspectorTestSubclass> TestList = new() {new InspectorTestSubclass(), new InspectorTestSubclass()};
 
 	[ValueDropdown("DropdownSource")] public int      DropdownInt    = 1;
 	[ValueDropdown("DropdownSource")] public string   DropdownString = "pear";
@@ -126,7 +128,7 @@ public class InspectorTest2
 	public                       int SomeValue1 = 5;
 	[ReadOnlyInInspector] public int SomeValue2 = 22;
 
-	public InspectorTestSubclass2 Subclass = new();
+	public InspectorTestSubclass2      Subclass = new();
 
 	[ShowInInspector] private int SomeValue3 = 333;
 	[HideInInspector] public  int SomeValue4 = 4444;
