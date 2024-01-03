@@ -15,7 +15,7 @@ public abstract class InspectorEditControl<T> : InspectorControl
 	
 	protected bool _isReadOnly = false;
 	
-	protected InspectorEditControl(Inspector inspector, string id) : base(inspector, id)
+	protected InspectorEditControl(IInspectorCommandTarget commandTarget, string id) : base(commandTarget, id)
 	{
 		_multipleValuesLabelId = $"{MultipleValuesButtonLabel}##{Id}";
 	}

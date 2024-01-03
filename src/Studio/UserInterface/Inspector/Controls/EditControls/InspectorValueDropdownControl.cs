@@ -9,7 +9,7 @@ public abstract class InspectorValueDropdownControl<T> : InspectorSingleInputCon
 {
 	protected string[] _items = null!;
 
-	protected InspectorValueDropdownControl(Inspector inspector, string id) : base(inspector, id)
+	protected InspectorValueDropdownControl(IInspectorCommandTarget commandTarget, string id) : base(commandTarget, id)
 	{
 	}
 

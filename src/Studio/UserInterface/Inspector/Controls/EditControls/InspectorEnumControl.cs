@@ -7,7 +7,7 @@ public class InspectorEnumControl : InspectorSingleInputControl<Enum>
 {
 	private string[] _items = null!;
 	
-	public InspectorEnumControl(Inspector inspector, string id) : base(inspector, id)
+	public InspectorEnumControl(IInspectorCommandTarget commandTarget, string id) : base(commandTarget, id)
 	{
 	}
 
