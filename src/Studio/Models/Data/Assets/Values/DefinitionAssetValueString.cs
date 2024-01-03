@@ -1,11 +1,13 @@
 using Migration;
+using RedHerring.Studio.UserInterface;
 
 namespace Mine.Studio;
 
 [Serializable, SerializedClassId("7f82bf71-e5b8-4fe9-8e2a-8d86853aaf21")]
 public sealed class DefinitionAssetValueString : DefinitionAssetValue
 {
-	public string Value;
+	public override Type   InspectorControlType => typeof(InspectorStringControl);
+	public          string Value;
 }
 
 #region Migration

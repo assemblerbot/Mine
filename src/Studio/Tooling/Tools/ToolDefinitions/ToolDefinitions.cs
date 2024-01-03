@@ -21,7 +21,7 @@ public sealed class ToolDefinitions : Tool
 	private readonly string _definitionTemplateChildId;
 	private readonly string _buttonApplyTemplateChangesNameId;
 
-	private object?                   _prevSelected                   = null;
+	private object? _prevSelected = null;
 	
 	// template editor
 	private ProjectScriptFileNode?    _definitionTemplateNode         = null;
@@ -31,9 +31,9 @@ public sealed class ToolDefinitions : Tool
 	private string?                   _definitionTemplateErrorMessage = null;
 	
 	// asset editor
-	private ProjectAssetFileNode? _definitionAssetNode           = null;
-	private DefinitionAsset?      _definitionAsset               = null;
-	private CommandHistory?       _definitionAssetCommandHistory = null;
+	private ProjectAssetFileNode?      _definitionAssetNode   = null;
+	private DefinitionAsset?           _definitionAsset       = null;
+	private ToolDefinitionAssetEditor? _definitionAssetEditor = null;
 
 	public ToolDefinitions(StudioModel studioModel, int uniqueId) : base(studioModel, uniqueId)
 	{
@@ -90,6 +90,7 @@ public sealed class ToolDefinitions : Tool
 		bool wasChange = _definitionTemplateHistory?.WasChange ?? false; 
 		if (wasChange)
 		{
+			// TODO - move to style
 			ImGui.PushStyleColor(ImGuiCol.Button,        new Vector4(0.2f, 0.5f, 0.2f, 1f));
 			ImGui.PushStyleColor(ImGuiCol.ButtonHovered, new Vector4(0.3f, 0.5f, 0.3f, 1f));
 			ImGui.PushStyleColor(ImGuiCol.ButtonActive,  new Vector4(0.4f, 0.5f, 0.4f, 1f));
@@ -144,59 +145,7 @@ public sealed class ToolDefinitions : Tool
 		}
 
 		ImGui.Text(_definitionAssetNode.RelativePath);
-
-		ImGuiTableFlags flags =
-			ImGuiTableFlags.Borders       |
-			ImGuiTableFlags.Resizable     |
-			ImGuiTableFlags.Sortable      |
-			ImGuiTableFlags.Reorderable   |
-			ImGuiTableFlags.RowBg         |
-			ImGuiTableFlags.ScrollX       |
-			ImGuiTableFlags.ScrollY;
-		
-		IReadOnlyList<DefinitionTemplateField?> fields = _definitionTemplate.Fields;
-		if (ImGui.BeginTable("table", 1 + fields.Count, flags))
-		{
-			ImGui.TableSetupColumn(" ", ImGuiTableColumnFlags.WidthFixed | ImGuiTableColumnFlags.NoResize | ImGuiTableColumnFlags.NoReorder, 20f);
-			
-			for (int col = 0; col < fields.Count; ++col)
-			{
-				ImGui.TableSetupColumn(fields[col]?.Name ?? "null", ImGuiTableColumnFlags.WidthStretch);
-			}
-			ImGui.TableSetupScrollFreeze(0, 1);
-			ImGui.TableHeadersRow();
-
-			for (int row = 0; row < 10; ++row)
-			{
-				ImGui.TableNextRow();
-				
-				ImGui.TableSetColumnIndex(0);
-				if (ImGui.SmallButton(FontAwesome6.Xmark))
-				{
-					// todo - remove row
-				}
-
-				for (int col = 0; col < fields.Count; ++col)
-				{
-					ImGui.TableSetColumnIndex(col + 1);
-					
-					// int value = 123;
-					// ImGui.InputInt("", ref value);
-
-					ImGui.Text("todo");
-				}
-			}
-
-			// last row is empty, with just a + button
-			ImGui.TableNextRow();
-			ImGui.TableSetColumnIndex(0);
-			if (ImGui.SmallButton(FontAwesome6.Plus))
-			{
-				// todo - add row
-			}
-
-			ImGui.EndTable();
-		}
+		_definitionAssetEditor!.Update();
 	}
 
 	private void UpdateNodesFromSelection()
@@ -224,7 +173,7 @@ public sealed class ToolDefinitions : Tool
 				return;
 			}
 
-			_definitionTemplateNode      = scriptFileNode;
+			_definitionTemplateNode = scriptFileNode;
 		}
 		else
 		{
@@ -260,12 +209,13 @@ public sealed class ToolDefinitions : Tool
 			
 			ProjectScriptFileNode? templateNode = StudioModel.Project.FindScriptNodeByGuid(_definitionAsset.Template.Header.Guid);
 			_definitionTemplateNode = templateNode;
+			_definitionAssetEditor  = new ToolDefinitionAssetEditor(_definitionAsset);
 		}
 
 		// try to read script node
 		if (_definitionTemplateNode != null)
 		{
-			_definitionTemplate          = DefinitionTemplate.CreateFromFile(_definitionTemplateNode.AbsolutePath);
+			_definitionTemplate = DefinitionTemplate.CreateFromFile(_definitionTemplateNode.AbsolutePath);
 			if (_definitionTemplate == null)
 			{
 				_definitionAsset        = null;

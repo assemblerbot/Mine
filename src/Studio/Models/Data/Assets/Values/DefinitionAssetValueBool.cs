@@ -1,11 +1,13 @@
 using Migration;
+using RedHerring.Studio.UserInterface;
 
 namespace Mine.Studio;
 
 [Serializable, SerializedClassId("d4709c62-3053-4f8c-ad43-2a29ac9facc2")]
 public sealed class DefinitionAssetValueBool : DefinitionAssetValue
 {
-	public bool Value;
+	public override Type InspectorControlType => typeof(InspectorBoolControl);
+	public          bool Value;
 }
 
 #region Migration

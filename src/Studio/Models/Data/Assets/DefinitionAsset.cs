@@ -6,11 +6,10 @@ namespace Mine.Studio;
 [Serializable, SerializedClassId("d38c1f35-e309-41c4-8a99-6f5defad421a")]
 public sealed class DefinitionAsset
 {
-	[OdinSerialize] private DefinitionTemplate       _template;
-	public                  DefinitionTemplate       Template => _template;
+	[OdinSerialize] private DefinitionTemplate _template;
+	public                  DefinitionTemplate Template => _template;
 	
-	[OdinSerialize] private List<DefinitionAssetRow>          _rows = new();
-	public                  IReadOnlyList<DefinitionAssetRow> Rows => _rows;
+	[OdinSerialize] public List<DefinitionAssetRow> Rows = new();
 
 	public DefinitionAsset(DefinitionTemplate template)
 	{
