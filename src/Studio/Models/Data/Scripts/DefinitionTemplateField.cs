@@ -2,7 +2,7 @@ using Migration;
 
 namespace Mine.Studio;
 
-[Serializable]
+[Serializable, SerializedClassId("3b2b36d4-9272-490b-87e4-495393682604")]
 public sealed class DefinitionTemplateField
 {
 	public DefinitionTemplateFieldType Type;

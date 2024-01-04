@@ -2,6 +2,7 @@ using System.Numerics;
 using ImGuiNET;
 using Mine.ImGuiPlugin;
 using RedHerring.Studio.Commands;
+using RedHerring.Studio.Models.Project.FileSystem;
 using RedHerring.Studio.UserInterface;
 
 namespace Mine.Studio;
@@ -43,9 +44,9 @@ public sealed class ToolDefinitionAssetEditor : IInspectorCommandTarget
 		private readonly List<Row>               _rows;
 		private readonly Func<int>               _uniqueIdGenerator;
 
-		private          int                 _rowIndex;
-		private          DefinitionAssetRow? _assetRow;
-		private          Row?                _controlsRow;
+		private int                 _rowIndex;
+		private DefinitionAssetRow? _assetRow;
+		private Row?                _controlsRow;
 
 		public AddRowCommand(IInspectorCommandTarget commandTarget, DefinitionAsset asset, List<Row> rows, Func<int> uniqueIdGenerator)
 		{
@@ -118,18 +119,21 @@ public sealed class ToolDefinitionAssetEditor : IInspectorCommandTarget
 	}
 	#endregion
 
-	private readonly DefinitionAsset              _definitionAsset;
-	private readonly CommandHistoryWithChange     _commandHistory = new();
-	private readonly List<Row> _controls       = new();
+	private readonly ProjectAssetFileNode     _definitionAssetNode;
+	private readonly DefinitionAsset          _definitionAsset;
+	private readonly string                   _editorUniqueId;
+
+	private readonly CommandHistoryWithChange _commandHistory = new();
+	private readonly List<Row>                _controlRows    = new();
 	
 	private int _uniqueIdGenerator = 0;
 
-	private readonly string _editorUniqueId;
 	
-	public ToolDefinitionAssetEditor(DefinitionAsset asset, string editorUniqueId)
+	public ToolDefinitionAssetEditor(ProjectAssetFileNode assetNode, DefinitionAsset asset, string editorUniqueId)
 	{
-		_definitionAsset                  = asset;
-		_editorUniqueId                   = editorUniqueId;
+		_definitionAssetNode = assetNode;
+		_definitionAsset         = asset;
+		_editorUniqueId          = editorUniqueId;
 		RebuildControls();
 	}
 
@@ -141,6 +145,8 @@ public sealed class ToolDefinitionAssetEditor : IInspectorCommandTarget
 	public void Update()
 	{
 		ImGui.PushID(_editorUniqueId);
+		
+		ImGui.Text(_definitionAssetNode.RelativePath);
 		
 		//--- buttons ---
 		bool wasChange = _commandHistory.WasChange;
@@ -158,10 +164,10 @@ public sealed class ToolDefinitionAssetEditor : IInspectorCommandTarget
 
 		if (ImGui.Button("Apply changes"))
 		{
-			// if (UpdateTemplateFile())
-			// {
-			// 	_definitionTemplateHistory!.ResetChange();
-			// }
+			if (WriteToFile())
+			{
+				_commandHistory.ResetChange();
+			}
 		}
 
 		if (wasChange)
@@ -217,24 +223,47 @@ public sealed class ToolDefinitionAssetEditor : IInspectorCommandTarget
 		IReadOnlyList<DefinitionTemplateField?> fields = _definitionAsset.Template.Fields;
 		if (ImGui.BeginTable("definition_asset_editor_table", 1 + fields.Count, flags))
 		{
-			ImGui.TableSetupColumn(" ", ImGuiTableColumnFlags.WidthFixed | ImGuiTableColumnFlags.NoResize | ImGuiTableColumnFlags.NoReorder, 20f);
+			bool newRowRequested    = false;
+			int  deleteRowRequested = -1;
+
+			ImGui.TableSetupColumn("", ImGuiTableColumnFlags.WidthFixed | ImGuiTableColumnFlags.NoResize | ImGuiTableColumnFlags.NoReorder, 20f);
 			
 			for (int col = 0; col < fields.Count; ++col)
 			{
 				ImGui.TableSetupColumn(fields[col]?.Name ?? "null", ImGuiTableColumnFlags.WidthStretch);
 			}
 			ImGui.TableSetupScrollFreeze(0, 1);
-			ImGui.TableHeadersRow();
 
-			int deleteRowRequested = -1;
+			// setup headers
+			{
+				//ImGui.TableHeadersRow(); <-- default was replaced by:
+
+				ImGui.TableNextRow(ImGuiTableRowFlags.Headers);
+				{
+					ImGui.TableSetColumnIndex(0);
+					ImGui.PushID(0);
+					newRowRequested = ImGui.SmallButton(FontAwesome6.Plus);
+					ImGui.PopID();
+				}
+
+				for (int col = 0; col < fields.Count; ++col)
+				{
+					ImGui.TableSetColumnIndex(col+1);
+					ImGui.PushID(col+1);
+					string columnName = ImGui.TableGetColumnName(col+1);
+					ImGui.TableHeader(columnName);
+					ImGui.PopID();
+				}
+			}
+
 			for (int rowIndex = 0; rowIndex < _definitionAsset.Rows.Count; ++rowIndex)
 			{
 				DefinitionAssetRow row = _definitionAsset.Rows[rowIndex];
 				
 				ImGui.TableNextRow();
-				
+
 				ImGui.TableSetColumnIndex(0);
-				if (ImGui.SmallButton(_controls[rowIndex].DeleteButtonNameId))
+				if (ImGui.SmallButton(_controlRows[rowIndex].DeleteButtonNameId))
 				{
 					deleteRowRequested = rowIndex;
 				}
@@ -242,24 +271,20 @@ public sealed class ToolDefinitionAssetEditor : IInspectorCommandTarget
 				for (int columnIndex = 0; columnIndex < fields.Count; ++columnIndex)
 				{
 					ImGui.TableSetColumnIndex(columnIndex + 1);
-					_controls[rowIndex].Controls[columnIndex].Update();
+					_controlRows[rowIndex].Controls[columnIndex].Update();
 				}
 			}
+			ImGui.EndTable();
 
-			// last row is empty, with just a + button
-			ImGui.TableNextRow();
-			ImGui.TableSetColumnIndex(0);
-			if (ImGui.SmallButton(FontAwesome6.Plus))
+			if (newRowRequested)
 			{
-				Commit(new AddRowCommand(this, _definitionAsset, _controls, CreateUniqueId));
+				Commit(new AddRowCommand(this, _definitionAsset, _controlRows, CreateUniqueId));
 			}
 
 			if (deleteRowRequested != -1)
 			{
-				Commit(new DeleteRowCommand(_definitionAsset, _controls, deleteRowRequested));
+				Commit(new DeleteRowCommand(_definitionAsset, _controlRows, deleteRowRequested));
 			}
-
-			ImGui.EndTable();
 		}
 
 		ImGui.PopID();
@@ -267,16 +292,22 @@ public sealed class ToolDefinitionAssetEditor : IInspectorCommandTarget
 
 	private void RebuildControls()
 	{
-		_controls.Clear();
+		_controlRows.Clear();
 
 		foreach (DefinitionAssetRow row in _definitionAsset.Rows)
 		{
-			_controls.Add(new Row(CreateUniqueId()).AddControls(this, row, CreateUniqueId));
+			_controlRows.Add(new Row(CreateUniqueId()).AddControls(this, row, CreateUniqueId));
 		}
 	}
 
 	private int CreateUniqueId()
 	{
 		return ++_uniqueIdGenerator;
+	}
+
+	private bool WriteToFile()
+	{
+		_definitionAsset.WriteToFile(_definitionAssetNode.AbsolutePath);
+		return true;
 	}
 }

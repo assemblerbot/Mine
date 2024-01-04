@@ -1,11 +1,9 @@
 using System.Numerics;
 using ImGuiNET;
 using Mine.ImGuiPlugin;
-using RedHerring.Studio.Commands;
 using RedHerring.Studio.Models;
 using RedHerring.Studio.Models.Project.FileSystem;
 using RedHerring.Studio.Tools;
-using RedHerring.Studio.UserInterface;
 
 namespace Mine.Studio;
 
@@ -18,17 +16,13 @@ public sealed class ToolDefinitions : Tool
 	private readonly string _tabBarId;
 	private readonly string _tabDefinitionNameId;
 	private readonly string _tabDataNameId;
-	private readonly string _definitionTemplateChildId;
-	private readonly string _buttonApplyTemplateChangesNameId;
 
 	private object? _prevSelected = null;
 	
 	// template editor
-	private ProjectScriptFileNode?    _definitionTemplateNode         = null;
-	private DefinitionTemplate?       _definitionTemplate             = null;
-	private Inspector?                _definitionTemplateInspector    = null;
-	private CommandHistoryWithChange? _definitionTemplateHistory      = null;
-	private string?                   _definitionTemplateErrorMessage = null;
+	private ProjectScriptFileNode?        _definitionTemplateNode   = null;
+	private DefinitionTemplate?           _definitionTemplate       = null;
+	private ToolDefinitionTemplateEditor? _definitionTemplateEditor = null;
 	
 	// asset editor
 	private ProjectAssetFileNode?      _definitionAssetNode   = null;
@@ -37,11 +31,9 @@ public sealed class ToolDefinitions : Tool
 
 	public ToolDefinitions(StudioModel studioModel, int uniqueId) : base(studioModel, uniqueId)
 	{
-		_tabBarId                         = NameId + ".tabbar";
-		_tabDefinitionNameId              = $"Definition##{Id}.definition";
-		_tabDataNameId                    = $"Data##{Id}.data";
-		_definitionTemplateChildId        = $"{Id}.templatechild";
-		_buttonApplyTemplateChangesNameId = $"Apply changes##{Id}.applytemplate";
+		_tabBarId            = NameId + ".tabbar";
+		_tabDefinitionNameId = $"Definition##{Id}.definition";
+		_tabDataNameId       = $"Data##{Id}.data";
 	}
 
 	public override void Update(out bool finished)
@@ -85,49 +77,7 @@ public sealed class ToolDefinitions : Tool
 			return;
 		}
 
-		ImGui.Text(_definitionTemplateNode.RelativePath);
-		
-		bool wasChange = _definitionTemplateHistory?.WasChange ?? false; 
-		if (wasChange)
-		{
-			// TODO - move to style
-			ImGui.PushStyleColor(ImGuiCol.Button,        new Vector4(0.2f, 0.5f, 0.2f, 1f));
-			ImGui.PushStyleColor(ImGuiCol.ButtonHovered, new Vector4(0.3f, 0.5f, 0.3f, 1f));
-			ImGui.PushStyleColor(ImGuiCol.ButtonActive,  new Vector4(0.4f, 0.5f, 0.4f, 1f));
-		}
-		else
-		{
-			ImGui.BeginDisabled();
-		}
-
-		if (ImGui.Button(_buttonApplyTemplateChangesNameId))
-		{
-			if (UpdateTemplateFile())
-			{
-				_definitionTemplateHistory!.ResetChange();
-			}
-		}
-
-		if (wasChange)
-		{
-			ImGui.PopStyleColor(3);
-		}
-		else
-		{
-			ImGui.EndDisabled();
-		}
-
-		if (_definitionTemplateErrorMessage != null)
-		{
-			ImGui.SameLine();
-			ImGui.TextColored(new Vector4(1f, 0.5f, 0.5f, 1f), _definitionTemplateErrorMessage);
-		}
-		
-		if (ImGui.BeginChild(_definitionTemplateChildId))
-		{
-			_definitionTemplateInspector?.Update();
-			ImGui.EndChild();
-		}
+		_definitionTemplateEditor!.Update();
 	}
 
 	private void UpdateAssetEditorUI()
@@ -144,7 +94,6 @@ public sealed class ToolDefinitions : Tool
 			return;
 		}
 
-		ImGui.Text(_definitionAssetNode.RelativePath);
 		_definitionAssetEditor!.Update();
 	}
 
@@ -209,7 +158,7 @@ public sealed class ToolDefinitions : Tool
 			
 			ProjectScriptFileNode? templateNode = StudioModel.Project.FindScriptNodeByGuid(_definitionAsset.Template.Header.Guid);
 			_definitionTemplateNode = templateNode;
-			_definitionAssetEditor  = new ToolDefinitionAssetEditor(_definitionAsset, NameId + ".asset_editor");
+			_definitionAssetEditor  = new ToolDefinitionAssetEditor(_definitionAssetNode, _definitionAsset, NameId + ".asset_editor");
 		}
 
 		// try to read script node
@@ -224,26 +173,7 @@ public sealed class ToolDefinitions : Tool
 				return;
 			}
 
-			_definitionTemplateHistory   = new CommandHistoryWithChange();
-			_definitionTemplateInspector = new Inspector(_definitionTemplateHistory);
-			_definitionTemplateInspector.Init(_definitionTemplate);
+			_definitionTemplateEditor = new ToolDefinitionTemplateEditor(_definitionTemplateNode, _definitionTemplate, NameId + ".template_editor");
 		}
-	}
-
-	private bool UpdateTemplateFile()
-	{
-		if (_definitionTemplateNode == null)
-		{
-			return false;
-		}
-
-		_definitionTemplateErrorMessage = _definitionTemplate!.Validate();
-		if (_definitionTemplateErrorMessage != null)
-		{
-			return false;
-		}
-
-		_definitionTemplate.Write(_definitionTemplateNode.AbsolutePath); // it is safe to write here?
-		return true;
 	}
 }

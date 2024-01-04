@@ -2,7 +2,7 @@ using Migration;
 
 namespace Mine.Studio;
 
-[Serializable]
+[Serializable, SerializedClassId("c62608e0-7dd6-4235-97e3-9462ad82726c")]
 public abstract class DefinitionAssetValue
 {
 	public abstract Type InspectorControlType { get; }
