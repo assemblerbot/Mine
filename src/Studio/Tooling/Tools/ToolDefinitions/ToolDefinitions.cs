@@ -209,7 +209,7 @@ public sealed class ToolDefinitions : Tool
 			
 			ProjectScriptFileNode? templateNode = StudioModel.Project.FindScriptNodeByGuid(_definitionAsset.Template.Header.Guid);
 			_definitionTemplateNode = templateNode;
-			_definitionAssetEditor  = new ToolDefinitionAssetEditor(_definitionAsset);
+			_definitionAssetEditor  = new ToolDefinitionAssetEditor(_definitionAsset, NameId + ".asset_editor");
 		}
 
 		// try to read script node

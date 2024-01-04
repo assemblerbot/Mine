@@ -3,6 +3,9 @@
 public class CommandHistory : ICommandHistory
 {
 	public readonly int Capacity;
+	
+	public bool CanUndo => _executionIndex >= 0;
+	public bool CanRedo => _executionIndex < _stack.Count - 1; 
 
 	private List<Command> _stack = new();
 	private int           _executionIndex;
@@ -39,7 +42,7 @@ public class CommandHistory : ICommandHistory
     
 	public virtual void Undo()
 	{
-		if (_executionIndex >= 0)
+		if (CanUndo)
 		{
 			var command = _stack[_executionIndex];
 			command.Undo();
@@ -50,7 +53,7 @@ public class CommandHistory : ICommandHistory
 
 	public virtual void Redo()
 	{
-		if (_executionIndex < _stack.Count - 1)
+		if (CanRedo)
 		{
 			++_executionIndex;
 
