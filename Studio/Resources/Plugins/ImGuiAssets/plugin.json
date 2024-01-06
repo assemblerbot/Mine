@@ -2,7 +2,7 @@
   "Id":"ImGuiAssets",
   "Name":"ImGui assets",
   "Description" : "Assets required by ImGui component plugin.",
-  "Version":"0.0.0",
+  "Version":"1.0.0",
   "Dependencies":[],
   "Target":"Assets"
 }

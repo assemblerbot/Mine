@@ -117,7 +117,7 @@ public sealed class InspectorListControl : InspectorControl
 
 	private void UpdateReadOnlyTreeStyle()
 	{
-		if (Gui.TreeNodeEx(LabelId, ImGuiTreeNodeFlags.AllowItemOverlap))
+		if (Gui.TreeNodeEx(LabelId, ImGuiTreeNodeFlags.AllowOverlap))
 		{
 			for(int i = 0; i < _controls.Count; ++i)
 			{
@@ -142,7 +142,7 @@ public sealed class InspectorListControl : InspectorControl
 
 	private void UpdateEditableTreeStyle(IList list, ref bool createNewElement, ref int deleteElementIndex)
 	{
-		if (Gui.TreeNodeEx(LabelId, ImGuiTreeNodeFlags.AllowItemOverlap))
+		if (Gui.TreeNodeEx(LabelId, ImGuiTreeNodeFlags.AllowOverlap))
 		{
 			if (!_isReadOnly)
 			{

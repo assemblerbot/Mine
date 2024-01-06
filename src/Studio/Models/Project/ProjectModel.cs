@@ -518,7 +518,7 @@ public sealed class ProjectModel
 	{
 		{
 			int    index      = eventRelativePath.LastIndexOfAny(_slash);
-			string parentPath = eventRelativePath.Substring(0, index);
+			string parentPath = index == -1 ? "" : eventRelativePath.Substring(0, index);
 			string nodeName   = eventRelativePath.Substring(index + 1);
 			EnqueueProjectTaskFromWatcher(CreateDeleteNodeTask(_scriptsFolder!, parentPath, nodeName));
 		}
@@ -671,8 +671,13 @@ public sealed class ProjectModel
 							return;
 						}
 
-						ProjectNode child = parent.Children[index];
-						File.Delete(child.AbsolutePath + ".meta");
+						ProjectNode child    = parent.Children[index];
+						string      metaPath = child.AbsolutePath + ".meta";
+						if (File.Exists(metaPath))
+						{
+							File.Delete(metaPath);
+						}
+
 						parent.Children.RemoveAt(index);
 					}
 				}

@@ -21,16 +21,12 @@ public sealed class ImGuiComponent : Component, IUpdatable, IRenderable
 	public int RenderOrder = Int32.MaxValue;
 	public int GetRenderOrder() => RenderOrder;
 	
-	private ImGuiRenderer _renderer;
-	private CommandList   _commandList;
-	
-	private ImGuiInputSnapshot _imGuiInputSnapshot;
+	private readonly ImGuiRenderer _renderer;
+	private readonly CommandList   _commandList;
 	
 	public ImGuiComponent()
 	{
 		Vector2D<int> windowSize = Engine.Window.Size;
-		
-		_imGuiInputSnapshot = new ImGuiInputSnapshot();
 		
 		_renderer = new ImGuiRenderer(
 			Engine.Renderer.Device,
@@ -82,6 +78,7 @@ public sealed class ImGuiComponent : Component, IUpdatable, IRenderable
 				                      OversampleV        = 1,
 				                      PixelSnapH         = 1,
 				                      RasterizerMultiply = 1,
+				                      RasterizerDensity  = 1,
 				                      GlyphMinAdvanceX   = 1,
 				                      GlyphMaxAdvanceX   = 256,
 			                      };
@@ -116,6 +113,7 @@ public sealed class ImGuiComponent : Component, IUpdatable, IRenderable
 					                      OversampleV        = 1,
 					                      PixelSnapH         = 1,
 					                      RasterizerMultiply = 1,
+					                      RasterizerDensity  = 1,
 					                      GlyphMinAdvanceX   = 1,
 					                      GlyphMaxAdvanceX   = 256,
 				                      };
@@ -128,7 +126,6 @@ public sealed class ImGuiComponent : Component, IUpdatable, IRenderable
 	public override void Dispose()
 	{
 		_renderer.ClearCachedImageResources();
-		_renderer.DestroyDeviceObjects();
 		_renderer.Dispose();
 
 		_commandList.Dispose();
@@ -137,22 +134,21 @@ public sealed class ImGuiComponent : Component, IUpdatable, IRenderable
 	public void Update(double timeDelta)
 	{
 		UpdateCursor();
-		_imGuiInputSnapshot.Update();
-		_renderer?.Update((float)timeDelta, _imGuiInputSnapshot);
+		_renderer.Update((float)timeDelta);
 	}
 
 	public void Render()
 	{
 		_commandList.Begin();
 		_commandList.SetFramebuffer(Engine.Renderer.Device.SwapchainFramebuffer);
-		_renderer?.Render(Engine.Renderer.Device, _commandList);
+		_renderer.Render(Engine.Renderer.Device, _commandList);
 		_commandList.End();
 		Engine.Renderer.Device.SubmitCommands(_commandList);
 	}
 	
 	public void WindowResized(Vector2Int size)
 	{
-		_renderer?.WindowResized(size.x, size.y);
+		_renderer.WindowResized(size.x, size.y);
 	}
 	
 	private void UpdateCursor()
