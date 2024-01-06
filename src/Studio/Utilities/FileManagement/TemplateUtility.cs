@@ -19,7 +19,7 @@ public static class TemplateUtility
 		
 		FileUtility.ReplaceTextInFilesRecursive(targetPath, fileName => fileName.EndsWith(".cs"), "Template", projectName);
 
-		UpdateFromTemplate(targetPath);
+		//UpdateLibrariesFromTemplate(targetPath);
 	}
 
 	// check if libraries in target path are up to date with template
@@ -27,6 +27,11 @@ public static class TemplateUtility
 	{
 		string sourceLibrariesPath = Path.Combine(_templatePath, _librariesPath);
 		string targetLibrariesPath = Path.Combine(targetPath,    _librariesPath);
+
+		if (!Directory.Exists(sourceLibrariesPath) || !Directory.Exists(targetLibrariesPath))
+		{
+			return false; // nothing to update, folder structure is different
+		}
 
 		DirectoryInfo sourceDirectory = new DirectoryInfo(sourceLibrariesPath);
 		
@@ -60,7 +65,7 @@ public static class TemplateUtility
 	}
 	
 	// update just libraries in target path from template
-	public static void UpdateFromTemplate(string targetPath)
+	public static void UpdateLibrariesFromTemplate(string targetPath)
 	{
 		string sourceLibrariesPath = Path.Combine(_templatePath, _librariesPath);
 		string targetLibrariesPath = Path.Combine(targetPath,    _librariesPath);

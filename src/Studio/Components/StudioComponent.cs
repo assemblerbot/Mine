@@ -13,20 +13,26 @@ public sealed class StudioComponent : Component, IUpdatable
 {
 	public int GetUpdateOrder() => 0;
 
-	private StudioModel _studioModel = new();
+	private readonly StudioModel _studioModel = new();
 
-	private ToolManager _toolManager = new();
+	private readonly ToolManager _toolManager = new();
 	
 	#region User Interface
-	private readonly DockSpace        _dockSpace        = new();
-	private readonly Menu             _menu             = new(MenuStyle.MainMenu);
-	private readonly StatusBar        _statusBar        = new();
-	private          ObjectDialog     _projectSettings  = null!;
-	private          ObjectDialog     _studioSettings   = null!;
-	private          NewProjectDialog _newProjectDialog = null!;
-	private readonly MessageBox       _messageBox       = new();
+	private readonly DockSpace               _dockSpace        = new();
+	private readonly Menu                    _menu             = new(MenuStyle.MainMenu);
+	private readonly StatusBar               _statusBar        = new();
+	private          ObjectDialog            _projectSettings  = null!;
+	private          ObjectDialog            _studioSettings   = null!;
+	private          NewProjectDialog        _newProjectDialog = null!;
+	private readonly MessageBox              _messageBox       = new();
+	private readonly StatusBarMessageHandler _statusBarMessageHandler;
 	#endregion
-	
+
+	public StudioComponent()
+	{
+		_statusBarMessageHandler = new StatusBarMessageHandler(_statusBar, _studioModel);
+	}
+
 	public override void AfterAddedToScene()
 	{
 		Engine.Scene.RegisterUpdatable(this);
@@ -45,8 +51,6 @@ public sealed class StudioComponent : Component, IUpdatable
 		
 		Engine.Scene.Add(new GameObject("Test Object").AddComponent<TestRenderComponent>().GameObject);
 
-		_statusBar.Message = "Ready";
-
 		// List<int> test   = new() {2, 4, 6, 8, 10, 12, 13};
 		// int       index0 = test.FindInsertionIndexBinary(x => x.CompareTo(0));
 		// int       index1 = test.FindInsertionIndexBinary(x => x.CompareTo(15));
@@ -56,7 +60,7 @@ public sealed class StudioComponent : Component, IUpdatable
 		// int       index5 = test.FindInsertionIndexBinary(x => x.CompareTo(12));
 		//
 		// int d=0;
-		
+
 		//Engine.Window.
 	}
 
@@ -79,6 +83,7 @@ public sealed class StudioComponent : Component, IUpdatable
 		_dockSpace.Update();
 		_menu.Update();
 		_menu.InvokeClickActions();
+		_statusBarMessageHandler.Update();
 		_statusBar.Update();
 		_projectSettings.Update();
 		_studioSettings.Update();
