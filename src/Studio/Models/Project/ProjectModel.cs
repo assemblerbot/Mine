@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Reflection;
 using Migration;
+using Mine.Studio;
 using RedHerring.Studio.Models.Project.FileSystem;
 using RedHerring.Studio.Models.Project.Importers;
 using RedHerring.Studio.Models.ViewModels.Console;
@@ -40,6 +41,9 @@ public sealed class ProjectModel
 
 	private ProjectSettings? _projectSettings;
 	public  ProjectSettings  ProjectSettings => _projectSettings!;
+
+	public bool IsOpened               => !string.IsNullOrEmpty(_projectSettings?.ProjectFolderPath);
+	public bool NeedsUpdateEngineFiles { get; private set; } = false;
 
 	private          FileSystemWatcher?           _assetsWatcher;
 	private          FileSystemWatcher?           _scriptsWatcher;
@@ -121,6 +125,8 @@ public sealed class ProjectModel
 			}
 		}
 
+		EnqueueProjectTask(CreateEngineFilesCheckTask(projectPath));
+		
 		InitMeta();
 
 		ImportAll();
@@ -526,7 +532,20 @@ public sealed class ProjectModel
 	}
 	#endregion
 	
+	#region Engine files manipulation
+	public void UpdateEngineFiles()
+	{
+		EnqueueProjectTask(CreateEngineFilesUpdateTask(_projectSettings!.ProjectFolderPath));
+		EnqueueProjectTask(CreateEngineFilesCheckTask(_projectSettings!.ProjectFolderPath));
+	}
+	#endregion
+	
 	#region Tasks
+	private void EnqueueProjectTask(ProjectTask task)
+	{
+		_thread.Enqueue(task);
+	}
+	
 	private ProjectTask CreateNewFolderNodeTask(ProjectRootNode root, string parentPath, string name, bool hasMetaFile, ProjectNodeType type)
 	{
 		return new ProjectTask(
@@ -682,6 +701,26 @@ public sealed class ProjectModel
 						parent.Children.RemoveAt(index);
 					}
 				}
+			}
+		);
+	}
+
+	private ProjectTask CreateEngineFilesCheckTask(string projectRootPath)
+	{
+		return new ProjectTask(
+			cancellationToken =>
+			{
+				NeedsUpdateEngineFiles = TemplateUtility.NeedsUpdateFromTemplate(projectRootPath);
+			}
+		);
+	}
+
+	private ProjectTask CreateEngineFilesUpdateTask(string projectRootPath)
+	{
+		return new ProjectTask(
+			cancellationToken =>
+			{
+				TemplateUtility.UpdateLibrariesFromTemplate(projectRootPath);
 			}
 		);
 	}

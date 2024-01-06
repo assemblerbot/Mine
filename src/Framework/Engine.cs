@@ -45,7 +45,7 @@ public sealed class Engine
 
 	private bool _exitRequested = false;
 
-	public        Action<bool>?  OnFocusChanged;
+	public         Action<bool>?  OnFocusChanged;
 	private        bool          _hasFocus = true;
 	public  static bool          HasFocus => _instance._hasFocus;
 	

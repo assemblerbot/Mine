@@ -8,7 +8,7 @@ namespace RedHerring.Studio.Models;
 [Serializable, SerializedClassId("project-settings")]
 public sealed class ProjectSettings
 {
-	[ReadOnlyInInspector, NonSerialized] public string ProjectFolderPath = "[here will be path to game folder]";
+	[ReadOnlyInInspector, NonSerialized] public string ProjectFolderPath = "";
 
 	[NonSerialized] private string? _relativeResourcesPath;
 	public                  string  RelativeResourcesPath => _relativeResourcesPath ??= Engine.ResourcesPath;

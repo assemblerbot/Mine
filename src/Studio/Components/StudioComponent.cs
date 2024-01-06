@@ -119,6 +119,8 @@ public sealed class StudioComponent : Component, IUpdatable
 		_menu.AddItem("View/Plugins",     OnViewPluginsClicked);
 		_menu.AddItem("View/Definitions", OnViewDefinitionsClicked);
 
+		_menu.AddItem("Project/Update engine files", OnProjectUpdateEngineFilesClicked, () => _studioModel.Project.IsOpened);
+		
 		_menu.AddItem("Debug/Modal window",        () => ImGui.OpenPopup("MessageBox"));
 		_menu.AddItem("Debug/Task processor test", OnDebugTaskProcessorTestClicked);
 		_menu.AddItem("Debug/Serialization test",  OnDebugSerializationTestClicked);
@@ -191,6 +193,11 @@ public sealed class StudioComponent : Component, IUpdatable
 	private void OnViewDefinitionsClicked()
 	{
 		_toolManager.Activate(ToolDefinitions.ToolName);
+	}
+
+	private void OnProjectUpdateEngineFilesClicked()
+	{
+		_studioModel.Project.UpdateEngineFiles();
 	}
 
 	private void OnDebugTaskProcessorTestClicked()
