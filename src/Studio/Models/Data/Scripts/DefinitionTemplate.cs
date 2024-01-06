@@ -75,7 +75,7 @@ public sealed class DefinitionTemplate
 		_className     = className;
 	}
 
-	public void Write(string path)
+	public void WriteToFile(string path)
 	{
 		using StreamWriter stream = File.CreateText(path);
 

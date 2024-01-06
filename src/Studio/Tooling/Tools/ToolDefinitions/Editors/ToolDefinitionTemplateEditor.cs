@@ -119,7 +119,7 @@ public class ToolDefinitionTemplateEditor
 			return false;
 		}
 
-		_definitionTemplate.Write(_definitionTemplateNode.AbsolutePath); // it is safe to write here?
+		_definitionTemplate.WriteToFile(_definitionTemplateNode.AbsolutePath); // it is safe to write here?
 		return true;
 	}
 }

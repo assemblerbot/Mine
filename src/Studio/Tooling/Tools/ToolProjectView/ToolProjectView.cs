@@ -191,7 +191,7 @@ public sealed class ToolProjectView : Tool
 		try
 		{
 			DefinitionTemplate template = new(namespaceName, className);
-			template.Write(path);
+			template.WriteToFile(path);
 		}
 		catch (Exception e)
 		{

@@ -640,7 +640,7 @@ public sealed class ProjectModel
 				try
 				{
 					using Stream   stream = File.OpenRead(node.AbsolutePath);
-					ImporterResult result = importer.Import(stream, node.Meta.ImporterSettings, resourcePath, cancellationToken);
+					ImporterResult result = importer.Import(stream, node.Meta.ImporterSettings, resourcePath, _migrationManager, cancellationToken);
 
 					if (result == ImporterResult.FinishedSettingsChanged)
 					{

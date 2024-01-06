@@ -4,8 +4,8 @@ namespace RedHerring.Studio.Models.Project.Importers;
 
 public sealed class ImporterRegistry
 {
-	private Dictionary<string, Importer> _importers        = new();
-	private Importer                     _fallbackImporter = new CopyImporter();
+	private readonly Dictionary<string, Importer> _importers        = new();
+	private readonly Importer                     _fallbackImporter = new CopyImporter();
 
 	public ImporterRegistry()
 	{

@@ -8,6 +8,11 @@ public sealed class DefinitionAssetValueInt : DefinitionAssetValue
 {
 	public override Type InspectorControlType => typeof(InspectorIntControl);
 	public          int  Value;
+
+	public override void WriteJsonValue(StringWriter stringWriter)
+	{
+		stringWriter.Write(Value);
+	}
 }
 
 #region Migration

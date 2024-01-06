@@ -8,6 +8,13 @@ public sealed class DefinitionAssetValueString : DefinitionAssetValue
 {
 	public override Type   InspectorControlType => typeof(InspectorStringControl);
 	public          string Value;
+
+	public override void WriteJsonValue(StringWriter stringWriter)
+	{
+		stringWriter.Write('"');
+		stringWriter.Write(Value);
+		stringWriter.Write('"');
+	}
 }
 
 #region Migration

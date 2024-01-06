@@ -6,6 +6,7 @@ namespace Mine.Studio;
 public abstract class DefinitionAssetValue
 {
 	public abstract Type InspectorControlType { get; }
+	public abstract void WriteJsonValue(StringWriter stringWriter);
 }
 
 #region Migration

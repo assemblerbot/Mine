@@ -8,6 +8,11 @@ public sealed class DefinitionAssetValueBool : DefinitionAssetValue
 {
 	public override Type InspectorControlType => typeof(InspectorBoolControl);
 	public          bool Value;
+
+	public override void WriteJsonValue(StringWriter stringWriter)
+	{
+		stringWriter.Write(Value ? "true" : "false");
+	}
 }
 
 #region Migration

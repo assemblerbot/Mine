@@ -16,6 +16,14 @@ public sealed class DefinitionAsset
 		_template = template;
 	}
 
+	public static DefinitionAsset? CreateFromStream(Stream stream, MigrationManager migrationManager)
+	{
+		byte[] json = new byte[stream.Length];
+		int    read = stream.Read(json, 0, json.Length);
+		DefinitionAsset asset = MigrationSerializer.Deserialize<DefinitionAsset, IDefinitionAssetMigratable>(migrationManager.TypesHash, json, SerializedDataFormat.JSON, migrationManager);
+		return asset;
+	}
+
 	public static DefinitionAsset? CreateFromFile(string path, MigrationManager migrationManager)
 	{
 		byte[] json = File.ReadAllBytes(path);
@@ -27,6 +35,49 @@ public sealed class DefinitionAsset
 	{
 		byte[] json = MigrationSerializer.Serialize(this, SerializedDataFormat.JSON);
 		File.WriteAllBytes(path, json);
+	}
+
+	public void ImportToResources(string path)
+	{
+		StringWriter stringWriter = new ();
+
+		stringWriter.Write('[');
+		for(int rowIndex=0; rowIndex<Rows.Count; ++rowIndex)
+		{
+			DefinitionAssetRow row = Rows[rowIndex];
+
+			stringWriter.Write('{');
+			for (int fieldIndex = 0; fieldIndex < Template.Fields.Count; ++fieldIndex)
+			{
+				DefinitionTemplateField? field = Template.Fields[fieldIndex];
+				if (field == null)
+				{
+					continue;
+				}
+
+				stringWriter.Write('"');
+				stringWriter.Write(field.Name);
+				stringWriter.Write('"');
+				
+				stringWriter.Write(':');
+
+				row.Values[fieldIndex].WriteJsonValue(stringWriter);
+
+				if (fieldIndex < Template.Fields.Count - 1)
+				{
+					stringWriter.Write(',');
+				}
+			}
+			stringWriter.Write('}');
+			
+			if (rowIndex < Rows.Count - 1)
+			{
+				stringWriter.Write(',');
+			}
+		}
+		stringWriter.Write(']');
+
+		File.WriteAllText(path, stringWriter.ToString());
 	}
 }
 

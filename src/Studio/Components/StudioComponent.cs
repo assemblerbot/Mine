@@ -1,3 +1,4 @@
+using System.Text.Json;
 using ImGuiNET;
 using Mine.Framework;
 using Mine.ImGuiPlugin;
@@ -198,6 +199,10 @@ public sealed class StudioComponent : Component, IUpdatable
 	private void OnDebugSerializationTestClicked()
 	{
 //		SerializationTests.Test();
+		List<DefinitionTemplateTest> templates = new() {new DefinitionTemplateTest(), new DefinitionTemplateTest(), new DefinitionTemplateTest()};
+
+		string json = JsonSerializer.Serialize(templates);
+		File.WriteAllText("D:\\Tmp\\serialization_test.json", json);
 	}
 
 	private void OnDebugImporterTestClicked()
@@ -231,3 +236,39 @@ public sealed class StudioComponent : Component, IUpdatable
 	}
 	#endregion
 }
+
+	
+public sealed class DefinitionTemplateTest
+{
+	//--- data begin ---
+	public int    IntField    {get; private set;}
+	public float  FloatField  {get; private set;}
+	public string StringField {get; private set;}
+	public bool   MyField     {get; private set;}
+	//--- data end ---
+}
+
+/*
+ 
+ [
+    {
+        "IntField": 0,
+        "FloatField": 0,
+        "StringField": null,
+        "MyField": false
+    },
+    {
+        "IntField": 0,
+        "FloatField": 0,
+        "StringField": null,
+        "MyField": false
+    },
+    {
+        "IntField": 0,
+        "FloatField": 0,
+        "StringField": null,
+        "MyField": false
+    }
+]
+ 
+ */
