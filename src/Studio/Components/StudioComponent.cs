@@ -120,6 +120,9 @@ public sealed class StudioComponent : Component, IUpdatable
 		_menu.AddItem("View/Definitions", OnViewDefinitionsClicked);
 
 		_menu.AddItem("Project/Update engine files", OnProjectUpdateEngineFilesClicked, () => _studioModel.Project.IsOpened);
+		_menu.AddItem("Project/Clear Resources",     OnProjectClearResourcesClicked,    () => _studioModel.Project.IsOpened);
+		_menu.AddItem("Project/Reimport all",        OnProjectReimportAllClicked,       () => _studioModel.Project.IsOpened);
+		_menu.AddItem("Project/Import changed",      OnProjectImportChangedClicked,       () => _studioModel.Project.IsOpened);
 		
 		_menu.AddItem("Debug/Modal window",        () => ImGui.OpenPopup("MessageBox"));
 		_menu.AddItem("Debug/Task processor test", OnDebugTaskProcessorTestClicked);
@@ -198,6 +201,22 @@ public sealed class StudioComponent : Component, IUpdatable
 	private void OnProjectUpdateEngineFilesClicked()
 	{
 		_studioModel.Project.UpdateEngineFiles();
+	}
+
+	private void OnProjectClearResourcesClicked()
+	{
+		_studioModel.Project.ClearResources();
+	}
+
+	private void OnProjectReimportAllClicked()
+	{
+		_studioModel.Project.ClearResources();
+		_studioModel.Project.ImportAll();
+	}
+
+	private void OnProjectImportChangedClicked()
+	{
+		_studioModel.Project.ImportAll();
 	}
 
 	private void OnDebugTaskProcessorTestClicked()

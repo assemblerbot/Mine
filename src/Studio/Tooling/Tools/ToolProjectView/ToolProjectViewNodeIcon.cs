@@ -9,7 +9,7 @@ public static class ToolProjectViewNodeIcon
 	{
 		return type switch
 		{
-			ProjectNodeType.Uninitialized => "?",
+			ProjectNodeType.Uninitialized => FontAwesome6.CircleQuestion,
 			
 			ProjectNodeType.AssetBinary => FontAwesome6.File,
 			ProjectNodeType.AssetFolder => FontAwesome6.Folder,
@@ -21,7 +21,7 @@ public static class ToolProjectViewNodeIcon
 			ProjectNodeType.ScriptFolder => FontAwesome6.Folder,
 			ProjectNodeType.ScriptDefinitionTemplate => FontAwesome6.TableColumns,
 
-			_ => "???"
+			_ => FontAwesome6.Ban
 		};
 	}
 }
