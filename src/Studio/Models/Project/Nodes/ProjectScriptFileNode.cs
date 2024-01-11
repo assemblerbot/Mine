@@ -22,7 +22,7 @@ public class ProjectScriptFileNode : ProjectNode
 		if(header != null)
 		{
 			guid = header.Guid;
-			SetNodeType(ProjectNodeType.ScriptDefinitionTemplate);
+			SetNodeType(ProjectNodeType.ScriptDefinition);
 		}
 
 		Meta = new Metadata

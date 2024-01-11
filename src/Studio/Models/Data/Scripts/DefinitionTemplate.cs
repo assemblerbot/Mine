@@ -82,17 +82,26 @@ public sealed class DefinitionTemplate
 		stream.WriteLine(_header.ToHeaderString());
 		stream.WriteLine("//THIS FILE WAS GENERATED! DON'T MODIFY IT. ONLY THE NAMESPACE AND THE CLASS NAME CAN BE MODIFIED SAFELY!");
 
+		stream.WriteLine("using Mine.Framework;");
+		
 		if (!string.IsNullOrEmpty(_namespaceName))
 		{
 			stream.WriteLine($"namespace {_namespaceName};");
 		}
 
-		stream.WriteLine($"public sealed class {_className}");
+		stream.WriteLine($"public sealed class {_className} : Definition");
 		stream.WriteLine("{");
 		stream.WriteLine("	" + _dataBegin);
 		foreach (DefinitionTemplateField field in _fields)
 		{
-			stream.WriteLine($"	public {field.Type.ToCSharpType()} {field.Name} {{get; private set;}}");
+			if (string.IsNullOrEmpty(field.GenericParameter))
+			{
+				stream.WriteLine($"	public {field.Type.ToCSharpType()} {field.Name};");
+			}
+			else
+			{
+				stream.WriteLine($"	public {field.Type.ToCSharpType()}<{field.GenericParameter}> {field.Name};");
+			}
 		}
 		stream.WriteLine("	" + _dataEnd);
 		stream.WriteLine("}");
@@ -121,6 +130,7 @@ public sealed class DefinitionTemplate
 		Regex classRegex     = new (@"class\s+(\w+)", RegexOptions.Compiled);
 		Regex namespaceRegex = new (@"namespace\s+(\w+)", RegexOptions.Compiled);
 		Regex propertyRegex  = new (@"public\s+(\w+)\s+(\w+)", RegexOptions.Compiled);
+		Regex genericPropertyRegex  = new (@"public\s+(\w+)<(\w+)>\s+(\w+)", RegexOptions.Compiled);
 		
 		// parse line by line
 		bool classNameParsed     = false;
@@ -144,16 +154,25 @@ public sealed class DefinitionTemplate
 				}
 
 				Match propertyMatch = propertyRegex.Match(line);
-				if (!propertyMatch.Success)
+				if (propertyMatch.Success)
 				{
-					continue;
+					// type without generic parameter
+					string propertyType = propertyMatch.Groups[1].Captures[0].ToString();
+					string propertyName = propertyMatch.Groups[2].Captures[0].ToString();
+
+					DefinitionTemplateField field = new(propertyType.ToTemplateType(), propertyName);
+					_fields.Add(field);
 				}
+				else if((propertyMatch = genericPropertyRegex.Match(line)).Success)
+				{
+					// type with generic parameter
+					string propertyType     = propertyMatch.Groups[1].Captures[0].ToString();
+					string genericParameter = propertyMatch.Groups[2].Captures[0].ToString();
+					string propertyName     = propertyMatch.Groups[3].Captures[0].ToString();
 
-				string propertyType = propertyMatch.Groups[1].Captures[0].ToString();
-				string propertyName = propertyMatch.Groups[2].Captures[0].ToString();
-
-				DefinitionTemplateField  field = new(propertyType.ToTemplateType(), propertyName);
-				_fields.Add(field);
+					DefinitionTemplateField field = new(propertyType.ToTemplateType(), propertyName, genericParameter);
+					_fields.Add(field);
+				}
 			}
 			else
 			{

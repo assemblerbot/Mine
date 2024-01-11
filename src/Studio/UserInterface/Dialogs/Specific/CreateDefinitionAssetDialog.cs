@@ -81,7 +81,7 @@ public class CreateDefinitionAssetDialog
 		_projectModel.ScriptsFolder!.TraverseRecursive(
 			node =>
 			{
-				if (node.Type == ProjectNodeType.ScriptDefinitionTemplate)
+				if (node.Type == ProjectNodeType.ScriptDefinition)
 				{
 					_templates.Add((ProjectScriptFileNode)node);
 				}

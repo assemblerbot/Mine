@@ -8,11 +8,11 @@ public enum ProjectNodeType
 	AssetImage,
 	AssetMesh,
 	AssetBinary,
-	AssetDefinitionData,
+	AssetDefinition,
 	
 	ScriptFolder,
 	ScriptFile,
-	ScriptDefinitionTemplate,
+	ScriptDefinition,
 }
 
 public static class ProjectNodeTypeExtensions
@@ -24,7 +24,7 @@ public static class ProjectNodeTypeExtensions
 			type == ProjectNodeType.AssetImage  ||
 			type == ProjectNodeType.AssetMesh   ||
 			type == ProjectNodeType.AssetBinary ||
-			type == ProjectNodeType.AssetDefinitionData;
+			type == ProjectNodeType.AssetDefinition;
 	}
 
 	public static bool IsScriptsRelated(this ProjectNodeType type)
@@ -32,6 +32,6 @@ public static class ProjectNodeTypeExtensions
 		return
 			type == ProjectNodeType.ScriptFolder ||
 			type == ProjectNodeType.ScriptFile   ||
-			type == ProjectNodeType.ScriptDefinitionTemplate;
+			type == ProjectNodeType.ScriptDefinition;
 	}
 }

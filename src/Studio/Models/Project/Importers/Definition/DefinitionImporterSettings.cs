@@ -6,7 +6,7 @@ namespace RedHerring.Studio.Models.Project.Importers;
 [Serializable, SerializedClassId("7d81811d-0a7a-4e75-86b8-c99d389950b3")]
 public sealed class DefinitionImporterSettings : ImporterSettings
 {
-	public override ProjectNodeType NodeType => ProjectNodeType.AssetDefinitionData;
+	public override ProjectNodeType NodeType => ProjectNodeType.AssetDefinition;
 }
 
 #region Migration

@@ -232,8 +232,12 @@ public sealed class StudioComponent : Component, IUpdatable
 //		SerializationTests.Test();
 		List<DefinitionTemplateTest> templates = new() {new DefinitionTemplateTest(), new DefinitionTemplateTest(), new DefinitionTemplateTest()};
 
-		string json = JsonSerializer.Serialize(templates);
+		string json = JsonSerializer.Serialize(templates, new JsonSerializerOptions{IncludeFields = true});
 		File.WriteAllText("D:\\Tmp\\serialization_test.json", json);
+
+		List<DefinitionTemplateTest>? deserialized = JsonSerializer.Deserialize<List<DefinitionTemplateTest>>(json, new JsonSerializerOptions {IncludeFields = true});
+
+		int d = 0;
 	}
 
 	private void OnDebugImporterTestClicked()
@@ -268,14 +272,36 @@ public sealed class StudioComponent : Component, IUpdatable
 	#endregion
 }
 
-	
+public class ReferenceTest
+{
+}
+
+public class ReferenceTestString : ReferenceTest
+{
+	public string StrValue;
+}
+
+public class ReferenceTestInt : ReferenceTest
+{
+	public int IntValue;
+}
+
+public sealed class GenericReference<T> where T : ReferenceTest
+{
+	public string Guid;
+	public string Path;
+	public T      Value;
+}
+
 public sealed class DefinitionTemplateTest
 {
 	//--- data begin ---
-	public int    IntField    {get; private set;}
-	public float  FloatField  {get; private set;}
-	public string StringField {get; private set;}
-	public bool   MyField     {get; private set;}
+	public int    IntField;
+	public float  FloatField;
+	public string StringField;
+	public bool   MyField;
+
+	public GenericReference<ReferenceTestInt> Reference = new GenericReference<ReferenceTestInt>() {Guid = "guid", Path = "path", Value = new ReferenceTestInt() {IntValue = 523}};
 	//--- data end ---
 }
 
