@@ -4,5 +4,6 @@ namespace Mine.Framework;
 public sealed class MeshReference : Reference
 {
 	public override ReferenceKind Kind => ReferenceKind.AssetMesh;
+
 	//public          Mesh          ReferencedMesh;
 }

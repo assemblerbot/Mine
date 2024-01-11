@@ -27,7 +27,10 @@ public sealed class ToolDefinitionAssetEditor : IInspectorCommandTarget
 				InspectorControl control = (InspectorControl) Activator.CreateInstance(value.InspectorControlType, commandTarget, $"tool_asset_editor_control.{uniqueIdGenerator()}")!;
 				Controls.Add(control);
 
-				control.InitFromSource(row, value, value.GetType().GetFields()[0]);
+				control.InitFromSource(row, value, value.GetType().GetFields()[0]); // TODO - this is wrong:
+				// field info should be returned from value, not just first field
+				// reference is bound in wrong way, reference should be bound as class not as some field inside it
+				// normalize: too hacky, should be much cleaner
 				control.SetCustomLabel("");
 			}
 
@@ -68,7 +71,7 @@ public sealed class ToolDefinitionAssetEditor : IInspectorCommandTarget
 						return;
 					}
 
-					_assetRow.Values.Add(field.Type.ToDefinitionAssetValue());
+					_assetRow.Values.Add(field.Type.ToDefinitionAssetValue(field.GenericParameter));
 				}
 
 				_controlsRow = new Row(_uniqueIdGenerator()).AddControls(_commandTarget, _assetRow, _uniqueIdGenerator);

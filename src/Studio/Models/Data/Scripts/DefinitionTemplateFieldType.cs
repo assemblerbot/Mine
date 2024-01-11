@@ -8,7 +8,9 @@ public enum DefinitionTemplateFieldType
 	Type_string = 2,
 	Type_bool   = 3,
 	
-	Type_AssetReference = 100,
+	Type_AssetReference      = 100,
+	Type_FolderReference     = 101,
+	Type_DefinitionReference = 102,
 }
 
 public static class DefinitionTemplateFiledTypeExtensions
@@ -25,7 +27,7 @@ public static class DefinitionTemplateFiledTypeExtensions
 			: DefinitionTemplateFieldType.Type_int;
 	}
 
-	public static DefinitionAssetValue ToDefinitionAssetValue(this DefinitionTemplateFieldType type)
+	public static DefinitionAssetValue ToDefinitionAssetValue(this DefinitionTemplateFieldType type, string genericParameter)
 	{
 		return type switch
 		{
@@ -34,6 +36,8 @@ public static class DefinitionTemplateFiledTypeExtensions
 			DefinitionTemplateFieldType.Type_string         => new DefinitionAssetValueString(),
 			DefinitionTemplateFieldType.Type_bool           => new DefinitionAssetValueBool(),
 			DefinitionTemplateFieldType.Type_AssetReference => new DefinitionAssetValueAssetReference(),
+			DefinitionTemplateFieldType.Type_FolderReference => new DefinitionAssetValueFolderReference(),
+			DefinitionTemplateFieldType.Type_DefinitionReference => new DefinitionAssetValueDefinitionReference(genericParameter),
 			_ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
 		};
 	}

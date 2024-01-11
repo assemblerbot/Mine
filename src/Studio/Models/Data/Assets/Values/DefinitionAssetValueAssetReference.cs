@@ -1,28 +1,19 @@
 using Migration;
-using RedHerring.Studio.UserInterface;
 
 namespace Mine.Studio;
 
 [Serializable, SerializedClassId("4018303e-635a-4a9d-9aa0-368586747f10")]
-public sealed class DefinitionAssetValueAssetReference : DefinitionAssetValue
+public sealed class DefinitionAssetValueAssetReference : DefinitionAssetValueReference
 {
-	public override Type   InspectorControlType => typeof(InspectorStringControl); // TODO
-	public          string Guid;
-
-	public override void WriteJsonValue(StringWriter stringWriter)
-	{
-		//TODO
-	}
+	public override string Name => "Asset";
 }
 
 #region Migration
-
 [MigratableInterface(typeof(DefinitionAssetValueAssetReference))]
-public interface IDefinitionAssetValueAssetReferenceMigratable : IDefinitionAssetValueMigratable;
+public interface IDefinitionAssetValueAssetReferenceMigratable : IDefinitionAssetValueReferenceMigratable;
     
 [Serializable, LatestVersion(typeof(DefinitionAssetValueAssetReference))]
-public class DefinitionAssetValueAssetReference_000 : DefinitionAssetValue_000, IDefinitionAssetValueAssetReferenceMigratable
+public class DefinitionAssetValueAssetReference_000 : DefinitionAssetValueReference_000, IDefinitionAssetValueAssetReferenceMigratable
 {
-	public string Guid;
 }
 #endregion
