@@ -12,4 +12,5 @@
 ## Game
 
 - source in Assets
-- game version in Resources built from Studio
+- Resources built from Studio
+- engine dlls managed from Studio

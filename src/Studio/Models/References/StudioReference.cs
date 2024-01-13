@@ -1,0 +1,30 @@
+using Migration;
+using RedHerring.Studio.UserInterface;
+
+namespace Mine.Studio;
+
+[Serializable, SerializedClassId("f82d86eb-7957-4c24-8b8d-3a1e04c86ec6")]
+public abstract class StudioReference
+{
+	public virtual Type   InspectorControlType => typeof(InspectorReferenceControl);
+	public abstract string Name { get; }
+
+	public          string Guid;
+
+	public virtual void WriteJsonValue(StringWriter stringWriter)
+	{
+		//TODO
+	}
+}
+
+#region Migration
+
+[MigratableInterface(typeof(StudioReference))]
+public interface IStudioReferenceMigratable;
+    
+[Serializable, LatestVersion(typeof(StudioReference))]
+public class StudioReference_000 : IStudioReferenceMigratable
+{
+	public string Guid;
+}
+#endregion

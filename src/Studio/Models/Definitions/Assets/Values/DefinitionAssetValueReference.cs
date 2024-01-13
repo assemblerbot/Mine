@@ -1,19 +1,25 @@
+using System.Reflection;
 using Migration;
 using RedHerring.Studio.UserInterface;
 
 namespace Mine.Studio;
 
-[Serializable, SerializedClassId("f82d86eb-7957-4c24-8b8d-3a1e04c86ec6")]
-public abstract class DefinitionAssetValueReference : DefinitionAssetValue
+[Serializable, SerializedClassId("6df13d2c-9faa-4f48-b230-32348a4e0638")]
+public class DefinitionAssetValueReference : DefinitionAssetValue
 {
-	public override Type   InspectorControlType => typeof(InspectorReferenceControl);
-	public abstract string Name { get; }
+	public override Type            InspectorControlType => typeof(InspectorReferenceControl);
+	public override FieldInfo       EditableField        => GetType().GetField(nameof(Value))!;
+	public          StudioReference Value;
 
-	public          string Guid;
+	public DefinitionAssetValueReference(StudioReference value)
+	{
+		Value = value;
+	}
 
 	public override void WriteJsonValue(StringWriter stringWriter)
 	{
-		//TODO
+		// TODO
+		//stringWriter.Write(Value);
 	}
 }
 
@@ -25,6 +31,6 @@ public interface IDefinitionAssetValueReferenceMigratable : IDefinitionAssetValu
 [Serializable, LatestVersion(typeof(DefinitionAssetValueReference))]
 public class DefinitionAssetValueReference_000 : DefinitionAssetValue_000, IDefinitionAssetValueReferenceMigratable
 {
-	public string Guid;
+	public int Value;
 }
 #endregion

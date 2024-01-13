@@ -35,9 +35,9 @@ public static class DefinitionTemplateFiledTypeExtensions
 			DefinitionTemplateFieldType.Type_float          => new DefinitionAssetValueFloat(),
 			DefinitionTemplateFieldType.Type_string         => new DefinitionAssetValueString(),
 			DefinitionTemplateFieldType.Type_bool           => new DefinitionAssetValueBool(),
-			DefinitionTemplateFieldType.Type_AssetReference => new DefinitionAssetValueAssetReference(),
-			DefinitionTemplateFieldType.Type_FolderReference => new DefinitionAssetValueFolderReference(),
-			DefinitionTemplateFieldType.Type_DefinitionReference => new DefinitionAssetValueDefinitionReference(genericParameter),
+			DefinitionTemplateFieldType.Type_AssetReference => new DefinitionAssetValueReference(new StudioAssetReference()),
+			DefinitionTemplateFieldType.Type_FolderReference => new DefinitionAssetValueReference(new StudioFolderReference()),
+			DefinitionTemplateFieldType.Type_DefinitionReference => new DefinitionAssetValueReference(new StudioDefinitionReference(genericParameter)),
 			_ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
 		};
 	}
