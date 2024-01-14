@@ -4,7 +4,7 @@ namespace RedHerring.Studio.UserInterface;
 
 public class InspectorValueDropdownStringControl : InspectorValueDropdownControl<string>
 {
-	public InspectorValueDropdownStringControl(IInspectorCommandTarget commandTarget, string id) : base(commandTarget, id)
+	public InspectorValueDropdownStringControl(IInspector inspector, string id) : base(inspector, id)
 	{
 	}
 

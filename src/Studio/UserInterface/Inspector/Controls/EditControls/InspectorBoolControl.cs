@@ -5,7 +5,7 @@ namespace RedHerring.Studio.UserInterface;
 
 public class InspectorBoolControl : InspectorSingleInputControl<bool>
 {
-	public InspectorBoolControl(IInspectorCommandTarget commandTarget, string id) : base(commandTarget, id)
+	public InspectorBoolControl(IInspector inspector, string id) : base(inspector, id)
 	{
 	}
 

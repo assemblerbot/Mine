@@ -1,4 +1,5 @@
 using Migration;
+using RedHerring.Studio.Models.Project.FileSystem;
 
 namespace Mine.Studio;
 
@@ -6,6 +7,15 @@ namespace Mine.Studio;
 public sealed class StudioFolderReference : StudioReference
 {
 	public override string Name => "Folder";
+	public override bool   CanAcceptNode(ProjectNode node)
+	{
+		return node.Type == ProjectNodeType.AssetFolder;
+	}
+
+	public override StudioReference CreateCopy()
+	{
+		return new StudioFolderReference {Guid = Guid};
+	}
 }
 
 #region Migration

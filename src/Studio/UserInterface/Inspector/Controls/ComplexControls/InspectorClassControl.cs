@@ -36,7 +36,7 @@ public sealed class InspectorClassControl : InspectorControl
 
 	private Type[]? _assignableTypes = null;
 
-	public InspectorClassControl(IInspectorCommandTarget commandTarget, string id) : base(commandTarget, id)
+	public InspectorClassControl(IInspector inspector, string id) : base(inspector, id)
 	{
 		_instantiationButtonId = id + ".button";
 		_instantiationPopupId  = id + ".popup";
@@ -106,7 +106,7 @@ public sealed class InspectorClassControl : InspectorControl
 			
 			string controlId = $"{Id}.{field.Name}";
 			
-			InspectorControl control = (InspectorControl) Activator.CreateInstance(controlType, _commandTarget, controlId)!;
+			InspectorControl control = (InspectorControl) Activator.CreateInstance(controlType, _inspector, controlId)!;
 			_controls.Add(control);
 
 			control.InitFromSource(source, sourceFieldValue, field);
@@ -127,7 +127,7 @@ public sealed class InspectorClassControl : InspectorControl
 			
 			string controlId = $"{Id}.{method.Name}()";
 
-			InspectorButtonControl button = new (_commandTarget, controlId, buttonAttribute.Title ?? method.Name.PrettyCamelCase(), sourceFieldValue, method);
+			InspectorButtonControl button = new (_inspector, controlId, buttonAttribute.Title ?? method.Name.PrettyCamelCase(), sourceFieldValue, method);
 			_controls.Add(button);
 		}
 	}
@@ -400,7 +400,7 @@ public sealed class InspectorClassControl : InspectorControl
 	
 	private void InstantiateClass(Type type)
 	{
-		_commandTarget.Commit(new InspectorInstantiateClassCommand(Bindings, type));
+		_inspector.Commit(new InspectorInstantiateClassCommand(Bindings, type));
 		_sourceFieldValues.Clear(); // force refresh
 	}
 
@@ -416,7 +416,7 @@ public sealed class InspectorClassControl : InspectorControl
 
 	private void DeleteValue()
 	{
-		_commandTarget.Commit(new InspectorDeleteClassCommand(Bindings));
+		_inspector.Commit(new InspectorDeleteClassCommand(Bindings));
 		_sourceFieldValues.Clear(); // force refresh
 	}
 	#endregion

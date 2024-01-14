@@ -9,15 +9,15 @@ public abstract class InspectorControl
 	protected static readonly object UnboundValue   = new(); // mark that there is no value to update
 	protected static readonly object MultipleValues = new(); // mark that there are multiple values
 
-	protected readonly IInspectorCommandTarget _commandTarget;
+	protected readonly IInspector _inspector;
 	public readonly    string                  Id;
 	public             string?                 Label    = null;
 	public             string                  LabelId  = null!;
 	public readonly    List<InspectorBinding>  Bindings = new();
 
-	protected InspectorControl(IInspectorCommandTarget commandTarget, string id)
+	protected InspectorControl(IInspector inspector, string id)
 	{
-		_commandTarget = commandTarget;
+		_inspector = inspector;
 		Id         = id;
 		LabelId    = $"##{id}";
 	}
@@ -121,7 +121,7 @@ public abstract class InspectorControl
 		}
 
 		Console.WriteLine($"Submitted value {value} from control {Id}");
-		_commandTarget.Commit(new InspectorModifyValueCommand(Bindings, value));
+		_inspector.Commit(new InspectorModifyValueCommand(Bindings, value));
 	}
 	#endregion
 }

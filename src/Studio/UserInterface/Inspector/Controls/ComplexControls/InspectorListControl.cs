@@ -45,7 +45,7 @@ public sealed class InspectorListControl : InspectorControl
 
 	private int _draggedIndex = -1; // to avoid using unsafe context
 
-	public InspectorListControl(IInspectorCommandTarget commandTarget, string id) : base(commandTarget, id)
+	public InspectorListControl(IInspector inspector, string id) : base(inspector, id)
 	{
 		_buttonCreateElementId = id + ".create";
 	}
@@ -105,13 +105,13 @@ public sealed class InspectorListControl : InspectorControl
 		if (createNewElement)
 		{
 			//Console.WriteLine("Create new element");
-			_commandTarget.Commit(new InspectorCreateListElementCommand(Bindings));
+			_inspector.Commit(new InspectorCreateListElementCommand(Bindings));
 		}
 
 		if (deleteElementIndex != -1)
 		{
 			//Console.WriteLine($"Delete element {deleteElementIndex}");
-			_commandTarget.Commit(new InspectorDeleteListElementCommand(Bindings, deleteElementIndex));
+			_inspector.Commit(new InspectorDeleteListElementCommand(Bindings, deleteElementIndex));
 		}
 	}
 
@@ -286,7 +286,7 @@ public sealed class InspectorListControl : InspectorControl
 			return null;
 		}
 		
-		return (InspectorControl) Activator.CreateInstance(controlType, _commandTarget, $"{Id}[{index}]")!;
+		return (InspectorControl) Activator.CreateInstance(controlType, _inspector, $"{Id}[{index}]")!;
 	}
 
 	#region Drag&drop
@@ -315,7 +315,7 @@ public sealed class InspectorListControl : InspectorControl
 				if (_draggedIndex >= 0 && _draggedIndex < _controls.Count)
 				{
 					Console.WriteLine($"Swap {_draggedIndex} with {index}");
-					_commandTarget.Commit(new InspectorSwapListElementsCommand(Bindings, _draggedIndex, index));
+					_inspector.Commit(new InspectorSwapListElementsCommand(Bindings, _draggedIndex, index));
 				}
 
 				_draggedIndex = -1;

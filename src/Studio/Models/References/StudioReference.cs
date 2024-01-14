@@ -1,4 +1,5 @@
 using Migration;
+using RedHerring.Studio.Models.Project.FileSystem;
 using RedHerring.Studio.UserInterface;
 
 namespace Mine.Studio;
@@ -9,12 +10,16 @@ public abstract class StudioReference
 	public virtual Type   InspectorControlType => typeof(InspectorReferenceControl);
 	public abstract string Name { get; }
 
-	public          string Guid;
+	public string? Guid = null;
 
+	public abstract bool            CanAcceptNode(ProjectNode node);
+	public abstract StudioReference CreateCopy();
+	
 	public virtual void WriteJsonValue(StringWriter stringWriter)
 	{
 		//TODO
 	}
+
 }
 
 #region Migration

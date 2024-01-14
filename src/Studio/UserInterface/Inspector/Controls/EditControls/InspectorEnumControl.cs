@@ -9,7 +9,7 @@ public class InspectorEnumControl : InspectorSingleInputControl<Enum>
 	private Dictionary<int,int> _enumToIndex = null!;
 	private int[]               _indexToEnum = null!;
 	
-	public InspectorEnumControl(IInspectorCommandTarget commandTarget, string id) : base(commandTarget, id)
+	public InspectorEnumControl(IInspector inspector, string id) : base(inspector, id)
 	{
 	}
 

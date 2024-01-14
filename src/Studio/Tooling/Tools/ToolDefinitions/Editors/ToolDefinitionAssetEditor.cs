@@ -2,12 +2,13 @@ using System.Numerics;
 using ImGuiNET;
 using Mine.ImGuiPlugin;
 using RedHerring.Studio.Commands;
+using RedHerring.Studio.Models.Project;
 using RedHerring.Studio.Models.Project.FileSystem;
 using RedHerring.Studio.UserInterface;
 
 namespace Mine.Studio;
 
-public sealed class ToolDefinitionAssetEditor : IInspectorCommandTarget
+public sealed class ToolDefinitionAssetEditor : IInspectorStudio
 {
 	#region Row
 	private sealed class Row
@@ -20,7 +21,7 @@ public sealed class ToolDefinitionAssetEditor : IInspectorCommandTarget
 			DeleteButtonNameId = $"{FontAwesome6.Xmark}##delete_button.{uniqueId}";
 		}
 
-		public Row AddControls(IInspectorCommandTarget commandTarget, DefinitionAssetRow row, Func<int> uniqueIdGenerator)
+		public Row AddControls(IInspector commandTarget, DefinitionAssetRow row, Func<int> uniqueIdGenerator)
 		{
 			foreach (DefinitionAssetValue value in row.Values)
 			{
@@ -39,7 +40,7 @@ public sealed class ToolDefinitionAssetEditor : IInspectorCommandTarget
 	#region Commands
 	private sealed class AddRowCommand : Command
 	{
-		private readonly IInspectorCommandTarget _commandTarget;
+		private readonly IInspector _commandTarget;
 		private readonly DefinitionAsset         _asset;
 		private readonly List<Row>               _rows;
 		private readonly Func<int>               _uniqueIdGenerator;
@@ -48,7 +49,7 @@ public sealed class ToolDefinitionAssetEditor : IInspectorCommandTarget
 		private DefinitionAssetRow? _assetRow;
 		private Row?                _controlsRow;
 
-		public AddRowCommand(IInspectorCommandTarget commandTarget, DefinitionAsset asset, List<Row> rows, Func<int> uniqueIdGenerator)
+		public AddRowCommand(IInspector commandTarget, DefinitionAsset asset, List<Row> rows, Func<int> uniqueIdGenerator)
 		{
 			_commandTarget     = commandTarget;
 			_asset             = asset;
@@ -125,15 +126,18 @@ public sealed class ToolDefinitionAssetEditor : IInspectorCommandTarget
 
 	private readonly CommandHistoryWithChange _commandHistory = new();
 	private readonly List<Row>                _controlRows    = new();
+
+	private readonly StudioReferencePopup _referencePopup;
 	
 	private int _uniqueIdGenerator = 0;
 
 	
-	public ToolDefinitionAssetEditor(ProjectAssetFileNode assetNode, DefinitionAsset asset, string editorUniqueId)
+	public ToolDefinitionAssetEditor(ProjectModel projectModel, ProjectAssetFileNode assetNode, DefinitionAsset asset, string editorUniqueId)
 	{
 		_definitionAssetNode = assetNode;
-		_definitionAsset         = asset;
-		_editorUniqueId          = editorUniqueId;
+		_definitionAsset     = asset;
+		_editorUniqueId      = editorUniqueId;
+		_referencePopup      = new StudioReferencePopup(projectModel, editorUniqueId + ".referencePopup");
 		RebuildControls();
 	}
 
@@ -141,7 +145,17 @@ public sealed class ToolDefinitionAssetEditor : IInspectorCommandTarget
 	{
 		_commandHistory.Commit(command);
 	}
-	
+
+	public void OpenReferencePopup(StudioReference value, Action<ProjectNode?> onSelected)
+	{
+		_referencePopup.Open(value, onSelected);
+	}
+
+	public bool UpdateReferencePopup()
+	{
+		return _referencePopup.Update();
+	}
+
 	public void Update()
 	{
 		ImGui.PushID(_editorUniqueId);
@@ -274,6 +288,7 @@ public sealed class ToolDefinitionAssetEditor : IInspectorCommandTarget
 					_controlRows[rowIndex].Controls[columnIndex].Update();
 				}
 			}
+			UpdateReferencePopup(); // must be here, so the ID is in the same stack as controls
 			ImGui.EndTable();
 
 			if (newRowRequested)

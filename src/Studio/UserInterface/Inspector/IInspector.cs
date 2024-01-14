@@ -2,7 +2,7 @@ using RedHerring.Studio.Commands;
 
 namespace RedHerring.Studio.UserInterface;
 
-public interface IInspectorCommandTarget
+public interface IInspector
 {
 	void Commit(Command command);
 }

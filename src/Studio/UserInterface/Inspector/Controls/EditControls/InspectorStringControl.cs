@@ -7,7 +7,7 @@ public sealed class InspectorStringControl : InspectorSingleInputControl<string>
 {
 	private const int MaxLength = 1024; // TODO - maybe from some attribute?
 	
-	public InspectorStringControl(IInspectorCommandTarget commandTarget, string id) : base(commandTarget, id)
+	public InspectorStringControl(IInspector inspector, string id) : base(inspector, id)
 	{
 	}
 

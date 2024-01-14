@@ -4,7 +4,7 @@ namespace RedHerring.Studio.UserInterface;
 
 public abstract class InspectorSingleInputControl<T> : InspectorEditControl<T>
 {
-	protected InspectorSingleInputControl(IInspectorCommandTarget commandTarget, string id) : base(commandTarget, id)
+	protected InspectorSingleInputControl(IInspector inspector, string id) : base(inspector, id)
 	{
 	}
 

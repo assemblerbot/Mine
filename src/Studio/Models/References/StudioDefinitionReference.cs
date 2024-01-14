@@ -1,4 +1,5 @@
 using Migration;
+using RedHerring.Studio.Models.Project.FileSystem;
 
 namespace Mine.Studio;
 
@@ -6,11 +7,21 @@ namespace Mine.Studio;
 public sealed class StudioDefinitionReference : StudioReference
 {
 	public override string Name => $"Definition<{GenericParameter}>";
+	public override bool   CanAcceptNode(ProjectNode node)
+	{
+		return node.Type == ProjectNodeType.AssetDefinition; // TODO - also type of definition
+	}
+
 	public          string GenericParameter;
 
 	public StudioDefinitionReference(string genericParameter)
 	{
 		GenericParameter = genericParameter;
+	}
+
+	public override StudioReference CreateCopy()
+	{
+		return new StudioDefinitionReference(GenericParameter) {Guid = Guid};
 	}
 }
 

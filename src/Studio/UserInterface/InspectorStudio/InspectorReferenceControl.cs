@@ -7,20 +7,23 @@ namespace RedHerring.Studio.UserInterface;
 
 public sealed class InspectorReferenceControl : InspectorEditControl<StudioReference>
 {
-	private string                      _buttonLabelId;
-	private string                      _popupLabelId;
-	//private readonly Func<StudioReference, bool> _popupUpdateUI;
+	private string  _buttonLabelId;
+	private string? _currentGuid = null;
 
-	// called from reflection
-	public InspectorReferenceControl(IInspectorCommandTarget commandTarget, string id) : base(commandTarget, id)
+	private StudioReference? _newValue  = null;
+	private bool             _wasCommit = false;
+
+	public InspectorReferenceControl(IInspector inspector, string id) : base(inspector, id)
 	{
-		_popupLabelId  = id + ".popup";
 	}
 
 	public override void InitFromSource(object? sourceOwner, object source, FieldInfo? sourceField = null, int sourceIndex = -1)
 	{
 		base.InitFromSource(sourceOwner, source, sourceField, sourceIndex);
-		_buttonLabelId = $"{FontAwesome6.CircleDot} None ({Value?.Name ?? "null"})##{Id}.button";
+		_newValue    = null;
+		_wasCommit   = false;
+		_currentGuid = Value?.Guid;
+		RefreshButtonLabelByCurrentGuid();
 	}
 
 	public override void Update() // TODO - if not changed, just derive from SingleValue control
@@ -46,11 +49,25 @@ public sealed class InspectorReferenceControl : InspectorEditControl<StudioRefer
 
 	protected bool InputControl(bool makeItemActive)
 	{
+		if (_currentGuid != Value?.Guid)
+		{
+			_currentGuid = Value?.Guid;
+			RefreshButtonLabelByCurrentGuid();
+		}
+
 		if (Gui.Button(_buttonLabelId))
 		{
 			if (Value != null)
 			{
-				Gui.OpenPopup(_popupLabelId);
+				(_inspector as IInspectorStudio)?.OpenReferencePopup(
+					Value!,
+					node =>
+					{
+						_newValue      = Value.CreateCopy();
+						_newValue.Guid = node?.Meta?.Guid;
+						_wasCommit  = true;
+					}
+				);
 			}
 		}
 
@@ -60,13 +77,18 @@ public sealed class InspectorReferenceControl : InspectorEditControl<StudioRefer
 			Gui.Text(Label);
 		}
 
-		bool wasSubmit = false;
-		if (Gui.BeginPopup(_popupLabelId))
+		if (_wasCommit)
 		{
-			//wasSubmit = _popupUpdateUI(Value!);
-			Gui.EndPopup();
+			Value      = _newValue;
+			_wasCommit = false;
+			return true;
 		}
 
-		return wasSubmit; // submit after dropped something or after picked reference object
+		return false;
+	}
+
+	private void RefreshButtonLabelByCurrentGuid()
+	{
+		_buttonLabelId = $"{FontAwesome6.CircleDot} {_currentGuid} ({Value?.Name ?? "null"})##{Id}.button";
 	}
 }
