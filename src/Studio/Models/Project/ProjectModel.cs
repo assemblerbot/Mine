@@ -39,7 +39,9 @@ public sealed class ProjectModel
 	public  ProjectRootNode? AssetsFolder => _assetsFolder;
 
 	private ProjectRootNode? _scriptsFolder;
-	public  ProjectRootNode? ScriptsFolder => _scriptsFolder; 
+	public  ProjectRootNode? ScriptsFolder => _scriptsFolder;
+
+	private ConcurrentDictionary<string, ProjectNode> _nodesIndex = new();
 
 	private ProjectSettings? _projectSettings;
 	public  ProjectSettings  ProjectSettings => _projectSettings!;
@@ -66,6 +68,43 @@ public sealed class ProjectModel
 		_thread.Cancel();
 	}
 
+	// TODO - this is bad, kind of project database is needed, indexation in this class will be just too messy
+	public ProjectNode? FindNodeByGuid(string guid)
+	{
+		ProjectNode? resultNode = null;
+
+		_assetsFolder!.TraverseRecursive(
+			node =>
+			{
+				if (node.Meta?.Guid == guid)
+				{
+					resultNode = node;
+				}
+			},
+			TraverseFlags.Files | TraverseFlags.Directories,
+			new CancellationToken()
+		);
+		
+		if (resultNode != null)
+		{
+			return resultNode;
+		}
+
+		_scriptsFolder!.TraverseRecursive(
+			node =>
+			{
+				if (node.Meta?.Guid == guid)
+				{
+					resultNode = node;
+				}
+			},
+			TraverseFlags.Files | TraverseFlags.Directories,
+			new CancellationToken()
+		);
+
+		return resultNode;
+	}
+	
 	#region Open/close
 	public void Close()
 	{
@@ -74,7 +113,9 @@ public sealed class ProjectModel
 		_thread.ClearQueue();
 		
 		SaveSettings();
-		_assetsFolder = null;
+		_assetsFolder  = null;
+		_scriptsFolder = null;
+		_nodesIndex.Clear();
 		_eventAggregator.Trigger(new ClosedEvent());
 	}
 	

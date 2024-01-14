@@ -120,9 +120,10 @@ public sealed class ToolDefinitionAssetEditor : IInspectorStudio
 	}
 	#endregion
 
-	private readonly ProjectAssetFileNode     _definitionAssetNode;
-	private readonly DefinitionAsset          _definitionAsset;
-	private readonly string                   _editorUniqueId;
+	private readonly ProjectModel         _projectModel;
+	private readonly ProjectAssetFileNode _definitionAssetNode;
+	private readonly DefinitionAsset      _definitionAsset;
+	private readonly string               _editorUniqueId;
 
 	private readonly CommandHistoryWithChange _commandHistory = new();
 	private readonly List<Row>                _controlRows    = new();
@@ -134,6 +135,7 @@ public sealed class ToolDefinitionAssetEditor : IInspectorStudio
 	
 	public ToolDefinitionAssetEditor(ProjectModel projectModel, ProjectAssetFileNode assetNode, DefinitionAsset asset, string editorUniqueId)
 	{
+		_projectModel        = projectModel;
 		_definitionAssetNode = assetNode;
 		_definitionAsset     = asset;
 		_editorUniqueId      = editorUniqueId;
@@ -154,6 +156,12 @@ public sealed class ToolDefinitionAssetEditor : IInspectorStudio
 	public bool UpdateReferencePopup()
 	{
 		return _referencePopup.Update();
+	}
+
+	public string ProjectNodeGuidToName(string guid)
+	{
+		ProjectNode? node = _projectModel.FindNodeByGuid(guid);
+		return node?.Name ?? guid;
 	}
 
 	public void Update()

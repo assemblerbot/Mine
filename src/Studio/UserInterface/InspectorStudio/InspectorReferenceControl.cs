@@ -70,6 +70,14 @@ public sealed class InspectorReferenceControl : InspectorEditControl<StudioRefer
 				);
 			}
 		}
+		
+		// const int referencePickButtonWidth = 40;
+		// Gui.SameLine();
+		// Gui.SetCursorPosX(Gui.GetCursorPosX() - referencePickButtonWidth);
+		// Gui.SetNextItemAllowOverlap();
+		// Gui.SetNextItemWidth(referencePickButtonWidth);
+		// Gui.Button(FontAwesome6.Anchor);
+		
 
 		if (!string.IsNullOrEmpty(Label))
 		{
@@ -89,6 +97,7 @@ public sealed class InspectorReferenceControl : InspectorEditControl<StudioRefer
 
 	private void RefreshButtonLabelByCurrentGuid()
 	{
-		_buttonLabelId = $"{FontAwesome6.CircleDot} {_currentGuid} ({Value?.Name ?? "null"})##{Id}.button";
+		string? path = _currentGuid == null ? "null" : (_inspector as IInspectorStudio)?.ProjectNodeGuidToName(_currentGuid) ?? _currentGuid; 
+		_buttonLabelId = $"{FontAwesome6.CircleDot} {path} ({Value?.Name ?? "null"})##{Id}.button";
 	}
 }
