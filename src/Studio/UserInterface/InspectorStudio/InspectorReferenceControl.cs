@@ -8,6 +8,7 @@ namespace RedHerring.Studio.UserInterface;
 public sealed class InspectorReferenceControl : InspectorEditControl<StudioReference>
 {
 	private string  _buttonLabelId;
+	private string  _pickButtonLabelId;
 	private string? _currentGuid = null;
 
 	private StudioReference? _newValue  = null;
@@ -15,6 +16,7 @@ public sealed class InspectorReferenceControl : InspectorEditControl<StudioRefer
 
 	public InspectorReferenceControl(IInspector inspector, string id) : base(inspector, id)
 	{
+		_pickButtonLabelId = $"{FontAwesome6.CircleDot}##{Id}.pickbutton";
 	}
 
 	public override void InitFromSource(object? sourceOwner, object source, FieldInfo? sourceField = null, int sourceIndex = -1)
@@ -55,7 +57,19 @@ public sealed class InspectorReferenceControl : InspectorEditControl<StudioRefer
 			RefreshButtonLabelByCurrentGuid();
 		}
 
+		// select in project button
+		float prevPosition = Gui.GetCursorPosX();
+		Gui.SetNextItemAllowOverlap();
 		if (Gui.Button(_buttonLabelId))
+		{
+			// TODO - select in project
+		}
+
+		// pick button
+		float nextPosition = Gui.GetCursorPosX();
+		Gui.SameLine();
+		Gui.SetCursorPosX(prevPosition);
+		if (Gui.Button(_pickButtonLabelId))
 		{
 			if (Value != null)
 			{
@@ -65,20 +79,13 @@ public sealed class InspectorReferenceControl : InspectorEditControl<StudioRefer
 					{
 						_newValue      = Value.CreateCopy();
 						_newValue.Guid = node?.Meta?.Guid;
-						_wasCommit  = true;
+						_wasCommit     = true;
 					}
 				);
 			}
 		}
+		Gui.SetCursorPosX(nextPosition);
 		
-		// const int referencePickButtonWidth = 40;
-		// Gui.SameLine();
-		// Gui.SetCursorPosX(Gui.GetCursorPosX() - referencePickButtonWidth);
-		// Gui.SetNextItemAllowOverlap();
-		// Gui.SetNextItemWidth(referencePickButtonWidth);
-		// Gui.Button(FontAwesome6.Anchor);
-		
-
 		if (!string.IsNullOrEmpty(Label))
 		{
 			Gui.SameLine();
@@ -98,6 +105,6 @@ public sealed class InspectorReferenceControl : InspectorEditControl<StudioRefer
 	private void RefreshButtonLabelByCurrentGuid()
 	{
 		string? path = _currentGuid == null ? "null" : (_inspector as IInspectorStudio)?.ProjectNodeGuidToName(_currentGuid) ?? _currentGuid; 
-		_buttonLabelId = $"{FontAwesome6.CircleDot} {path} ({Value?.Name ?? "null"})##{Id}.button";
+		_buttonLabelId = $"{FontAwesome6.CircleDot}  {path} ({Value?.Name ?? "null"})##{Id}.button";
 	}
 }
