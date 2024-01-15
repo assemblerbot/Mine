@@ -7,6 +7,7 @@ namespace Mine.Studio;
 public sealed class StudioFolderReference : StudioReference
 {
 	public override string Name => "Folder";
+	
 	public override bool   CanAcceptNode(ProjectNode node)
 	{
 		return node.Type == ProjectNodeType.AssetFolder;

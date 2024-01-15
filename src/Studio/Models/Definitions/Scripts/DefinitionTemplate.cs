@@ -1,6 +1,7 @@
 using System.Text.RegularExpressions;
 using Migration;
 using OdinSerializer;
+using RedHerring.Studio.Models.Project;
 using RedHerring.Studio.Models.Project.FileSystem;
 using RedHerring.Studio.Models.ViewModels.Console;
 using RedHerring.Studio.UserInterface.Attributes;
@@ -14,6 +15,8 @@ public sealed class DefinitionTemplate
 	private const int    _version   = 1;
 	private const string _dataBegin = "//--- data begin ---";
 	private const string _dataEnd   = "//--- data end ---";
+
+	[NonSerialized] private readonly ProjectModel _projectModel;
 	
 	[OdinSerialize] private ProjectScriptFileHeader _header;
 	public                  ProjectScriptFileHeader Header => _header;
@@ -24,8 +27,9 @@ public sealed class DefinitionTemplate
 	[ShowInInspector, OdinSerialize] private List<DefinitionTemplateField?>          _fields = new();
 	public                                   IReadOnlyList<DefinitionTemplateField?> Fields => _fields;
 
-	private DefinitionTemplate()
+	private DefinitionTemplate(ProjectModel projectModel)
 	{
+		_projectModel = projectModel;
 	}
 
 	public static DefinitionTemplate? CreateFromFile(string path)
@@ -160,7 +164,7 @@ public sealed class DefinitionTemplate
 					string propertyType = propertyMatch.Groups[1].Captures[0].ToString();
 					string propertyName = propertyMatch.Groups[2].Captures[0].ToString();
 
-					DefinitionTemplateField field = new(propertyType.ToTemplateType(), propertyName);
+					DefinitionTemplateField field = new(propertyType.ToTemplateType(), propertyName, new StudioScriptReference());
 					_fields.Add(field);
 				}
 				else if((propertyMatch = genericPropertyRegex.Match(line)).Success)

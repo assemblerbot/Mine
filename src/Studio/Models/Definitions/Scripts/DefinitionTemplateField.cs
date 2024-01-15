@@ -7,16 +7,16 @@ public sealed class DefinitionTemplateField
 {
 	public DefinitionTemplateFieldType Type;
 	public string                      Name;
-	public string                      GenericParameter; // TODO - make a dropdown list by Type
+	public StudioScriptReference       GenericParameter;
 
 	public DefinitionTemplateField()
 	{
 		Type             = DefinitionTemplateFieldType.Type_int;
 		Name             = "newField";
-		GenericParameter = "";
+		GenericParameter = new StudioScriptReference();
 	}
 
-	public DefinitionTemplateField(DefinitionTemplateFieldType type, string name, string genericParameter = "")
+	public DefinitionTemplateField(DefinitionTemplateFieldType type, string name, StudioScriptReference genericParameter)
 	{
 		Type             = type;
 		Name             = name;
@@ -31,8 +31,8 @@ public interface IDefinitionTemplateFieldMigratable;
 [Serializable, LatestVersion(typeof(DefinitionTemplateField))]
 public class DefinitionTemplateField_000 : IDefinitionTemplateFieldMigratable
 {
-	public DefinitionTemplateFieldType Type;
-	public string                      Name;
-	public string                      GenericParameter;
+	public DefinitionTemplateFieldType      Type;
+	public string                           Name;
+	public IStudioScriptReferenceMigratable GenericParameter;
 }
 #endregion
