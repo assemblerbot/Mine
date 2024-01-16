@@ -2,6 +2,7 @@ using System.Numerics;
 using ImGuiNET;
 using Mine.ImGuiPlugin;
 using RedHerring.Studio.Models;
+using RedHerring.Studio.Models.Project;
 using RedHerring.Studio.Models.Project.FileSystem;
 using RedHerring.Studio.Tools;
 
@@ -18,6 +19,8 @@ public sealed class ToolDefinitions : Tool
 	private readonly string _tabDataNameId;
 
 	private object? _prevSelected = null;
+
+	private readonly ProjectModel _projectModel;
 	
 	// template editor
 	private ProjectScriptFileNode?        _definitionTemplateNode   = null;
@@ -31,6 +34,7 @@ public sealed class ToolDefinitions : Tool
 
 	public ToolDefinitions(StudioModel studioModel, int uniqueId) : base(studioModel, uniqueId)
 	{
+		_projectModel        = studioModel.Project;
 		_tabBarId            = NameId + ".tabbar";
 		_tabDefinitionNameId = $"Definition##{Id}.definition";
 		_tabDataNameId       = $"Data##{Id}.data";
@@ -164,7 +168,7 @@ public sealed class ToolDefinitions : Tool
 		// try to read script node
 		if (_definitionTemplateNode != null)
 		{
-			_definitionTemplate = DefinitionTemplate.CreateFromFile(_definitionTemplateNode.AbsolutePath);
+			_definitionTemplate = DefinitionTemplate.CreateFromFile(_projectModel, _definitionTemplateNode.AbsolutePath);
 			if (_definitionTemplate == null)
 			{
 				_definitionAsset        = null;

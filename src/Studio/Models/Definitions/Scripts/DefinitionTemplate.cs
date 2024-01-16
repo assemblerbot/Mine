@@ -32,9 +32,9 @@ public sealed class DefinitionTemplate
 		_projectModel = projectModel;
 	}
 
-	public static DefinitionTemplate? CreateFromFile(string path)
+	public static DefinitionTemplate? CreateFromFile(ProjectModel projectModel, string path)
 	{
-		DefinitionTemplate template = new();
+		DefinitionTemplate template = new(projectModel);
 		return template.Read(path) ? template : null;
 	}
 
@@ -96,15 +96,21 @@ public sealed class DefinitionTemplate
 		stream.WriteLine($"public sealed class {_className} : Definition");
 		stream.WriteLine("{");
 		stream.WriteLine("	" + _dataBegin);
-		foreach (DefinitionTemplateField field in _fields)
+		foreach (DefinitionTemplateField? field in _fields)
 		{
-			if (string.IsNullOrEmpty(field.GenericParameter))
+			if (field == null)
 			{
-				stream.WriteLine($"	public {field.Type.ToCSharpType()} {field.Name};");
+				continue;
+			}
+
+			if (field.Type.HasGenericParameter())
+			{
+				// TODO - translate generic parameter to class name
+				stream.WriteLine($"	public {field.Type.ToCSharpType()}<{field.GenericParameter}> {field.Name};");
 			}
 			else
 			{
-				stream.WriteLine($"	public {field.Type.ToCSharpType()}<{field.GenericParameter}> {field.Name};");
+				stream.WriteLine($"	public {field.Type.ToCSharpType()} {field.Name};");
 			}
 		}
 		stream.WriteLine("	" + _dataEnd);
@@ -174,7 +180,8 @@ public sealed class DefinitionTemplate
 					string genericParameter = propertyMatch.Groups[2].Captures[0].ToString();
 					string propertyName     = propertyMatch.Groups[3].Captures[0].ToString();
 
-					DefinitionTemplateField field = new(propertyType.ToTemplateType(), propertyName, genericParameter);
+					// TODO - generic parameter class name to GUID
+					DefinitionTemplateField field = new(propertyType.ToTemplateType(), propertyName, new StudioScriptReference());
 					_fields.Add(field);
 				}
 			}

@@ -11,6 +11,7 @@ public abstract class StudioReference
 	public abstract string Name { get; }
 
 	public string? Guid = null;
+	public bool    IsEmpty => Guid == null;
 
 	public abstract bool            CanAcceptNode(ProjectNode node);
 	public abstract StudioReference CreateCopy();

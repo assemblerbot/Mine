@@ -27,7 +27,7 @@ public static class DefinitionTemplateFiledTypeExtensions
 			: DefinitionTemplateFieldType.Type_int;
 	}
 
-	public static DefinitionAssetValue ToDefinitionAssetValue(this DefinitionTemplateFieldType type, string genericParameter)
+	public static DefinitionAssetValue ToDefinitionAssetValue(this DefinitionTemplateFieldType type, StudioScriptReference genericParameter)
 	{
 		return type switch
 		{
@@ -37,8 +37,13 @@ public static class DefinitionTemplateFiledTypeExtensions
 			DefinitionTemplateFieldType.Type_bool           => new DefinitionAssetValueBool(),
 			DefinitionTemplateFieldType.Type_AssetReference => new DefinitionAssetValueReference(new StudioAssetReference()),
 			DefinitionTemplateFieldType.Type_FolderReference => new DefinitionAssetValueReference(new StudioFolderReference()),
-			DefinitionTemplateFieldType.Type_DefinitionReference => new DefinitionAssetValueReference(new StudioDefinitionReference(genericParameter)),
+			DefinitionTemplateFieldType.Type_DefinitionReference => new DefinitionAssetValueReference(genericParameter),
 			_ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
 		};
+	}
+	
+	public static bool HasGenericParameter(this DefinitionTemplateFieldType type)
+	{
+		return type == DefinitionTemplateFieldType.Type_AssetReference;
 	}
 }

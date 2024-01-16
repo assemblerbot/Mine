@@ -2,6 +2,7 @@
 using Mine.ImGuiPlugin;
 using Mine.Studio;
 using RedHerring.Studio.Models;
+using RedHerring.Studio.Models.Project;
 using RedHerring.Studio.Models.Project.FileSystem;
 using RedHerring.Studio.Models.ViewModels.Console;
 using RedHerring.Studio.UserInterface;
@@ -20,8 +21,9 @@ public sealed class ToolProjectView : Tool
 	
 	protected override string Name => ToolName;
 
+	private readonly ProjectModel                                       _projectModel;
 	private readonly Dictionary<(ProjectNode, ProjectNodeType), string> _nodeLabels = new();
-
+	
 	private readonly Menu         _contextMenu            = new(MenuStyle.ContextMenu);
 	private          ProjectNode? _contextMenuActivatedAt = null;
 
@@ -30,6 +32,7 @@ public sealed class ToolProjectView : Tool
     
 	public ToolProjectView(StudioModel studioModel, int uniqueId) : base(studioModel, uniqueId)
 	{
+		_projectModel = studioModel.Project;
 		CreateContextMenu();
 		_createScriptDialog          = new CreateScriptDialog(studioModel.Project);
 		_createDefinitionAssetDialog = new CreateDefinitionAssetDialog(studioModel.Project);
@@ -212,7 +215,7 @@ public sealed class ToolProjectView : Tool
 		
 		try
 		{
-			DefinitionTemplate? template = DefinitionTemplate.CreateFromFile(templateFileNode.AbsolutePath);
+			DefinitionTemplate? template = DefinitionTemplate.CreateFromFile(_projectModel, templateFileNode.AbsolutePath);
 			if (template == null)
 			{
 				ConsoleViewModel.LogError($"Cannot read template file: {templateFileNode.AbsolutePath}");
