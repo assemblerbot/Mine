@@ -4,7 +4,7 @@ using RedHerring.Studio.Models.Project.FileSystem;
 
 namespace Mine.Studio;
 
-public class StudioReferencePopup
+public class InspectorReferencePopup
 {
 	private readonly ProjectModel _projectModel;
 	private          string       _id;
@@ -12,7 +12,7 @@ public class StudioReferencePopup
 	private List<ProjectNode>     _relevantNodes = new();
 	private Action<ProjectNode?>? _onSelected;
 	
-	public StudioReferencePopup(ProjectModel projectModel, string id)
+	public InspectorReferencePopup(ProjectModel projectModel, string id)
 	{
 		_projectModel = projectModel;
 		_id           = id;

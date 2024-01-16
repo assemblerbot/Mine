@@ -26,6 +26,7 @@ public sealed class StudioComponent : Component, IUpdatable
 	private          NewProjectDialog        _newProjectDialog = null!;
 	private readonly MessageBox              _messageBox       = new();
 	private readonly StatusBarMessageHandler _statusBarMessageHandler;
+	private          bool                    _showImGuiDemoWindow = false;
 	#endregion
 
 	public StudioComponent()
@@ -92,7 +93,10 @@ public sealed class StudioComponent : Component, IUpdatable
 
 		_toolManager.Update();
 
-		//ImGui.ShowDemoWindow();
+		if (_showImGuiDemoWindow)
+		{
+			ImGui.ShowDemoWindow();
+		}
 	}
 	
 	private void InitImGui()
@@ -128,6 +132,8 @@ public sealed class StudioComponent : Component, IUpdatable
 		_menu.AddItem("Debug/Task processor test", OnDebugTaskProcessorTestClicked);
 		_menu.AddItem("Debug/Serialization test",  OnDebugSerializationTestClicked);
 		_menu.AddItem("Debug/Importer test",       OnDebugImporterTestClicked);
+		_menu.AddItem("Debug/Show ImGui demo",     OnDebugShowImGuiDemoClicked, null, () => _showImGuiDemoWindow);
+		_menu.AddItem("Debug/Test",                OnDebugTestClicked);
 	}
 
 	private void OnNewProjectClicked()
@@ -243,6 +249,16 @@ public sealed class StudioComponent : Component, IUpdatable
 	private void OnDebugImporterTestClicked()
 	{
 //		ImporterTests.Test();
+	}
+
+	private void OnDebugShowImGuiDemoClicked()
+	{
+		_showImGuiDemoWindow = !_showImGuiDemoWindow;
+	}
+	
+	private void OnDebugTestClicked()
+	{
+		
 	}
 	#endregion
 

@@ -128,10 +128,11 @@ public sealed class ToolDefinitionAssetEditor : IInspectorStudio
 	private readonly CommandHistoryWithChange _commandHistory = new();
 	private readonly List<Row>                _controlRows    = new();
 
-	private readonly StudioReferencePopup _referencePopup;
+	private readonly InspectorReferencePopup _referencePopup;
 	
 	private int _uniqueIdGenerator = 0;
 
+	private bool _popupOpened = false;
 	
 	public ToolDefinitionAssetEditor(ProjectModel projectModel, ProjectAssetFileNode assetNode, DefinitionAsset asset, string editorUniqueId)
 	{
@@ -139,7 +140,7 @@ public sealed class ToolDefinitionAssetEditor : IInspectorStudio
 		_definitionAssetNode = assetNode;
 		_definitionAsset     = asset;
 		_editorUniqueId      = editorUniqueId;
-		_referencePopup      = new StudioReferencePopup(projectModel, editorUniqueId + ".referencePopup");
+		_referencePopup      = new InspectorReferencePopup(projectModel, editorUniqueId + ".referencePopup");
 		RebuildControls();
 	}
 
@@ -231,6 +232,33 @@ public sealed class ToolDefinitionAssetEditor : IInspectorStudio
 			ImGui.EndDisabled();
 		}
 
+		
+		// TODO - debug block begin
+		ImGui.SameLine();
+		bool openPopupRequested = false;
+		ImGui.PushID("test block");
+		if (ImGui.Button("Test"))
+		{
+			ImGui.OpenPopup("Test popup");
+			openPopupRequested = true;
+		}
+		ImGui.PopID();
+
+		if (openPopupRequested || _popupOpened)
+		{
+			if (ImGui.BeginPopup("Test popup"))
+			{
+				_popupOpened = true;
+				ImGui.Text("some text");
+				ImGui.EndPopup();
+			}
+			else
+			{
+				_popupOpened = false;
+			}
+		}
+		// TODO - debug block end
+		
 
 		//--- table ---
 		ImGuiTableFlags flags =
