@@ -7,6 +7,5 @@ namespace RedHerring.Studio.UserInterface;
 public interface IInspectorStudio : IInspector
 {
 	void   OpenReferencePopup(StudioReference value, Action<ProjectNode?> onSelected);
-	bool   UpdateReferencePopup();
 	string ProjectNodeGuidToName(string guid);
 }

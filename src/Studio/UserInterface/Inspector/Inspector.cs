@@ -4,11 +4,14 @@ namespace RedHerring.Studio.UserInterface;
 
 public class Inspector : IInspector
 {
+	private InspectorControlMap _controlMap = new ();
+	public virtual InspectorControlMap ControlMap => _controlMap;
+	
 	private readonly List<object>           _sources = new();
 	private          InspectorClassControl? _contentControl;
 
 	private static int _uniqueIdGenerator = 0;
-	private        int _uniqueId          = _uniqueIdGenerator++;
+	protected        int _uniqueId          = _uniqueIdGenerator++;
 
 	private ICommandHistory _commandHistory;
 
@@ -36,7 +39,7 @@ public class Inspector : IInspector
 		Rebuild();
 	}
 
-	public void Update()
+	public virtual void Update()
 	{
 		_contentControl?.Update();
 	}

@@ -125,6 +125,9 @@ public sealed class ToolDefinitionAssetEditor : IInspectorStudio
 	private readonly DefinitionAsset      _definitionAsset;
 	private readonly string               _editorUniqueId;
 
+	private readonly InspectorStudioControlMap _controlMap = new();
+	public           InspectorControlMap ControlMap => _controlMap;
+	
 	private readonly CommandHistoryWithChange _commandHistory = new();
 	private readonly List<Row>                _controlRows    = new();
 
@@ -231,34 +234,6 @@ public sealed class ToolDefinitionAssetEditor : IInspectorStudio
 			ImGui.Button(FontAwesome6.RotateRight);
 			ImGui.EndDisabled();
 		}
-
-		
-		// TODO - debug block begin
-		ImGui.SameLine();
-		bool openPopupRequested = false;
-		ImGui.PushID("test block");
-		if (ImGui.Button("Test"))
-		{
-			ImGui.OpenPopup("Test popup");
-			openPopupRequested = true;
-		}
-		ImGui.PopID();
-
-		if (openPopupRequested || _popupOpened)
-		{
-			if (ImGui.BeginPopup("Test popup"))
-			{
-				_popupOpened = true;
-				ImGui.Text("some text");
-				ImGui.EndPopup();
-			}
-			else
-			{
-				_popupOpened = false;
-			}
-		}
-		// TODO - debug block end
-		
 
 		//--- table ---
 		ImGuiTableFlags flags =

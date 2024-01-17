@@ -3,15 +3,15 @@ using RedHerring.Studio.UserInterface.Attributes;
 
 namespace RedHerring.Studio.UserInterface;
 
-public static class InspectorControlMap
+public class InspectorControlMap
 {
-	private static Dictionary<Type, Type> _fieldToControlMap
+	private static readonly Dictionary<Type, Type> _fieldToControlMap
 		= new()
 		  {
-			  {typeof(int), typeof(InspectorIntControl)},
-			  {typeof(float), typeof(InspectorFloatControl)},
+			  {typeof(int),    typeof(InspectorIntControl)},
+			  {typeof(float),  typeof(InspectorFloatControl)},
 			  {typeof(string), typeof(InspectorStringControl)},
-			  {typeof(bool), typeof(InspectorBoolControl)},
+			  {typeof(bool),   typeof(InspectorBoolControl)},
 		  };
 
 	private static readonly Type _classControl               = typeof(InspectorClassControl);
@@ -20,7 +20,7 @@ public static class InspectorControlMap
 	private static readonly Type _valueDropdownStringControl = typeof(InspectorValueDropdownStringControl);
 	private static readonly Type _listControl                = typeof(InspectorListControl);
 
-	public static Type? FieldToControl(FieldInfo fieldInfo)
+	public Type? FieldToControl(FieldInfo fieldInfo)
 	{
 		Type fieldType = fieldInfo.FieldType;
 		
@@ -44,7 +44,7 @@ public static class InspectorControlMap
 		return TypeToControl(fieldType);
 	}
 
-	public static Type? TypeToControl(Type type)
+	public virtual Type? TypeToControl(Type type)
 	{
 		if (type.IsArray || (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>)))
 		{

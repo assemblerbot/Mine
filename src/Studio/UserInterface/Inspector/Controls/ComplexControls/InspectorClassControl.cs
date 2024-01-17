@@ -98,7 +98,7 @@ public sealed class InspectorClassControl : InspectorControl
 				continue;
 			}
 			
-			Type? controlType = InspectorControlMap.FieldToControl(field);
+			Type? controlType = _inspector.ControlMap.FieldToControl(field);
 			if (controlType == null)
 			{
 				continue; // unsupported
@@ -178,7 +178,7 @@ public sealed class InspectorClassControl : InspectorControl
 				continue;
 			}
 			
-			Type? controlType = InspectorControlMap.FieldToControl(field);
+			Type? controlType = _inspector.ControlMap.FieldToControl(field);
 			if (controlType == null)
 			{
 				continue; // unsupported

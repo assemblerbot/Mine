@@ -58,7 +58,7 @@ public sealed class InspectorReferenceControl : InspectorEditControl<StudioRefer
 		}
 
 		// select in project button
-		float prevPosition = Gui.GetCursorPosX();
+		float showReferenceButtonPosition = Gui.GetCursorPosX();
 		Gui.SetNextItemAllowOverlap();
 		if (Gui.Button(_buttonLabelId))
 		{
@@ -66,9 +66,9 @@ public sealed class InspectorReferenceControl : InspectorEditControl<StudioRefer
 		}
 
 		// pick button
-		float nextPosition = Gui.GetCursorPosX();
 		Gui.SameLine();
-		Gui.SetCursorPosX(prevPosition);
+		float nextPosition = Gui.GetCursorPosX();
+		Gui.SetCursorPosX(showReferenceButtonPosition);
 		if (Gui.Button(_pickButtonLabelId))
 		{
 			if (Value != null)
@@ -84,11 +84,12 @@ public sealed class InspectorReferenceControl : InspectorEditControl<StudioRefer
 				);
 			}
 		}
-		Gui.SetCursorPosX(nextPosition);
+
 		
 		if (!string.IsNullOrEmpty(Label))
 		{
 			Gui.SameLine();
+			Gui.SetCursorPosX(nextPosition);
 			Gui.Text(Label);
 		}
 

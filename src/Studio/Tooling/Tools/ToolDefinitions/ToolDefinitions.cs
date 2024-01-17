@@ -177,7 +177,7 @@ public sealed class ToolDefinitions : Tool
 				return;
 			}
 
-			_definitionTemplateEditor = new ToolDefinitionTemplateEditor(_definitionTemplateNode, _definitionTemplate, NameId + ".template_editor");
+			_definitionTemplateEditor = new ToolDefinitionTemplateEditor(_projectModel, _definitionTemplateNode, _definitionTemplate, NameId + ".template_editor");
 		}
 	}
 }

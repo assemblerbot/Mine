@@ -280,7 +280,7 @@ public sealed class InspectorListControl : InspectorControl
 			return null;
 		}
 
-		Type? controlType = InspectorControlMap.TypeToControl(type);
+		Type? controlType = _inspector.ControlMap.TypeToControl(type);
 		if (controlType == null)
 		{
 			return null;

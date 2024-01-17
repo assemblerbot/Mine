@@ -7,25 +7,44 @@ namespace RedHerring.Studio.UserInterface;
 
 public class InspectorStudio : Inspector, IInspectorStudio
 {
+	private         InspectorStudioControlMap _studioControlMap = new();
+	public override InspectorControlMap       ControlMap => _studioControlMap;
+
 	private readonly ProjectModel _projectModel;
+
+	private readonly InspectorReferencePopup _referencePopup;
+	private          bool                    _requestOpenReferencePopup = false;
+	private          StudioReference         _reference                 = null!;
+	private          Action<ProjectNode?>    _onReferenceSelected;
 	
 	public InspectorStudio(ICommandHistory commandHistory, ProjectModel projectModel) : base(commandHistory)
 	{
-		_projectModel = projectModel;
+		_projectModel   = projectModel;
+		_referencePopup = new InspectorReferencePopup(projectModel, $"{_uniqueId}.referencePopup");
 	}
 
 	public void OpenReferencePopup(StudioReference value, Action<ProjectNode?> onSelected)
 	{
-		throw new NotImplementedException();
+		_reference                 = value;
+		_onReferenceSelected       = onSelected;
+		_requestOpenReferencePopup = true;
 	}
 
-	public bool   UpdateReferencePopup()
+	public override void Update()
 	{
-		throw new NotImplementedException();
+		if (_requestOpenReferencePopup)
+		{
+			_requestOpenReferencePopup = false;
+			_referencePopup.Open(_reference, _onReferenceSelected);
+		}
+
+		_referencePopup.Update();
+		base.Update();
 	}
 
 	public string ProjectNodeGuidToName(string guid)
 	{
-		throw new NotImplementedException();
+		ProjectNode? node = _projectModel.FindNodeByGuid(guid);
+		return node?.Name ?? "";
 	}
 }
