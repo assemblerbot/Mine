@@ -69,16 +69,16 @@ public class InspectorReferencePopup
 			new CancellationToken()
 		);
 		
-		// _projectModel.ScriptsFolder?.TraverseRecursive(
-		// 	node => 
-		// 	{
-		// 		if (reference.CanAcceptNode(node))
-		// 		{
-		// 			_relevantNodes.Add(node);
-		// 		}
-		// 	},
-		// 	TraverseFlags.Files | TraverseFlags.Directories,
-		// 	new CancellationToken()
-		// );
+		_projectModel.ScriptsFolder?.TraverseRecursive(
+			node => 
+			{
+				if (reference.CanAcceptNode(node))
+				{
+					_relevantNodes.Add(node);
+				}
+			},
+			TraverseFlags.Files | TraverseFlags.Directories,
+			new CancellationToken()
+		);
 	}
 }
