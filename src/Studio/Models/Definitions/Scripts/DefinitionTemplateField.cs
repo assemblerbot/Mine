@@ -5,18 +5,18 @@ namespace Mine.Studio;
 [Serializable, SerializedClassId("3b2b36d4-9272-490b-87e4-495393682604")]
 public sealed class DefinitionTemplateField
 {
-	public DefinitionTemplateFieldType Type;
-	public string                      Name;
-	public StudioScriptReference       GenericParameter;
+	public DefinitionTemplateFieldType     Type;
+	public string                          Name;
+	public StudioScriptDefinitionReference GenericParameter;
 
 	public DefinitionTemplateField()
 	{
 		Type             = DefinitionTemplateFieldType.Type_int;
 		Name             = "newField";
-		GenericParameter = new StudioScriptReference();
+		GenericParameter = new StudioScriptDefinitionReference();
 	}
 
-	public DefinitionTemplateField(DefinitionTemplateFieldType type, string name, StudioScriptReference genericParameter)
+	public DefinitionTemplateField(DefinitionTemplateFieldType type, string name, StudioScriptDefinitionReference genericParameter)
 	{
 		Type             = type;
 		Name             = name;

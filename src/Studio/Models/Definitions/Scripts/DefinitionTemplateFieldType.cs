@@ -27,7 +27,7 @@ public static class DefinitionTemplateFiledTypeExtensions
 			: DefinitionTemplateFieldType.Type_int;
 	}
 
-	public static DefinitionAssetValue ToDefinitionAssetValue(this DefinitionTemplateFieldType type, StudioScriptReference genericParameter)
+	public static DefinitionAssetValue ToDefinitionAssetValue(this DefinitionTemplateFieldType type, StudioScriptDefinitionReference genericParameter)
 	{
 		return type switch
 		{

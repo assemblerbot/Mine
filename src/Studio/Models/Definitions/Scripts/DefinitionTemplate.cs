@@ -170,7 +170,7 @@ public sealed class DefinitionTemplate
 					string propertyType = propertyMatch.Groups[1].Captures[0].ToString();
 					string propertyName = propertyMatch.Groups[2].Captures[0].ToString();
 
-					DefinitionTemplateField field = new(propertyType.ToTemplateType(), propertyName, new StudioScriptReference());
+					DefinitionTemplateField field = new(propertyType.ToTemplateType(), propertyName, new StudioScriptDefinitionReference());
 					_fields.Add(field);
 				}
 				else if((propertyMatch = genericPropertyRegex.Match(line)).Success)
@@ -181,7 +181,7 @@ public sealed class DefinitionTemplate
 					string propertyName     = propertyMatch.Groups[3].Captures[0].ToString();
 
 					// TODO - generic parameter class name to GUID
-					DefinitionTemplateField field = new(propertyType.ToTemplateType(), propertyName, new StudioScriptReference());
+					DefinitionTemplateField field = new(propertyType.ToTemplateType(), propertyName, new StudioScriptDefinitionReference());
 					_fields.Add(field);
 				}
 			}
