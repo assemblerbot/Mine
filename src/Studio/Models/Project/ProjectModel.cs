@@ -172,7 +172,7 @@ public sealed class ProjectModel
 		
 		InitMeta();
 
-		ImportAll();
+		//ImportAll();
 		_eventAggregator.Trigger(new OpenedEvent());
 
 		CreateWatchers();
@@ -831,12 +831,19 @@ public sealed class ProjectModel
 		return new ProjectTask(
 			cancellationToken =>
 			{
-				if (Directory.Exists(absoluteResourcesPath))
+				try
 				{
-					Directory.Delete(absoluteResourcesPath, true);
-				}
+					if (Directory.Exists(absoluteResourcesPath))
+					{
+						Directory.Delete(absoluteResourcesPath, true);
+					}
 
-				Directory.CreateDirectory(absoluteResourcesPath);
+					Directory.CreateDirectory(absoluteResourcesPath);
+				}
+				catch (Exception e)
+				{
+					ConsoleViewModel.LogException(e.ToString());
+				}
 			}
 		);
 	}

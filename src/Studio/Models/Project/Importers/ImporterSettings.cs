@@ -3,7 +3,7 @@ using RedHerring.Studio.Models.Project.FileSystem;
 
 namespace RedHerring.Studio.Models.Project.Importers;
 
-[Serializable]
+[Serializable, SerializedClassId("1fbf8638-5ae8-49cd-be7c-846bbadd6951")]
 public abstract class ImporterSettings
 {
 	public abstract ProjectNodeType NodeType { get; }

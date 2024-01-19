@@ -4,12 +4,12 @@ using RedHerring.Studio.Models.Project.FileSystem;
 namespace Mine.Studio;
 
 [Serializable, SerializedClassId("1d1cea4c-4339-4d76-a548-602210666e09")]
-public sealed class StudioDefinitionReference : StudioReference
+public sealed class StudioAssetDefinitionReference : StudioReference
 {
 	public override string Name => $"Definition<{GenericParameter}>";
 	public          string GenericParameter;
 
-	public StudioDefinitionReference(string genericParameter)
+	public StudioAssetDefinitionReference(string genericParameter)
 	{
 		GenericParameter = genericParameter;
 	}
@@ -21,16 +21,16 @@ public sealed class StudioDefinitionReference : StudioReference
 
 	public override StudioReference CreateCopy()
 	{
-		return new StudioDefinitionReference(GenericParameter) {Guid = Guid};
+		return new StudioAssetDefinitionReference(GenericParameter) {Guid = Guid};
 	}
 }
 
 #region Migration
-[MigratableInterface(typeof(StudioDefinitionReference))]
-public interface IStudioDefinitionReferenceMigratable : IStudioReferenceMigratable;
+[MigratableInterface(typeof(StudioAssetDefinitionReference))]
+public interface IStudioAssetDefinitionReferenceMigratable : IStudioReferenceMigratable;
     
-[Serializable, LatestVersion(typeof(StudioDefinitionReference))]
-public class StudioDefinitionReference_000 : StudioReference_000, IStudioDefinitionReferenceMigratable
+[Serializable, LatestVersion(typeof(StudioAssetDefinitionReference))]
+public class StudioAssetDefinitionReference_000 : StudioReference_000, IStudioAssetDefinitionReferenceMigratable
 {
 	public string GenericParameter;
 }

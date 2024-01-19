@@ -4,7 +4,7 @@ using RedHerring.Studio.UserInterface.Attributes;
 
 namespace RedHerring.Studio.Models.Project.FileSystem;
 
-[Serializable, SerializedClassId("metadata-class-id")]
+[Serializable, SerializedClassId("metadata-class-id")] // TODO - replace by GUID
 public class Metadata
 {
 	[ReadOnlyInInspector] public string? Guid = null;
