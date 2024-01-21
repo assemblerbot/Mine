@@ -9,7 +9,7 @@ public class Metadata
 {
 	[ReadOnlyInInspector] public string? Guid = null;
 	[ReadOnlyInInspector] public string? Hash = null;
-	
+
 	public ImporterSettings? ImporterSettings = null;
 
 	public void UpdateGuid()

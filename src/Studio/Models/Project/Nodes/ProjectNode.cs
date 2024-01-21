@@ -15,7 +15,8 @@ public abstract class ProjectNode
 
 	[ReadOnlyInInspector] public bool HasMetaFile;
 	
-	public Metadata? Meta;
+	public                   Metadata? Meta;
+	[HideInInspector] public object?   CachedContent = null;
 
 	public          string Extension => System.IO.Path.GetExtension(AbsolutePath).ToLower(); // cache if needed
 	public abstract bool   Exists    { get; }
@@ -23,7 +24,7 @@ public abstract class ProjectNode
 	protected ProjectNode(string name, string absolutePath, string relativePath, bool hasMetaFile)
 	{
 		Name         = name;
-		AbsolutePath         = absolutePath;
+		AbsolutePath = absolutePath;
 		RelativePath = relativePath;
 		HasMetaFile  = hasMetaFile;
 	}
@@ -45,6 +46,11 @@ public abstract class ProjectNode
 	public void SetNodeType(ProjectNodeType type)
 	{
 		Type = type;
+	}
+
+	public T? GetCachedContent<T>() where T:class
+	{
+		return CachedContent as T;
 	}
 
 	protected void CreateMetaFile(MigrationManager migrationManager)

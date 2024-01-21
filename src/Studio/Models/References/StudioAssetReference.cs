@@ -8,7 +8,7 @@ public sealed class StudioAssetReference : StudioReference
 {
 	public override string Name => "Asset";
 
-	public override bool   CanAcceptNode(ProjectNode node)
+	public override bool CanAcceptNode(ProjectNode node)
 	{
 		return node.Type.IsAssetsRelated() && node.Type != ProjectNodeType.AssetFolder;
 	}

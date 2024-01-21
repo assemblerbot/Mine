@@ -119,7 +119,7 @@ public sealed class ToolDefinitions : Tool
 		}
 
 		// get script node
-		if (selected is ProjectScriptFileNode scriptFileNode)
+		if (selected is ProjectScriptFileNode scriptFileNode && scriptFileNode.Type == ProjectNodeType.ScriptDefinition)
 		{
 			if (ReferenceEquals(scriptFileNode, _definitionTemplateNode))
 			{
@@ -134,7 +134,7 @@ public sealed class ToolDefinitions : Tool
 		}
 
 		// get asset node
-		if (selected is ProjectAssetFileNode assetFileNode)
+		if (selected is ProjectAssetFileNode assetFileNode && assetFileNode.Type == ProjectNodeType.AssetDefinition)
 		{
 			if (ReferenceEquals(assetFileNode, _definitionAssetNode))
 			{

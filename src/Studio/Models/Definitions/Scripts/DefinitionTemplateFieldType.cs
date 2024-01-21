@@ -1,5 +1,6 @@
 namespace Mine.Studio;
 
+// !!! Don't rename without thinking! Enum values are used as data types for definition fields! !!!
 [Serializable]
 public enum DefinitionTemplateFieldType
 {
@@ -37,13 +38,13 @@ public static class DefinitionTemplateFiledTypeExtensions
 			DefinitionTemplateFieldType.Type_bool           => new DefinitionAssetValueBool(),
 			DefinitionTemplateFieldType.Type_AssetReference => new DefinitionAssetValueReference(new StudioAssetReference()),
 			DefinitionTemplateFieldType.Type_FolderReference => new DefinitionAssetValueReference(new StudioFolderReference()),
-			DefinitionTemplateFieldType.Type_DefinitionReference => new DefinitionAssetValueReference(genericParameter),
+			DefinitionTemplateFieldType.Type_DefinitionReference => new DefinitionAssetValueReference(new StudioAssetDefinitionReference(genericParameter.Guid ?? "")),
 			_ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
 		};
 	}
 	
 	public static bool HasGenericParameter(this DefinitionTemplateFieldType type)
 	{
-		return type == DefinitionTemplateFieldType.Type_AssetReference;
+		return type == DefinitionTemplateFieldType.Type_DefinitionReference;
 	}
 }
