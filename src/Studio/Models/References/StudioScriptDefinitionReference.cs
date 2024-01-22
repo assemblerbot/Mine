@@ -1,4 +1,5 @@
 using Migration;
+using RedHerring.Studio.Models;
 using RedHerring.Studio.Models.Project.FileSystem;
 
 namespace Mine.Studio;
@@ -8,7 +9,7 @@ public class StudioScriptDefinitionReference : StudioReference
 {
 	public override string Name => "Definition template";
 
-	public override bool CanAcceptNode(ProjectNode node)
+	public override bool CanAcceptNode(StudioModel studioModel, ProjectNode node)
 	{
 		return node.Type == ProjectNodeType.ScriptDefinition;
 	}

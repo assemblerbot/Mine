@@ -1,4 +1,5 @@
 using Migration;
+using RedHerring.Studio.Models;
 using RedHerring.Studio.Models.Project.FileSystem;
 using RedHerring.Studio.UserInterface;
 
@@ -13,7 +14,7 @@ public abstract class StudioReference
 	public string? Guid = null;
 	public bool    IsEmpty => Guid == null;
 
-	public abstract bool            CanAcceptNode(ProjectNode node);
+	public abstract bool            CanAcceptNode(StudioModel studioModel, ProjectNode node);
 	public abstract StudioReference CreateCopy();
 	
 	public virtual void WriteJsonValue(StringWriter stringWriter)

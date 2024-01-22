@@ -162,7 +162,7 @@ public sealed class ToolDefinitions : Tool
 			
 			ProjectScriptFileNode? templateNode = StudioModel.Project.FindScriptNodeByGuid(_definitionAsset.Template.Header.Guid);
 			_definitionTemplateNode = templateNode;
-			_definitionAssetEditor  = new ToolDefinitionAssetEditor(StudioModel.Project, _definitionAssetNode, _definitionAsset, NameId + ".asset_editor");
+			_definitionAssetEditor  = new ToolDefinitionAssetEditor(StudioModel, StudioModel.Project, _definitionAssetNode, _definitionAsset, NameId + ".asset_editor");
 		}
 
 		// try to read script node
@@ -177,7 +177,7 @@ public sealed class ToolDefinitions : Tool
 				return;
 			}
 
-			_definitionTemplateEditor = new ToolDefinitionTemplateEditor(_projectModel, _definitionTemplateNode, _definitionTemplate, NameId + ".template_editor");
+			_definitionTemplateEditor = new ToolDefinitionTemplateEditor(StudioModel, _projectModel, _definitionTemplateNode, _definitionTemplate, NameId + ".template_editor");
 		}
 	}
 }

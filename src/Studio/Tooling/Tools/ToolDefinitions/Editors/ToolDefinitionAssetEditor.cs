@@ -2,6 +2,7 @@ using System.Numerics;
 using ImGuiNET;
 using Mine.ImGuiPlugin;
 using RedHerring.Studio.Commands;
+using RedHerring.Studio.Models;
 using RedHerring.Studio.Models.Project;
 using RedHerring.Studio.Models.Project.FileSystem;
 using RedHerring.Studio.UserInterface;
@@ -137,13 +138,13 @@ public sealed class ToolDefinitionAssetEditor : IInspectorStudio
 
 	private bool _popupOpened = false;
 	
-	public ToolDefinitionAssetEditor(ProjectModel projectModel, ProjectAssetFileNode assetNode, DefinitionAsset asset, string editorUniqueId)
+	public ToolDefinitionAssetEditor(StudioModel studioModel, ProjectModel projectModel, ProjectAssetFileNode assetNode, DefinitionAsset asset, string editorUniqueId)
 	{
 		_projectModel        = projectModel;
 		_definitionAssetNode = assetNode;
 		_definitionAsset     = asset;
 		_editorUniqueId      = editorUniqueId;
-		_referencePopup      = new InspectorReferencePopup(projectModel, editorUniqueId + ".referencePopup");
+		_referencePopup      = new InspectorReferencePopup(studioModel, projectModel, editorUniqueId + ".referencePopup");
 		RebuildControls();
 	}
 

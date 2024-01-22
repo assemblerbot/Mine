@@ -1,4 +1,5 @@
 using ImGuiNET;
+using RedHerring.Studio.Models;
 using RedHerring.Studio.Models.Project;
 using RedHerring.Studio.Models.Project.FileSystem;
 
@@ -6,14 +7,16 @@ namespace Mine.Studio;
 
 public class InspectorReferencePopup
 {
+	private readonly StudioModel  _studioModel;
 	private readonly ProjectModel _projectModel;
 	private          string       _id;
 
 	private List<ProjectNode>     _relevantNodes = new();
 	private Action<ProjectNode?>? _onSelected;
 	
-	public InspectorReferencePopup(ProjectModel projectModel, string id)
+	public InspectorReferencePopup(StudioModel studioModel, ProjectModel projectModel, string id)
 	{
+		_studioModel  = studioModel;
 		_projectModel = projectModel;
 		_id           = id;
 	}
@@ -21,7 +24,7 @@ public class InspectorReferencePopup
 	public void Open(StudioReference value, Action<ProjectNode?> onSelected)
 	{
 		_onSelected = onSelected;
-		RefreshRelevantNodes(value);
+		RefreshRelevantNodes(_studioModel, value);
 		ImGui.OpenPopup(_id);
 	}
 
@@ -53,14 +56,14 @@ public class InspectorReferencePopup
 		return false;
 	}
 
-	private void RefreshRelevantNodes(StudioReference reference)
+	private void RefreshRelevantNodes(StudioModel studioModel, StudioReference reference)
 	{
 		_relevantNodes.Clear();
 
 		_projectModel.AssetsFolder?.TraverseRecursive(
 			node =>
 			{
-				if (reference.CanAcceptNode(node))
+				if (reference.CanAcceptNode(_studioModel, node))
 				{
 					_relevantNodes.Add(node);
 				}
@@ -72,7 +75,7 @@ public class InspectorReferencePopup
 		_projectModel.ScriptsFolder?.TraverseRecursive(
 			node => 
 			{
-				if (reference.CanAcceptNode(node))
+				if (reference.CanAcceptNode(studioModel, node))
 				{
 					_relevantNodes.Add(node);
 				}

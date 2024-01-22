@@ -2,6 +2,7 @@ using System.Numerics;
 using ImGuiNET;
 using Mine.ImGuiPlugin;
 using RedHerring.Studio.Commands;
+using RedHerring.Studio.Models;
 using RedHerring.Studio.Models.Project;
 using RedHerring.Studio.Models.Project.FileSystem;
 using RedHerring.Studio.UserInterface;
@@ -18,14 +19,14 @@ public class ToolDefinitionTemplateEditor
 	private readonly CommandHistoryWithChange _commandHistory;
 	private          string?                  _errorMessage = null;
 
-	public ToolDefinitionTemplateEditor(ProjectModel projectModel, ProjectScriptFileNode definitionTemplateNode, DefinitionTemplate definitionTemplate, string editorUniqueId)
+	public ToolDefinitionTemplateEditor(StudioModel studioModel, ProjectModel projectModel, ProjectScriptFileNode definitionTemplateNode, DefinitionTemplate definitionTemplate, string editorUniqueId)
 	{
 		_definitionTemplateNode = definitionTemplateNode;
 		_definitionTemplate     = definitionTemplate;
 		_editorUniqueId         = editorUniqueId;
 
-		_commandHistory   = new CommandHistoryWithChange();
-		_inspector = new InspectorStudio(_commandHistory, projectModel);
+		_commandHistory = new CommandHistoryWithChange();
+		_inspector      = new InspectorStudio(_commandHistory, studioModel, projectModel);
 		_inspector.Init(_definitionTemplate);
 	}
 

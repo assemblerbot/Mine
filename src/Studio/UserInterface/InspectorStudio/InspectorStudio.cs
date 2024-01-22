@@ -1,5 +1,6 @@
 using Mine.Studio;
 using RedHerring.Studio.Commands;
+using RedHerring.Studio.Models;
 using RedHerring.Studio.Models.Project;
 using RedHerring.Studio.Models.Project.FileSystem;
 
@@ -10,6 +11,7 @@ public class InspectorStudio : Inspector, IInspectorStudio
 	private         InspectorStudioControlMap _studioControlMap = new();
 	public override InspectorControlMap       ControlMap => _studioControlMap;
 
+	private readonly StudioModel  _studioModel;
 	private readonly ProjectModel _projectModel;
 
 	private readonly InspectorReferencePopup _referencePopup;
@@ -17,10 +19,11 @@ public class InspectorStudio : Inspector, IInspectorStudio
 	private          StudioReference         _reference                 = null!;
 	private          Action<ProjectNode?>    _onReferenceSelected;
 	
-	public InspectorStudio(ICommandHistory commandHistory, ProjectModel projectModel) : base(commandHistory)
+	public InspectorStudio(ICommandHistory commandHistory, StudioModel studioModel, ProjectModel projectModel) : base(commandHistory)
 	{
+		_studioModel    = studioModel;
 		_projectModel   = projectModel;
-		_referencePopup = new InspectorReferencePopup(projectModel, $"{_uniqueId}.referencePopup");
+		_referencePopup = new InspectorReferencePopup(_studioModel, projectModel, $"{_uniqueId}.referencePopup");
 	}
 
 	public void OpenReferencePopup(StudioReference value, Action<ProjectNode?> onSelected)

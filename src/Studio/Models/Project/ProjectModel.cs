@@ -29,9 +29,12 @@ public sealed class ProjectModel
 	public static           Assembly      Assembly => typeof(ProjectModel).Assembly; 
 	private static readonly HashAlgorithm _hashAlgorithm = SHA1.Create();
 
+	// TODO - move to studio model
 	private readonly MigrationManager           _migrationManager;
 	private readonly StudioModelEventAggregator _eventAggregator;
 	private readonly ImporterRegistry           _importerRegistry = new();
+	private readonly ContentRegistry            _contentRegistry  = new();
+	public           ContentRegistry            ContentRegistry => _contentRegistry;
 
 	public readonly object ProjectTreeLock = new(); // synchronization lock
 	

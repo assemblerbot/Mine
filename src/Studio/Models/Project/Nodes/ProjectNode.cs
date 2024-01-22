@@ -49,8 +49,10 @@ public abstract class ProjectNode
 		Type = type;
 	}
 
-	public T? GetContent<T>() where T:Content
+	public T? GetContent<T>(StudioModel studioModel) where T:Content
 	{
+		// TODO do in separate thread + add some management (unload?)
+		_content ??= studioModel.Project.ContentRegistry.LoadContent(studioModel, this);
 		return _content as T;
 	}
 
