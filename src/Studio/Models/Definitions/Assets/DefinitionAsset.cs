@@ -24,20 +24,20 @@ public sealed class DefinitionAsset
 		return asset;
 	}
 
-	public static DefinitionAsset? CreateFromFile(string path, MigrationManager migrationManager)
+	public static DefinitionAsset? CreateFromFile(string absolutePath, MigrationManager migrationManager)
 	{
-		byte[] json = File.ReadAllBytes(path);
+		byte[] json = File.ReadAllBytes(absolutePath);
 		DefinitionAsset asset = MigrationSerializer.Deserialize<DefinitionAsset, IDefinitionAssetMigratable>(migrationManager.TypesHash, json, SerializedDataFormat.JSON, migrationManager);
 		return asset;
 	}
 
-	public void WriteToFile(string path)
+	public void WriteToFile(string relativePath)
 	{
 		byte[] json = MigrationSerializer.Serialize(this, SerializedDataFormat.JSON);
-		File.WriteAllBytes(path, json);
+		File.WriteAllBytes(relativePath, json);
 	}
 
-	public void ImportToResources(string path)
+	public void ImportToResources(string absolutePath)
 	{
 		StringWriter stringWriter = new ();
 
@@ -77,7 +77,7 @@ public sealed class DefinitionAsset
 		}
 		stringWriter.Write(']');
 
-		File.WriteAllText(path, stringWriter.ToString());
+		File.WriteAllText(absolutePath, stringWriter.ToString());
 	}
 }
 

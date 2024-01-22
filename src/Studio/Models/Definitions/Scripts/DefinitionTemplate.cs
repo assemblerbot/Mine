@@ -16,9 +16,7 @@ public sealed class DefinitionTemplate
 	private const string _dataBegin = "//--- data begin ---";
 	private const string _dataEnd   = "//--- data end ---";
 
-	[NonSerialized] private readonly ProjectModel _projectModel;
-	
-	[OdinSerialize] private ProjectScriptFileHeader _header;
+	[OdinSerialize] private ProjectScriptFileHeader _header = null!;
 	public                  ProjectScriptFileHeader Header => _header;
 	
 	[ShowInInspector, OdinSerialize] private string _namespaceName = null!;
@@ -27,15 +25,21 @@ public sealed class DefinitionTemplate
 	[ShowInInspector, OdinSerialize] private List<DefinitionTemplateField?>          _fields = new();
 	public                                   IReadOnlyList<DefinitionTemplateField?> Fields => _fields;
 
-	private DefinitionTemplate(ProjectModel projectModel)
+	private DefinitionTemplate()
 	{
-		_projectModel = projectModel;
 	}
 
-	public static DefinitionTemplate? CreateFromFile(ProjectModel projectModel, string path)
+	public DefinitionTemplate(string namespaceName, string className)
 	{
-		DefinitionTemplate template = new(projectModel);
-		return template.Read(path) ? template : null;
+		_header        = new ProjectScriptFileHeader(Guid.NewGuid().ToString(), _typeId, _version);
+		_namespaceName = namespaceName;
+		_className     = className;
+	}
+
+	public static DefinitionTemplate? CreateFromFile(string absolutePath)
+	{
+		DefinitionTemplate template = new();
+		return template.Read(absolutePath) ? template : null;
 	}
 
 	public string? Validate()
@@ -72,16 +76,9 @@ public sealed class DefinitionTemplate
 		return null;
 	}
 
-	public DefinitionTemplate(string namespaceName, string className)
+	public void WriteToFile(string absolutePath)
 	{
-		_header        = new ProjectScriptFileHeader(Guid.NewGuid().ToString(), _typeId, _version);
-		_namespaceName = namespaceName;
-		_className     = className;
-	}
-
-	public void WriteToFile(string path)
-	{
-		using StreamWriter stream = File.CreateText(path);
+		using StreamWriter stream = File.CreateText(absolutePath);
 
 		stream.WriteLine(_header.ToHeaderString());
 		stream.WriteLine("//THIS FILE WAS GENERATED! DON'T MODIFY IT. ONLY THE NAMESPACE AND THE CLASS NAME CAN BE MODIFIED SAFELY!");
@@ -117,9 +114,9 @@ public sealed class DefinitionTemplate
 		stream.WriteLine("}");
 	}
 
-	public bool Read(string path)
+	public bool Read(string absolutePath)
 	{
-		using StreamReader stream = File.OpenText(path);
+		using StreamReader stream = File.OpenText(absolutePath);
 
 		// header
 		string? headerLine = stream.ReadLine();

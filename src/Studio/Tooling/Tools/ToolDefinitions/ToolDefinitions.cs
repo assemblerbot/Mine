@@ -168,7 +168,7 @@ public sealed class ToolDefinitions : Tool
 		// try to read script node
 		if (_definitionTemplateNode != null)
 		{
-			_definitionTemplate = DefinitionTemplate.CreateFromFile(_projectModel, _definitionTemplateNode.AbsolutePath);
+			_definitionTemplate = DefinitionTemplate.CreateFromFile(_definitionTemplateNode.AbsolutePath);
 			if (_definitionTemplate == null)
 			{
 				_definitionAsset        = null;
