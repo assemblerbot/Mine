@@ -1,4 +1,5 @@
 using Migration;
+using Mine.Studio;
 using RedHerring.Studio.Models.Project.Importers;
 using RedHerring.Studio.UserInterface.Attributes;
 
@@ -15,8 +16,8 @@ public abstract class ProjectNode
 
 	[ReadOnlyInInspector] public bool HasMetaFile;
 	
-	public                   Metadata? Meta;
-	[HideInInspector] public object?   CachedContent = null;
+	public  Metadata? Meta;
+	private Content?  _content = null;
 
 	public          string Extension => System.IO.Path.GetExtension(AbsolutePath).ToLower(); // cache if needed
 	public abstract bool   Exists    { get; }
@@ -48,9 +49,9 @@ public abstract class ProjectNode
 		Type = type;
 	}
 
-	public T? GetCachedContent<T>() where T:class
+	public T? GetContent<T>() where T:Content
 	{
-		return CachedContent as T;
+		return _content as T;
 	}
 
 	protected void CreateMetaFile(MigrationManager migrationManager)

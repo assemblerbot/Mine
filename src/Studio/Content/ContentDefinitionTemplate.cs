@@ -8,8 +8,9 @@ public sealed class ContentDefinitionTemplate : Content
 {
 	private DefinitionTemplate? _template = null;
 
-	public void Load(StudioModel model, ProjectNode node)
+	public override bool Load(StudioModel model, ProjectNode node)
 	{
 		_template = DefinitionTemplate.CreateFromFile(node.AbsolutePath);
+		return _template != null;
 	}
 }

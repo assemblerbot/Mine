@@ -7,9 +7,11 @@ namespace Mine.Studio;
 public sealed class ContentDefinitionAsset : Content
 {
 	private DefinitionAsset? _asset = null;
+	public  DefinitionAsset? Asset => _asset;
 
-	public void Load(StudioModel model, ProjectNode node)
+	public override bool Load(StudioModel model, ProjectNode node)
 	{
 		_asset = DefinitionAsset.CreateFromFile(node.AbsolutePath, model.MigrationManager);
+		return _asset != null;
 	}
 }

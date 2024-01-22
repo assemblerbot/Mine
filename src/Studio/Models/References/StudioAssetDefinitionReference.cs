@@ -16,7 +16,7 @@ public sealed class StudioAssetDefinitionReference : StudioReference
 
 	public override bool CanAcceptNode(ProjectNode node)
 	{
-		return node.Type == ProjectNodeType.AssetDefinition && node.GetCachedContent<DefinitionAsset>()?.Template.Header.Guid == GenericParameterGuid;
+		return node.Type == ProjectNodeType.AssetDefinition && node.GetContent<ContentDefinitionAsset>()?.Asset?.Template.Header.Guid == GenericParameterGuid;
 	}
 
 	public override StudioReference CreateCopy()
