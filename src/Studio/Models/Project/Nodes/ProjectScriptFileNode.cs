@@ -13,7 +13,7 @@ public class ProjectScriptFileNode : ProjectNode
 		SetNodeType(ProjectNodeType.ScriptFile);
 	}
 
-	public override void InitMeta(MigrationManager migrationManager, ImporterRegistry importerRegistry, CancellationToken cancellationToken)
+	public override void Init(MigrationManager migrationManager, ImporterRegistry importerRegistry, CancellationToken cancellationToken)
 	{
 		string guid = RelativePath;
 		

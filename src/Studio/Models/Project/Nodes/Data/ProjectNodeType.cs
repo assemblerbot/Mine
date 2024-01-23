@@ -34,4 +34,24 @@ public static class ProjectNodeTypeExtensions
 			type == ProjectNodeType.ScriptFile   ||
 			type == ProjectNodeType.ScriptDefinition;
 	}
+
+	public static ProjectNodeType FromAssetExtension(string extension)
+	{
+		return extension switch
+		{
+			".def" => ProjectNodeType.AssetDefinition,
+			".png" => ProjectNodeType.AssetImage,
+			".jpg" => ProjectNodeType.AssetImage,
+			_ => ProjectNodeType.AssetBinary
+		};
+	}
+
+	public static ProjectNodeType FromScriptType(string scriptType)
+	{
+		return scriptType switch
+		{
+			"DefinitionTemplate" => ProjectNodeType.ScriptDefinition,
+			_ => ProjectNodeType.ScriptFile
+		};
+	}
 }

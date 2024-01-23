@@ -12,7 +12,7 @@ public sealed class ProjectAssetFileNode : ProjectNode
 	{
 	}
 
-	public override void InitMeta(MigrationManager migrationManager, ImporterRegistry importerRegistry, CancellationToken cancellationToken)
+	public override void Init(MigrationManager migrationManager, ImporterRegistry importerRegistry, CancellationToken cancellationToken)
 	{
 		CreateMetaFile(migrationManager);
 

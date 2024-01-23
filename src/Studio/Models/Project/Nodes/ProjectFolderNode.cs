@@ -15,7 +15,7 @@ public class ProjectFolderNode : ProjectNode
 		SetNodeType(type);
 	}
 
-	public override void InitMeta(MigrationManager migrationManager, ImporterRegistry importerRegistry, CancellationToken cancellationToken)
+	public override void Init(MigrationManager migrationManager, ImporterRegistry importerRegistry, CancellationToken cancellationToken)
 	{
 		if (HasMetaFile)
 		{

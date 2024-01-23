@@ -30,7 +30,7 @@ public abstract class ProjectNode
 		HasMetaFile  = hasMetaFile;
 	}
 
-	public abstract void InitMeta(MigrationManager migrationManager, ImporterRegistry importerRegistry, CancellationToken cancellationToken);
+	public abstract void Init(MigrationManager migrationManager, ImporterRegistry importerRegistry, CancellationToken cancellationToken);
 
 	public void ResetMetaHash()
 	{
