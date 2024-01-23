@@ -1,4 +1,5 @@
 using Migration;
+using Mine.Studio;
 using RedHerring.Studio.Models.Project.Importers;
 
 namespace RedHerring.Studio.Models.Project.FileSystem;
@@ -12,22 +13,22 @@ public sealed class ProjectAssetFileNode : ProjectNode
 	{
 	}
 
-	public override void Init(MigrationManager migrationManager, ImporterRegistry importerRegistry, CancellationToken cancellationToken)
+	public override void Init(MigrationManager migrationManager, ImporterRegistry importerRegistry, NodeIORegistry nodeIORegistry, CancellationToken cancellationToken)
 	{
+		SetNodeType(ProjectNodeTypeExtensions.FromAssetExtension(Extension));
+		IO = nodeIORegistry.CreateNodeIO(this);
+		
 		CreateMetaFile(migrationManager);
-
 		if (Meta == null)
 		{
 			return;
 		}
 
-		if (Meta.ImporterSettings == null)
+		if (Meta.ImportSettings == null)
 		{
 			Importer importer = importerRegistry.GetImporter(Extension);
-			Meta.ImporterSettings = importer.CreateSettings();
+			Meta.ImportSettings = importer.CreateSettings();
 		}
-
-		SetNodeType(Meta.ImporterSettings.NodeType);
 	}
 
 	public override void TraverseRecursive(Action<ProjectNode> process, TraverseFlags flags, CancellationToken cancellationToken)

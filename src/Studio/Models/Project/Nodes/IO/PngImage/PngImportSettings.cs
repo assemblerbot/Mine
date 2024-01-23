@@ -2,10 +2,10 @@
 using Migration;
 using SixLabors.ImageSharp.Formats.Png;
 
-namespace RedHerring.Studio.Models.Project.Importers;
+namespace RedHerring.Studio.Models.Project.Imports;
 
-[Serializable, SerializedClassId("png-importer-id")]
-public sealed class PngImporterSettings : ImporterSettings
+[Serializable, SerializedClassId("79e3e75f-a6c2-465b-b815-fd68fb46972a")]
+public sealed class PngImportSettings : ImportSettings
 {
 	public override ProjectNodeType NodeType => ProjectNodeType.AssetImage;
 
@@ -17,11 +17,11 @@ public sealed class PngImporterSettings : ImporterSettings
 }
 
 #region Migration
-[MigratableInterface(typeof(PngImporterSettings))]
-public interface IPngImporterSettingsMigratable : IImporterSettingsMigratable;
+[MigratableInterface(typeof(PngImportSettings))]
+public interface IPngImportSettingsMigratable : IImportSettingsMigratable;
 
-[Serializable, LatestVersion(typeof(PngImporterSettings))]
-public class PngImporterSettings_000 : ImporterSettings_000, IPngImporterSettingsMigratable
+[Serializable, LatestVersion(typeof(PngImportSettings))]
+public class PngImportSettings_000 : ImportSettings_000, IPngImportSettingsMigratable
 {
     public PngBitDepth BitDepth;
     public PngColorType ColorType;

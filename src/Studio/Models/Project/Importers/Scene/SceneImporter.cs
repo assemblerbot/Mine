@@ -7,11 +7,11 @@ using Silk.NET.Maths;
 namespace RedHerring.Studio.Models.Project.Importers;
 
 [Importer(".fbx", ".obj")]
-public class SceneImporter : AssetImporter<SceneImporterSettings>
+public class SceneImporter : AssetImporter<SceneImportSettings>
 {
-	protected override SceneImporterSettings CreateImporterSettings() => new();
+	protected override SceneImportSettings CreateImporterSettings() => new();
 	
-	protected override ImporterResult Import(Stream stream, SceneImporterSettings settings, string resourcePath, MigrationManager migrationManager,
+	protected override ImporterResult Import(Stream stream, SceneImportSettings settings, string resourcePath, MigrationManager migrationManager,
 		CancellationToken                           cancellationToken)
 	{
 		AssimpContext context = new();
@@ -36,12 +36,12 @@ public class SceneImporter : AssetImporter<SceneImporterSettings>
 			Assimp.Mesh assimpMesh = scene.Meshes[i];
 			if (i == settings.Meshes.Count)
 			{
-				settings.Meshes.Add(new SceneImporterMeshSettings(assimpMesh.Name));
+				settings.Meshes.Add(new SceneImportMeshSettings(assimpMesh.Name));
 				settingsChanged = true;
 			}
 			else if(settings.Meshes[i].Name != assimpMesh.Name)
 			{
-				settings.Meshes[i] = new SceneImporterMeshSettings(assimpMesh.Name);
+				settings.Meshes[i] = new SceneImportMeshSettings(assimpMesh.Name);
 				settingsChanged    = true;
 			}
 

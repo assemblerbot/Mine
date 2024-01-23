@@ -35,6 +35,7 @@ public sealed class ProjectModel
 	private readonly ImporterRegistry           _importerRegistry = new();
 	private readonly ContentRegistry            _contentRegistry  = new();
 	public           ContentRegistry            ContentRegistry => _contentRegistry;
+	private readonly NodeIORegistry             _nodeIORegistry = new();
 
 	public readonly object ProjectTreeLock = new(); // synchronization lock
 	
@@ -408,13 +409,13 @@ public sealed class ProjectModel
 		lock (ProjectTreeLock)
 		{
 			_assetsFolder!.TraverseRecursive(
-				node => _thread.Enqueue(CreateInitMetaTask(_assetsFolder!, node.RelativePath)),
+				node => _thread.Enqueue(CreateInitNodeTask(_assetsFolder!, node.RelativePath)),
 				TraverseFlags.Directories | TraverseFlags.Files,
 				default
 			);
 
 			_scriptsFolder!.TraverseRecursive(
-				node => _thread.Enqueue(CreateInitMetaTask(_scriptsFolder!, node.RelativePath)),
+				node => _thread.Enqueue(CreateInitNodeTask(_scriptsFolder!, node.RelativePath)),
 				TraverseFlags.Directories | TraverseFlags.Files,
 				default
 			);
@@ -443,7 +444,7 @@ public sealed class ProjectModel
 
 				// folder
 				EnqueueProjectTaskFromWatcher(CreateNewFolderNodeTask(_assetsFolder!, parentRelativePath, folderName, true, ProjectNodeType.AssetFolder));
-				EnqueueProjectTaskFromWatcher(CreateInitMetaTask(_assetsFolder!, relativePath));
+				EnqueueProjectTaskFromWatcher(CreateInitNodeTask(_assetsFolder!, relativePath));
 			}
 			else
 			{
@@ -451,13 +452,13 @@ public sealed class ProjectModel
 				{
 					// created directory
 					EnqueueProjectTaskFromWatcher(CreateNewFolderNodeTask(_assetsFolder!, relativePath, path, true, ProjectNodeType.AssetFolder));
-					EnqueueProjectTaskFromWatcher(CreateInitMetaTask(_assetsFolder!, eventRelativePath));
+					EnqueueProjectTaskFromWatcher(CreateInitNodeTask(_assetsFolder!, eventRelativePath));
 				}
 				else
 				{
 					// created file
 					EnqueueProjectTaskFromWatcher(CreateNewAssetFileTask(_assetsFolder!, relativePath, path));
-					EnqueueProjectTaskFromWatcher(CreateInitMetaTask(_assetsFolder!, eventRelativePath));
+					EnqueueProjectTaskFromWatcher(CreateInitNodeTask(_assetsFolder!, eventRelativePath));
 					//EnqueueProjectTaskFromWatcher(CreateImportTask(_assetsFolder!, eventRelativePath));
 				}
 				break;
@@ -471,7 +472,7 @@ public sealed class ProjectModel
 		{
 			// deleted meta file .. create new
 			string assetRelativeFilePath = eventRelativePath.Substring(0, eventRelativePath.Length - ".meta".Length);
-			EnqueueProjectTaskFromWatcher(CreateInitMetaTask(_assetsFolder!, assetRelativeFilePath));
+			EnqueueProjectTaskFromWatcher(CreateInitNodeTask(_assetsFolder!, assetRelativeFilePath));
 			return;
 		}
 
@@ -572,7 +573,7 @@ public sealed class ProjectModel
 				{
 					// created file
 					EnqueueProjectTaskFromWatcher(CreateNewScriptFileTask(_scriptsFolder!, relativePath, path));
-					EnqueueProjectTaskFromWatcher(CreateInitMetaTask(_scriptsFolder!, eventRelativePath));
+					EnqueueProjectTaskFromWatcher(CreateInitNodeTask(_scriptsFolder!, eventRelativePath));
 				}
 				break;
 			}
@@ -681,7 +682,7 @@ public sealed class ProjectModel
 		);
 	}
 	
-	private ProjectTask CreateInitMetaTask(ProjectRootNode root, string path)
+	private ProjectTask CreateInitNodeTask(ProjectRootNode root, string path)
 	{
 		return new ProjectTask(
 			cancellationToken =>
@@ -691,7 +692,7 @@ public sealed class ProjectModel
 					ProjectNode? node = root.FindNode(path);
 					if (node != null && node.Exists)
 					{
-						node.Init(_migrationManager, _importerRegistry, cancellationToken);
+						node.Init(_migrationManager, _importerRegistry, _nodeIORegistry, cancellationToken);
 					}
 				}
 			}

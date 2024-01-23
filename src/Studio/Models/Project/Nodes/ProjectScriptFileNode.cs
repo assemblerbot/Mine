@@ -1,4 +1,5 @@
 using Migration;
+using Mine.Studio;
 using RedHerring.Studio.Models.Project.Importers;
 
 namespace RedHerring.Studio.Models.Project.FileSystem;
@@ -10,21 +11,27 @@ public class ProjectScriptFileNode : ProjectNode
 
 	public ProjectScriptFileNode(string name, string absolutePath, string relativePath) : base(name, absolutePath, relativePath, false)
 	{
-		SetNodeType(ProjectNodeType.ScriptFile);
 	}
 
-	public override void Init(MigrationManager migrationManager, ImporterRegistry importerRegistry, CancellationToken cancellationToken)
+	public override void Init(MigrationManager migrationManager, ImporterRegistry importerRegistry, NodeIORegistry nodeIORegistry, CancellationToken cancellationToken)
 	{
-		string guid = RelativePath;
+		string guid;
 		
 		// try to parse file header
 		ProjectScriptFileHeader? header = ProjectScriptFileHeader.CreateFromFile(AbsolutePath);
 		if(header != null)
 		{
 			guid = header.Guid;
-			SetNodeType(ProjectNodeType.ScriptDefinition);
+			SetNodeType(ProjectNodeTypeExtensions.FromScriptType(header.Type));
+		}
+		else
+		{
+			guid = RelativePath;
+			SetNodeType(ProjectNodeType.ScriptFile);
 		}
 
+		IO = nodeIORegistry.CreateNodeIO(this);
+		
 		Meta = new Metadata
 		       {
 			       Guid = guid,

@@ -16,8 +16,8 @@ public abstract class ProjectNode
 
 	[ReadOnlyInInspector] public bool HasMetaFile;
 	
-	public  Metadata? Meta;
-	private Content?  _content = null;
+	public Metadata? Meta;
+	public NodeIO?   IO;
 
 	public          string Extension => System.IO.Path.GetExtension(AbsolutePath).ToLower(); // cache if needed
 	public abstract bool   Exists    { get; }
@@ -30,7 +30,7 @@ public abstract class ProjectNode
 		HasMetaFile  = hasMetaFile;
 	}
 
-	public abstract void Init(MigrationManager migrationManager, ImporterRegistry importerRegistry, CancellationToken cancellationToken);
+	public abstract void Init(MigrationManager migrationManager, ImporterRegistry importerRegistry, NodeIORegistry nodeIORegistry, CancellationToken cancellationToken);
 
 	public void ResetMetaHash()
 	{
@@ -52,8 +52,9 @@ public abstract class ProjectNode
 	public T? GetContent<T>(StudioModel studioModel) where T:Content
 	{
 		// TODO do in separate thread + add some management (unload?)
-		_content ??= studioModel.Project.ContentRegistry.LoadContent(studioModel, this);
-		return _content as T;
+		// _content ??= studioModel.Project.ContentRegistry.LoadContent(studioModel, this);
+		// return _content as T;
+		return null;
 	}
 
 	protected void CreateMetaFile(MigrationManager migrationManager)

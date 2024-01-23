@@ -4,11 +4,11 @@ using Mine.Studio;
 namespace RedHerring.Studio.Models.Project.Importers.Definition;
 
 [Importer(".def")]
-public class DefinitionImporter : AssetImporter<DefinitionImporterSettings>
+public class DefinitionImporter : AssetImporter<DefinitionImportSettings>
 {
-	protected override DefinitionImporterSettings CreateImporterSettings() => new();
+	protected override DefinitionImportSettings CreateImporterSettings() => new();
 
-	protected override ImporterResult Import(Stream stream, DefinitionImporterSettings settings, string resourcePath, MigrationManager migrationManager,
+	protected override ImporterResult Import(Stream stream, DefinitionImportSettings settings, string resourcePath, MigrationManager migrationManager,
 		CancellationToken                           cancellationToken)
 	{
 		DefinitionAsset? asset = DefinitionAsset.CreateFromStream(stream, migrationManager);

@@ -1,5 +1,6 @@
 using Migration;
-using RedHerring.Studio.Models.Project.Importers;
+using RedHerring.Studio.Models.Project.Imports;
+using RedHerring.Studio.Models.Project.Imports;
 using RedHerring.Studio.UserInterface.Attributes;
 
 namespace RedHerring.Studio.Models.Project.FileSystem;
@@ -10,7 +11,7 @@ public class Metadata
 	[ReadOnlyInInspector] public string? Guid = null;
 	[ReadOnlyInInspector] public string? Hash = null;
 
-	public ImporterSettings? ImporterSettings = null;
+	public ImportSettings? ImportSettings = null;
 
 	public void UpdateGuid()
 	{
@@ -45,14 +46,14 @@ public class Metadata_001 : IMetadataMigratable
 	public string? Guid;
 	public string? Hash;
 	
-	[MigrateField] public List<IImporterSettingsMigratable>? ImporterSettings;
+	[MigrateField] public List<IImportSettingsMigratable>? ImportSettings;
 	
 	public void Migrate(Metadata_000 prev)
 	{
 		Guid = prev.Guid;
 		Hash = null; // to force reimport
 		
-		ImporterSettings = new List<IImporterSettingsMigratable>();
+		ImportSettings = new List<IImportSettingsMigratable>();
 	}
 }
 
@@ -62,14 +63,14 @@ public class Metadata_002 : IMetadataMigratable
 	public string? Guid;
 	public string? Hash;
 	
-	[MigrateField] public IImporterSettingsMigratable? ImporterSettings;
+	[MigrateField] public IImportSettingsMigratable? ImportSettings;
 	
 	public void Migrate(Metadata_001 prev)
 	{
 		Guid = prev.Guid;
 		Hash = null; // to force reimport
 		
-		ImporterSettings = null;
+		ImportSettings = null;
 	}
 }
 #endregion

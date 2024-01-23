@@ -13,10 +13,10 @@ public sealed class NodeIORegistry
 		ScanTypes();
 	}
 
-	public NodeIO CreateNodeIO(ProjectNodeType projectNodeType)
+	public NodeIO CreateNodeIO(ProjectNode node)
 	{
-		Type   nodeIOType = _types.TryGetValue(projectNodeType, out Type? type) ? type : _fallback;
-		object instance   = Activator.CreateInstance(nodeIOType)!;
+		Type   nodeIOType = _types.TryGetValue(node.Type, out Type? type) ? type : _fallback;
+		object instance   = Activator.CreateInstance(nodeIOType, node)!;
 		return (NodeIO) instance;
 	}
 	
