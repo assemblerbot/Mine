@@ -50,7 +50,7 @@ public static class ProjectNodeTypeExtensions
 	{
 		return scriptType switch
 		{
-			"DefinitionTemplate" => ProjectNodeType.ScriptDefinition,
+			ScriptNodeTypes.DEFINITION => ProjectNodeType.ScriptDefinition,
 			_ => ProjectNodeType.ScriptFile
 		};
 	}

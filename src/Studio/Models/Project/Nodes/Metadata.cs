@@ -1,6 +1,5 @@
 using Migration;
 using RedHerring.Studio.Models.Project.Imports;
-using RedHerring.Studio.Models.Project.Imports;
 using RedHerring.Studio.UserInterface.Attributes;
 
 namespace RedHerring.Studio.Models.Project.FileSystem;

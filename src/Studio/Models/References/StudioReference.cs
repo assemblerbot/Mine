@@ -21,7 +21,6 @@ public abstract class StudioReference
 	{
 		//TODO
 	}
-
 }
 
 #region Migration

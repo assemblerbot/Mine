@@ -17,7 +17,23 @@ public sealed class StudioAssetDefinitionReference : StudioReference
 
 	public override bool CanAcceptNode(StudioModel studioModel, ProjectNode node)
 	{
-		return node.Type == ProjectNodeType.AssetDefinition && node.GetNodeIO<NodeIOAssetDefinition>()?.Asset?.Template.Header.Guid == GenericParameterGuid;
+		if (node.Type != ProjectNodeType.AssetDefinition)
+		{
+			return false;
+		}
+
+		NodeIOAssetDefinition? io = node.GetNodeIO<NodeIOAssetDefinition>();
+		if (io == null)
+		{
+			return false;
+		}
+
+		if (io.Asset == null)
+		{
+			io.Load(); // TODO - other thread?
+		}
+
+		return io.Asset?.Template.Header.Guid == GenericParameterGuid;
 	}
 
 	public override StudioReference CreateCopy()
