@@ -1,6 +1,5 @@
 using Migration;
 using Mine.Studio;
-using RedHerring.Studio.Models.Project.Importers;
 using RedHerring.Studio.UserInterface.Attributes;
 
 namespace RedHerring.Studio.Models.Project.FileSystem;
@@ -19,7 +18,7 @@ public abstract class ProjectNode
 	public Metadata? Meta;
 	public NodeIO?   IO;
 
-	public          string Extension => System.IO.Path.GetExtension(AbsolutePath).ToLower(); // cache if needed
+	public          string Extension => Path.GetExtension(AbsolutePath).ToLower(); // cache if needed
 	public abstract bool   Exists    { get; }
 
 	protected ProjectNode(string name, string absolutePath, string relativePath, bool hasMetaFile)
@@ -30,7 +29,7 @@ public abstract class ProjectNode
 		HasMetaFile  = hasMetaFile;
 	}
 
-	public abstract void Init(MigrationManager migrationManager, ImporterRegistry importerRegistry, NodeIORegistry nodeIORegistry, CancellationToken cancellationToken);
+	public abstract void Init(CancellationToken cancellationToken);
 
 	public void ResetMetaHash()
 	{
@@ -40,7 +39,7 @@ public abstract class ProjectNode
 	public void UpdateMetaFile()
 	{
 		string metaPath = $"{AbsolutePath}.meta";
-		byte[] json     = MigrationSerializer.SerializeAsync(Meta, SerializedDataFormat.JSON, StudioModel.Assembly).GetAwaiter().GetResult();
+		byte[] json     = MigrationSerializer.SerializeAsync(Meta, SerializedDataFormat.JSON, StudioGlobals.Assembly).GetAwaiter().GetResult();
 		File.WriteAllBytes(metaPath, json);
 	}
 
@@ -49,7 +48,7 @@ public abstract class ProjectNode
 		Type = type;
 	}
 
-	public T? GetContent<T>(StudioModel studioModel) where T:Content
+	public T? GetNodeIO<T>() where T : NodeIO
 	{
 		// TODO do in separate thread + add some management (unload?)
 		// _content ??= studioModel.Project.ContentRegistry.LoadContent(studioModel, this);
@@ -57,7 +56,7 @@ public abstract class ProjectNode
 		return null;
 	}
 
-	protected void CreateMetaFile(MigrationManager migrationManager)
+	protected void CreateMetaFile()
 	{
 		string metaPath = $"{AbsolutePath}.meta";
 		
@@ -66,7 +65,7 @@ public abstract class ProjectNode
 		if (File.Exists(metaPath))
 		{
 			byte[] json = File.ReadAllBytes(metaPath);
-			meta = MigrationSerializer.DeserializeAsync<Metadata, IMetadataMigratable>(null, json, SerializedDataFormat.JSON, migrationManager, true, StudioModel.Assembly).GetAwaiter().GetResult();
+			meta = MigrationSerializer.DeserializeAsync<Metadata, IMetadataMigratable>(null, json, SerializedDataFormat.JSON, StudioGlobals.MigrationManager, true, StudioGlobals.Assembly).GetAwaiter().GetResult();
 		}
 		
 		// write if needed
@@ -75,7 +74,7 @@ public abstract class ProjectNode
 			meta ??= new Metadata();
 			meta.UpdateGuid();
 
-			byte[] json = MigrationSerializer.SerializeAsync(meta, SerializedDataFormat.JSON, StudioModel.Assembly).GetAwaiter().GetResult();
+			byte[] json = MigrationSerializer.SerializeAsync(meta, SerializedDataFormat.JSON, StudioGlobals.Assembly).GetAwaiter().GetResult();
 			File.WriteAllBytes(metaPath, json);
 		}
 

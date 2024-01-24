@@ -1,6 +1,4 @@
-using Migration;
 using Mine.Studio;
-using RedHerring.Studio.Models.Project.Importers;
 
 namespace RedHerring.Studio.Models.Project.FileSystem;
 
@@ -16,13 +14,13 @@ public class ProjectFolderNode : ProjectNode
 		SetNodeType(type); // set here, because we already know that it's a folder but we don't know if it's an asset folder or script folder, that comes from parameter
 	}
 
-	public override void Init(MigrationManager migrationManager, ImporterRegistry importerRegistry, NodeIORegistry nodeIORegistry, CancellationToken cancellationToken)
+	public override void Init(CancellationToken cancellationToken)
 	{
-		IO = nodeIORegistry.CreateNodeIO(this);
+		IO = StudioGlobals.NodeIORegistry.CreateNodeIO(this);
 		
 		if (HasMetaFile)
 		{
-			CreateMetaFile(migrationManager);
+			CreateMetaFile();
 		}
 		else
 		{

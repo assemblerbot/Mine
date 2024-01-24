@@ -1,6 +1,4 @@
-using Migration;
 using Mine.Studio;
-using RedHerring.Studio.Models.Project.Importers;
 
 namespace RedHerring.Studio.Models.Project.FileSystem;
 
@@ -13,7 +11,7 @@ public class ProjectScriptFileNode : ProjectNode
 	{
 	}
 
-	public override void Init(MigrationManager migrationManager, ImporterRegistry importerRegistry, NodeIORegistry nodeIORegistry, CancellationToken cancellationToken)
+	public override void Init(CancellationToken cancellationToken)
 	{
 		string guid;
 		
@@ -30,7 +28,7 @@ public class ProjectScriptFileNode : ProjectNode
 			SetNodeType(ProjectNodeType.ScriptFile);
 		}
 
-		IO = nodeIORegistry.CreateNodeIO(this);
+		IO = StudioGlobals.NodeIORegistry.CreateNodeIO(this);
 		
 		Meta = new Metadata
 		       {

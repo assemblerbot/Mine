@@ -151,7 +151,7 @@ public sealed class ToolDefinitions : Tool
 		// try to read asset node
 		if(_definitionAssetNode != null)
 		{
-			DefinitionAsset? asset = DefinitionAsset.CreateFromFile(_definitionAssetNode.AbsolutePath, StudioModel.MigrationManager);
+			DefinitionAsset? asset = DefinitionAsset.CreateFromFile(_definitionAssetNode.AbsolutePath, StudioGlobals.MigrationManager);
 			if (asset == null)
 			{
 				_definitionAssetNode = null;

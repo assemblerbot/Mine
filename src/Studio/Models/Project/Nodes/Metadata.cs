@@ -5,13 +5,13 @@ using RedHerring.Studio.UserInterface.Attributes;
 
 namespace RedHerring.Studio.Models.Project.FileSystem;
 
-[Serializable, SerializedClassId("metadata-class-id")] // TODO - replace by GUID
+[Serializable, SerializedClassId("0714ba10-3363-4221-ae09-53ad37dc2628")]
 public class Metadata
 {
 	[ReadOnlyInInspector] public string? Guid = null;
 	[ReadOnlyInInspector] public string? Hash = null;
 
-	public ImportSettings? ImportSettings = null;
+	public NodeIOSettings? NodeIOSettings = null;
 
 	public void UpdateGuid()
 	{
@@ -46,14 +46,14 @@ public class Metadata_001 : IMetadataMigratable
 	public string? Guid;
 	public string? Hash;
 	
-	[MigrateField] public List<IImportSettingsMigratable>? ImportSettings;
+	[MigrateField] public List<INodeIOSettingsMigratable>? NodeIOSettings;
 	
 	public void Migrate(Metadata_000 prev)
 	{
 		Guid = prev.Guid;
 		Hash = null; // to force reimport
 		
-		ImportSettings = new List<IImportSettingsMigratable>();
+		NodeIOSettings = new List<INodeIOSettingsMigratable>();
 	}
 }
 
@@ -63,14 +63,14 @@ public class Metadata_002 : IMetadataMigratable
 	public string? Guid;
 	public string? Hash;
 	
-	[MigrateField] public IImportSettingsMigratable? ImportSettings;
+	[MigrateField] public INodeIOSettingsMigratable? NodeIOSettings;
 	
 	public void Migrate(Metadata_001 prev)
 	{
 		Guid = prev.Guid;
 		Hash = null; // to force reimport
 		
-		ImportSettings = null;
+		NodeIOSettings = null;
 	}
 }
 #endregion

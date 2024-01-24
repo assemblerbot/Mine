@@ -1,4 +1,5 @@
 using RedHerring.Studio.Models.Project.FileSystem;
+using RedHerring.Studio.Models.Project.Imports;
 
 namespace Mine.Studio;
 
@@ -19,13 +20,18 @@ public sealed class NodeIOScriptDefinition : NodeIO
 		throw new NotImplementedException();
 	}
 
-	public override void Import(string resourcePath)
+	public override void ClearCache()
 	{
 		throw new NotImplementedException();
 	}
 
-	public override void ClearCache()
+	public override void Import(string resourcePath)
 	{
-		throw new NotImplementedException();
+		throw new InvalidOperationException();
+	}
+
+	public override NodeIOSettings CreateImportSettings()
+	{
+		return new NodeIOSettings();
 	}
 }

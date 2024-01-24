@@ -4,7 +4,6 @@ using System.Security.Cryptography;
 using Migration;
 using Mine.Studio;
 using RedHerring.Studio.Models.Project.FileSystem;
-using RedHerring.Studio.Models.Project.Importers;
 using RedHerring.Studio.Models.ViewModels.Console;
 
 namespace RedHerring.Studio.Models.Project;
@@ -30,12 +29,7 @@ public sealed class ProjectModel
 	private static readonly HashAlgorithm _hashAlgorithm = SHA1.Create();
 
 	// TODO - move to studio model
-	private readonly MigrationManager           _migrationManager;
 	private readonly StudioModelEventAggregator _eventAggregator;
-	private readonly ImporterRegistry           _importerRegistry = new();
-	private readonly ContentRegistry            _contentRegistry  = new();
-	public           ContentRegistry            ContentRegistry => _contentRegistry;
-	private readonly NodeIORegistry             _nodeIORegistry = new();
 
 	public readonly object ProjectTreeLock = new(); // synchronization lock
 	
@@ -61,9 +55,8 @@ public sealed class ProjectModel
 	private readonly ProjectThread _thread = new ();
 	public           int           TasksCount => _thread.TasksCount;
 	
-	public ProjectModel(MigrationManager migrationManager, StudioModelEventAggregator eventAggregator)
+	public ProjectModel(StudioModelEventAggregator eventAggregator)
 	{
-		_migrationManager = migrationManager;
 		_eventAggregator  = eventAggregator;
 	}
 
@@ -367,7 +360,7 @@ public sealed class ProjectModel
 		}
 		
 		byte[] json = File.ReadAllBytes(path);
-		ProjectSettings settings = MigrationSerializer.DeserializeAsync<ProjectSettings, IStudioSettingsMigratable>(_migrationManager.TypesHash, json, SerializedDataFormat.JSON, _migrationManager, false, Assembly).GetAwaiter().GetResult();
+		ProjectSettings settings = MigrationSerializer.DeserializeAsync<ProjectSettings, IStudioSettingsMigratable>(StudioGlobals.MigrationManager.TypesHash, json, SerializedDataFormat.JSON, StudioGlobals.MigrationManager, false, Assembly).GetAwaiter().GetResult();
 		settings.ProjectFolderPath = projectPath;
 		
 		_projectSettings = settings;
@@ -692,7 +685,7 @@ public sealed class ProjectModel
 					ProjectNode? node = root.FindNode(path);
 					if (node != null && node.Exists)
 					{
-						node.Init(_migrationManager, _importerRegistry, _nodeIORegistry, cancellationToken);
+						node.Init(cancellationToken);
 					}
 				}
 			}
@@ -751,22 +744,23 @@ public sealed class ProjectModel
 				{
 					return;
 				}
-
+ 
 				// import
-				Importer importer = _importerRegistry.GetImporter(node.Extension);
-				node.Meta!.ImporterSettings ??= importer.CreateSettings();
+				// Importer importer = _importerRegistry.GetImporter(node.Extension);
+				// node.Meta!.ImporterSettings ??= importer.CreateSettings();
 
 				string resourcePath = Path.Combine(_projectSettings!.AbsoluteResourcesPath, node.RelativePath);
 
 				try
 				{
-					using Stream   stream = File.OpenRead(node.AbsolutePath);
-					ImporterResult result = importer.Import(stream, node.Meta.ImporterSettings, resourcePath, _migrationManager, cancellationToken);
-
-					if (result == ImporterResult.FinishedSettingsChanged)
-					{
-						node.UpdateMetaFile();
-					}
+					node.IO!.Import(resourcePath);
+					// using Stream   stream = File.OpenRead(node.AbsolutePath);
+					// ImporterResult result = importer.Import(stream, node.Meta.ImporterSettings, resourcePath, _migrationManager, cancellationToken);
+					//
+					// if (result == ImporterResult.FinishedSettingsChanged)
+					// {
+					// 	node.UpdateMetaFile();
+					// }
 				}
 				catch (Exception e)
 				{

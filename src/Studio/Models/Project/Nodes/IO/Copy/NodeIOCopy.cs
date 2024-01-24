@@ -1,4 +1,5 @@
 using RedHerring.Studio.Models.Project.FileSystem;
+using RedHerring.Studio.Models.Project.Imports;
 using RedHerring.Studio.Models.ViewModels.Console;
 
 namespace Mine.Studio;
@@ -31,7 +32,12 @@ public sealed class NodeIOCopy : NodeIO
 
 	public override void Save()
 	{
-		throw new NotImplementedException();
+		throw new InvalidOperationException();
+	}
+
+	public override void ClearCache()
+	{
+		_cache = null;
 	}
 
 	public override void Import(string resourcePath)
@@ -57,8 +63,8 @@ public sealed class NodeIOCopy : NodeIO
 		ClearCache();
 	}
 
-	public override void ClearCache()
+	public override NodeIOSettings CreateImportSettings()
 	{
-		_cache = null;
+		return new NodeIOCopySettings();
 	}
 }

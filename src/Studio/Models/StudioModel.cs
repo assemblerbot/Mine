@@ -1,6 +1,7 @@
 using System.Reflection;
 using EventAggregatorPlugin;
 using Migration;
+using Mine.Studio;
 using RedHerring.Studio.Commands;
 using RedHerring.Studio.Models.Project;
 using RedHerring.Studio.Models.ViewModels;
@@ -13,10 +14,6 @@ namespace RedHerring.Studio.Models;
 public class StudioModel
 {
 	private const int _threadsCount = 4;
-	
-	public static    Assembly         Assembly => typeof(StudioModel).Assembly; 
-	private readonly MigrationManager _migrationManager = new(Assembly);
-	public           MigrationManager MigrationManager => _migrationManager;
 	
 	private readonly ProjectModel _project;
 	public           ProjectModel Project => _project;
@@ -43,7 +40,7 @@ public class StudioModel
 
 	public StudioModel()
 	{
-		_project   = new ProjectModel(_migrationManager, _eventAggregator);
+		_project   = new ProjectModel(_eventAggregator);
 		_selection = new(_eventAggregator);
 	}
 
@@ -80,7 +77,7 @@ public class StudioModel
 
 	public void SaveStudioSettings()
 	{
-		byte[] json = MigrationSerializer.SerializeAsync(StudioSettings, SerializedDataFormat.JSON, Assembly).GetAwaiter().GetResult();
+		byte[] json = MigrationSerializer.SerializeAsync(StudioSettings, SerializedDataFormat.JSON, StudioGlobals.Assembly).GetAwaiter().GetResult();
 		Directory.CreateDirectory(Path.GetDirectoryName(StudioSettings.SettingsPath)!);
 		File.WriteAllBytes(StudioSettings.SettingsPath, json);
 	}
@@ -93,7 +90,7 @@ public class StudioModel
 		}
 		
 		byte[] json = File.ReadAllBytes(StudioSettings.SettingsPath);
-		StudioSettings settings = MigrationSerializer.DeserializeAsync<StudioSettings, IStudioSettingsMigratable>(_migrationManager.TypesHash, json, SerializedDataFormat.JSON, _migrationManager, false, Assembly).GetAwaiter().GetResult();
+		StudioSettings settings = MigrationSerializer.DeserializeAsync<StudioSettings, IStudioSettingsMigratable>(StudioGlobals.MigrationManager.TypesHash, json, SerializedDataFormat.JSON, StudioGlobals.MigrationManager, false, StudioGlobals.Assembly).GetAwaiter().GetResult();
 		_studioSettings = settings;
 	}
 }

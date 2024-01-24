@@ -31,10 +31,10 @@ public sealed class DefinitionAsset
 		return asset;
 	}
 
-	public void WriteToFile(string relativePath)
+	public void WriteToFile(string absolutePath)
 	{
 		byte[] json = MigrationSerializer.Serialize(this, SerializedDataFormat.JSON);
-		File.WriteAllBytes(relativePath, json);
+		File.WriteAllBytes(absolutePath, json);
 	}
 
 	public void ImportToResources(string absolutePath)

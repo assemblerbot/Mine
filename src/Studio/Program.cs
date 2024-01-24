@@ -4,11 +4,14 @@ namespace Mine.Studio;
 
 internal static class Program
 {
-	private static Engine _engine = null!;
+	private static StudioGlobals _globals = null!;
+	private static Engine        _engine  = null!;
 	
 	private static void Main(string[] args)
 	{
-		_engine = new Engine(args, "MINE Studio", OnLoad, OnExit);
+		_engine  = new Engine(args, "MINE Studio", OnLoad, OnExit);
+		_globals = new();
+
 		_engine.Run();
 	}
 

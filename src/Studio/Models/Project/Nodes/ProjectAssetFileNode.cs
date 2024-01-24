@@ -1,6 +1,4 @@
-using Migration;
 using Mine.Studio;
-using RedHerring.Studio.Models.Project.Importers;
 
 namespace RedHerring.Studio.Models.Project.FileSystem;
 
@@ -13,21 +11,21 @@ public sealed class ProjectAssetFileNode : ProjectNode
 	{
 	}
 
-	public override void Init(MigrationManager migrationManager, ImporterRegistry importerRegistry, NodeIORegistry nodeIORegistry, CancellationToken cancellationToken)
+	public override void Init(CancellationToken cancellationToken)
 	{
 		SetNodeType(ProjectNodeTypeExtensions.FromAssetExtension(Extension));
-		IO = nodeIORegistry.CreateNodeIO(this);
+		IO = StudioGlobals.NodeIORegistry.CreateNodeIO(this);
 		
-		CreateMetaFile(migrationManager);
+		CreateMetaFile();
 		if (Meta == null)
 		{
 			return;
 		}
 
-		if (Meta.ImportSettings == null)
+		if (Meta.NodeIOSettings == null)
 		{
-			Importer importer = importerRegistry.GetImporter(Extension);
-			Meta.ImportSettings = importer.CreateSettings();
+			Meta.NodeIOSettings = IO.CreateImportSettings();
+			UpdateMetaFile();
 		}
 	}
 
