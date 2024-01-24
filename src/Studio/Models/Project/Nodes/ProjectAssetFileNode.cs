@@ -7,7 +7,8 @@ public sealed class ProjectAssetFileNode : ProjectNode
 	public override string RelativeDirectoryPath => RelativePath.Substring(0, RelativePath.Length - Name.Length);
 	public override bool   Exists                => File.Exists(AbsolutePath);
 	
-	public ProjectAssetFileNode(string name, string absolutePath, string relativePath) : base(name, absolutePath, relativePath, true)
+	public ProjectAssetFileNode(ProjectModel project, string name, string absolutePath, string relativePath)
+		: base(project, name, absolutePath, relativePath, true)
 	{
 	}
 

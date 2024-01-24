@@ -9,6 +9,15 @@ public class StudioScriptDefinitionReference : StudioReference
 {
 	public override string Name => "Definition template";
 
+	public StudioScriptDefinitionReference()
+	{
+	}
+
+	public StudioScriptDefinitionReference(string guid)
+	{
+		Guid = guid;
+	}
+
 	public override bool CanAcceptNode(StudioModel studioModel, ProjectNode node)
 	{
 		return node.Type == ProjectNodeType.ScriptDefinition;

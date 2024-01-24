@@ -9,7 +9,8 @@ public class ProjectFolderNode : ProjectNode
 
 	public List<ProjectNode> Children { get; } = new();
 	
-	public ProjectFolderNode(string name, string absolutePath, string relativePath, bool hasMetaFile, ProjectNodeType type) : base(name, absolutePath, relativePath, hasMetaFile)
+	public ProjectFolderNode(ProjectModel project, string name, string absolutePath, string relativePath, bool hasMetaFile, ProjectNodeType type)
+		: base(project, name, absolutePath, relativePath, hasMetaFile)
 	{
 		SetNodeType(type); // set here, because we already know that it's a folder but we don't know if it's an asset folder or script folder, that comes from parameter
 	}

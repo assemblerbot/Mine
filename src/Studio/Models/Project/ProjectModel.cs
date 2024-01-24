@@ -122,11 +122,11 @@ public sealed class ProjectModel
 		{
 			// create roots
 			string          assetsPath   = Path.Join(projectPath, _assetsFolderName);
-			ProjectRootNode assetsFolder = new ProjectRootNode(_assetsFolderName, assetsPath, ProjectNodeType.AssetFolder);
+			ProjectRootNode assetsFolder = new ProjectRootNode(this, _assetsFolderName, assetsPath, ProjectNodeType.AssetFolder);
 			_assetsFolder = assetsFolder;
 
 			string          scriptsGameLibraryPath   = Path.Join(projectPath, _scriptsFolderName);
-			ProjectRootNode scriptsGameLibraryFolder = new ProjectRootNode(_scriptsFolderName, scriptsGameLibraryPath, ProjectNodeType.ScriptFolder);
+			ProjectRootNode scriptsGameLibraryFolder = new ProjectRootNode(this, _scriptsFolderName, scriptsGameLibraryPath, ProjectNodeType.ScriptFolder);
 			_scriptsFolder = scriptsGameLibraryFolder;
 
 			// check
@@ -375,7 +375,7 @@ public sealed class ProjectModel
 		{
 			string            directory             = Path.GetFileName(directoryPath);
 			string            relativeDirectoryPath = Path.Combine(relativePath, directory);
-			ProjectFolderNode folderNode            = new(directory, directoryPath, relativeDirectoryPath, true, ProjectNodeType.AssetFolder);
+			ProjectFolderNode folderNode            = new(this, directory, directoryPath, relativeDirectoryPath, true, ProjectNodeType.AssetFolder);
 			root.Children.Add(folderNode);
 			
 			RecursiveAssetScan(directoryPath, relativeDirectoryPath, folderNode, foundMetaFiles);
@@ -392,7 +392,7 @@ public sealed class ProjectModel
 			}
 
 			string               relativeFilePath = Path.Combine(relativePath, fileName);
-			ProjectAssetFileNode assetFileNode    = new(fileName, filePath, relativeFilePath);
+			ProjectAssetFileNode assetFileNode    = new(this, fileName, filePath, relativeFilePath);
 			root.Children.Add(assetFileNode);
 		}
 	}
@@ -521,7 +521,7 @@ public sealed class ProjectModel
 		{
 			string            directory             = Path.GetFileName(directoryPath);
 			string            relativeDirectoryPath = Path.Combine(relativePath, directory);
-			ProjectFolderNode folderNode            = new(directory, directoryPath, relativeDirectoryPath, false, ProjectNodeType.ScriptFolder);
+			ProjectFolderNode folderNode            = new(this, directory, directoryPath, relativeDirectoryPath, false, ProjectNodeType.ScriptFolder);
 			root.Children.Add(folderNode);
 			
 			RecursiveScriptScan(directoryPath, relativeDirectoryPath, folderNode);
@@ -532,7 +532,7 @@ public sealed class ProjectModel
 		{
 			string                fileName         = Path.GetFileName(filePath);
 			string                relativeFilePath = Path.Combine(relativePath, fileName);
-			ProjectScriptFileNode assetFileNode    = new(fileName, filePath, relativeFilePath);
+			ProjectScriptFileNode assetFileNode    = new(this, fileName, filePath, relativeFilePath);
 			root.Children.Add(assetFileNode);
 		}
 	}
@@ -610,6 +610,7 @@ public sealed class ProjectModel
 						if (parentNode.FindChild(name) == null)
 						{
 							ProjectFolderNode newNode = new(
+								this,
 								name,
 								Path.Join(parentNode.AbsolutePath, name),
 								Path.Join(parentNode.RelativePath, name),
@@ -637,6 +638,7 @@ public sealed class ProjectModel
 						if (parentNode.FindChild(name) == null)
 						{
 							ProjectAssetFileNode newNode = new(
+								this,
 								name,
 								Path.Join(parentNode.AbsolutePath, name),
 								Path.Join(parentNode.RelativePath, name)
@@ -662,6 +664,7 @@ public sealed class ProjectModel
 						if (parentNode.FindChild(name) == null)
 						{
 							ProjectScriptFileNode newNode = new(
+								this,
 								name,
 								Path.Join(parentNode.AbsolutePath, name),
 								Path.Join(parentNode.RelativePath, name)
@@ -753,7 +756,7 @@ public sealed class ProjectModel
 
 				try
 				{
-					node.IO!.Import(resourcePath);
+					node.GetNodeIO<NodeIO>()!.Import(resourcePath);
 					// using Stream   stream = File.OpenRead(node.AbsolutePath);
 					// ImporterResult result = importer.Import(stream, node.Meta.ImporterSettings, resourcePath, _migrationManager, cancellationToken);
 					//

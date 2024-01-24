@@ -11,9 +11,10 @@ namespace Mine.Studio;
 
 public class ToolDefinitionTemplateEditor
 {
-	private readonly ProjectScriptFileNode    _definitionTemplateNode;
-	private readonly DefinitionTemplate       _definitionTemplate;
-	private readonly string                    _editorUniqueId;
+	private readonly StudioModel           _studioModel;
+	private readonly ProjectScriptFileNode _definitionTemplateNode;
+	private readonly DefinitionTemplate    _definitionTemplate;
+	private readonly string                _editorUniqueId;
 
 	private readonly InspectorStudio          _inspector;
 	private readonly CommandHistoryWithChange _commandHistory;
@@ -21,6 +22,7 @@ public class ToolDefinitionTemplateEditor
 
 	public ToolDefinitionTemplateEditor(StudioModel studioModel, ProjectModel projectModel, ProjectScriptFileNode definitionTemplateNode, DefinitionTemplate definitionTemplate, string editorUniqueId)
 	{
+		_studioModel            = studioModel;
 		_definitionTemplateNode = definitionTemplateNode;
 		_definitionTemplate     = definitionTemplate;
 		_editorUniqueId         = editorUniqueId;
@@ -121,7 +123,7 @@ public class ToolDefinitionTemplateEditor
 			return false;
 		}
 
-		_definitionTemplate.WriteToFile(_definitionTemplateNode.AbsolutePath); // it is safe to write here?
+		_definitionTemplate.WriteToFile(_definitionTemplateNode.AbsolutePath, _definitionTemplateNode.Meta?.Guid, _studioModel.Project); // it is safe to write here?
 		return true;
 	}
 }

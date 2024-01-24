@@ -194,7 +194,7 @@ public sealed class ToolProjectView : Tool
 		try
 		{
 			DefinitionTemplate template = new(namespaceName, className);
-			template.WriteToFile(path);
+			template.WriteToFile(path, null, StudioModel.Project);
 		}
 		catch (Exception e)
 		{
@@ -215,7 +215,7 @@ public sealed class ToolProjectView : Tool
 		
 		try
 		{
-			DefinitionTemplate? template = DefinitionTemplate.CreateFromFile(templateFileNode.AbsolutePath);
+			DefinitionTemplate? template = DefinitionTemplate.CreateFromFile(templateFileNode.AbsolutePath, StudioModel.Project);
 			if (template == null)
 			{
 				ConsoleViewModel.LogError($"Cannot read template file: {templateFileNode.AbsolutePath}");

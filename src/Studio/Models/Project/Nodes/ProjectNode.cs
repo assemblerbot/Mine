@@ -6,7 +6,8 @@ namespace RedHerring.Studio.Models.Project.FileSystem;
 
 public abstract class ProjectNode
 {
-	[ReadOnlyInInspector] public ProjectNodeType Type = ProjectNodeType.Uninitialized;
+	[HideInInspector]     public readonly ProjectModel    Project;
+	[ReadOnlyInInspector] public          ProjectNodeType Type = ProjectNodeType.Uninitialized;
 
 	public          string Name { get; }
 	public readonly string AbsolutePath;
@@ -16,13 +17,14 @@ public abstract class ProjectNode
 	[ReadOnlyInInspector] public bool HasMetaFile;
 	
 	public Metadata? Meta;
-	public NodeIO?   IO;
+	protected NodeIO?   IO;
 
 	public          string Extension => Path.GetExtension(AbsolutePath).ToLower(); // cache if needed
 	public abstract bool   Exists    { get; }
 
-	protected ProjectNode(string name, string absolutePath, string relativePath, bool hasMetaFile)
+	protected ProjectNode(ProjectModel project, string name, string absolutePath, string relativePath, bool hasMetaFile)
 	{
+		Project = project;
 		Name         = name;
 		AbsolutePath = absolutePath;
 		RelativePath = relativePath;
@@ -50,10 +52,7 @@ public abstract class ProjectNode
 
 	public T? GetNodeIO<T>() where T : NodeIO
 	{
-		// TODO do in separate thread + add some management (unload?)
-		// _content ??= studioModel.Project.ContentRegistry.LoadContent(studioModel, this);
-		// return _content as T;
-		return null;
+		return IO as T;
 	}
 
 	protected void CreateMetaFile()

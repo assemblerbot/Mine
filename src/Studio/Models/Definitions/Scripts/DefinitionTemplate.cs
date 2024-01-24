@@ -36,10 +36,10 @@ public sealed class DefinitionTemplate
 		_className     = className;
 	}
 
-	public static DefinitionTemplate? CreateFromFile(string absolutePath)
+	public static DefinitionTemplate? CreateFromFile(string absolutePath, ProjectModel projectModel)
 	{
 		DefinitionTemplate template = new();
-		return template.Read(absolutePath) ? template : null;
+		return template.Read(absolutePath, projectModel) ? template : null;
 	}
 
 	public string? Validate()
@@ -76,7 +76,7 @@ public sealed class DefinitionTemplate
 		return null;
 	}
 
-	public void WriteToFile(string absolutePath)
+	public void WriteToFile(string absolutePath, string? thisNodeGuid, ProjectModel projectModel)
 	{
 		using StreamWriter stream = File.CreateText(absolutePath);
 
@@ -102,8 +102,30 @@ public sealed class DefinitionTemplate
 
 			if (field.Type.HasGenericParameter())
 			{
-				// TODO - translate generic parameter to class name
-				stream.WriteLine($"	public {field.Type.ToCSharpType()}<{field.GenericParameter}> {field.Name};");
+				string genericParameter = "";
+				if (field.GenericParameter.Guid == thisNodeGuid)
+				{
+					genericParameter = $"{_namespaceName}.{_className}"; // self-reference
+				}
+				else
+				{
+					ProjectNode? scriptNode = projectModel.FindNodeByGuid(field.GenericParameter.Guid ?? "");
+					if (scriptNode != null && scriptNode.Type == ProjectNodeType.ScriptDefinition)
+					{
+						// TODO - translate generic parameter to class name
+						NodeIOScriptDefinition? io = scriptNode.GetNodeIO<NodeIOScriptDefinition>();
+						if (io != null)
+						{
+							io.Load();
+							if (io.Template != null)
+							{
+								genericParameter = $"{io.Template._namespaceName}.{io.Template._className}";
+							}
+						}
+					}
+				}
+
+				stream.WriteLine($"	public {field.Type.ToCSharpType()}<{genericParameter}> {field.Name};");
 			}
 			else
 			{
@@ -114,7 +136,7 @@ public sealed class DefinitionTemplate
 		stream.WriteLine("}");
 	}
 
-	public bool Read(string absolutePath)
+	public bool Read(string absolutePath, ProjectModel projectModel)
 	{
 		using StreamReader stream = File.OpenText(absolutePath);
 
@@ -137,7 +159,7 @@ public sealed class DefinitionTemplate
 		Regex classRegex     = new (@"class\s+(\w+)", RegexOptions.Compiled);
 		Regex namespaceRegex = new (@"namespace\s+(\w+)", RegexOptions.Compiled);
 		Regex propertyRegex  = new (@"public\s+(\w+)\s+(\w+)", RegexOptions.Compiled);
-		Regex genericPropertyRegex  = new (@"public\s+(\w+)<(\w+)>\s+(\w+)", RegexOptions.Compiled);
+		Regex genericPropertyRegex  = new (@"public\s+(\w+)<([\w\.]+)>\s+(\w+)", RegexOptions.Compiled);
 		
 		// parse line by line
 		bool classNameParsed     = false;
@@ -178,6 +200,9 @@ public sealed class DefinitionTemplate
 					string propertyName     = propertyMatch.Groups[3].Captures[0].ToString();
 
 					// TODO - generic parameter class name to GUID
+					// hmm if we try to load every node we encounter, cyclic reference will cause infinite loop
+					// load just "declaration" instead
+					// maybe the whole project could be consistently updated, just declarations
 					DefinitionTemplateField field = new(propertyType.ToTemplateType(), propertyName, new StudioScriptDefinitionReference());
 					_fields.Add(field);
 				}

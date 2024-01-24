@@ -7,7 +7,8 @@ public class ProjectScriptFileNode : ProjectNode
 	public override string RelativeDirectoryPath => RelativePath.Substring(0, RelativePath.Length - Name.Length);
 	public override bool   Exists                => File.Exists(AbsolutePath);
 
-	public ProjectScriptFileNode(string name, string absolutePath, string relativePath) : base(name, absolutePath, relativePath, false)
+	public ProjectScriptFileNode(ProjectModel project, string name, string absolutePath, string relativePath)
+		: base(project, name, absolutePath, relativePath, false)
 	{
 	}
 
