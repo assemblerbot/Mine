@@ -59,7 +59,7 @@ public class ToolPlugins : Tool
 		List<PluginManagerCollections.CPluginsPair> listOfPlugins = _pluginCollections.BuildListOfPlugins();
 		foreach (PluginManagerCollections.CPluginsPair pluginsPair in listOfPlugins)
 		{
-			_pluginFoldouts.Add(pluginsPair.Id, new PluginManagerFoldout(_settings, _pluginCollections, pluginsPair, RequestRefresh));
+			_pluginFoldouts.Add(pluginsPair.Id, new PluginManagerFoldout(_studioModel, _settings, _pluginCollections, pluginsPair, RequestRefresh));
 		}
 	}
 

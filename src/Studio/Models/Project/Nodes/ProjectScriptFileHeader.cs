@@ -21,44 +21,51 @@ public sealed class ProjectScriptFileHeader
 
 	public static ProjectScriptFileHeader? CreateFromFile(string path)
 	{
-		using FileStream file = new(path, FileMode.Open);
-
-		if (file.Length <= _scriptHeader.Length + 1)
+		try
 		{
-			return null;
-		}
+			using FileStream file = new(path, FileMode.Open);
 
-		byte[] header = new byte[_scriptHeader.Length];
-		file.ReadExactly(header, 0, _scriptHeader.Length);
-
-		bool equals = true;
-		for (int i = 0; i < _scriptHeader.Length; ++i)
-		{
-			if (header[i] != _scriptHeader[i])
+			if (file.Length <= _scriptHeader.Length + 1)
 			{
-				equals = false;
-				break;
+				return null;
 			}
-		}
 
-		if (!equals)
+			byte[] header = new byte[_scriptHeader.Length];
+			file.ReadExactly(header, 0, _scriptHeader.Length);
+
+			bool equals = true;
+			for (int i = 0; i < _scriptHeader.Length; ++i)
+			{
+				if (header[i] != _scriptHeader[i])
+				{
+					equals = false;
+					break;
+				}
+			}
+
+			if (!equals)
+			{
+				return null;
+			}
+
+			byte[] content = new byte[file.Length - _scriptHeader.Length];
+			if (file.ReadAtLeast(content, 1, false) != content.Length)
+			{
+				return null;
+			}
+
+			int endOfLine = Array.FindIndex(content, x => x == '\n' || x == '\r');
+			if (endOfLine != -1)
+			{
+				Array.Resize(ref content, endOfLine);
+			}
+
+			return JsonSerializer.Deserialize<ProjectScriptFileHeader>(content, new JsonSerializerOptions {IncludeFields = true});
+		}
+		catch (Exception e)
 		{
 			return null;
 		}
-
-		byte[] content = new byte[file.Length - _scriptHeader.Length];
-		if (file.ReadAtLeast(content, 1, false) != content.Length)
-		{
-			return null;
-		}
-
-		int endOfLine = Array.FindIndex(content, x => x == '\n' || x == '\r');
-		if (endOfLine != -1)
-		{
-			Array.Resize(ref content, endOfLine);
-		}
-
-		return JsonSerializer.Deserialize<ProjectScriptFileHeader>(content, new JsonSerializerOptions{IncludeFields = true});
 	}
 
 	public string ToHeaderString()

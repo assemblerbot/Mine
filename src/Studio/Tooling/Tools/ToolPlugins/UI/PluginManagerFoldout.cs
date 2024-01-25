@@ -2,11 +2,14 @@ using System.Numerics;
 using ImGuiNET;
 using Mine.Framework;
 using Mine.ImGuiPlugin;
+using RedHerring.Studio.Models;
 
 namespace Mine.Studio;
 
 public class PluginManagerFoldout
 {
+	private readonly StudioModel _studioModel;
+	
 	private readonly PluginManagerSettings    _settings;
 	private readonly PluginManagerCollections _collections;
 	private          Action                   _onChange;
@@ -36,12 +39,14 @@ public class PluginManagerFoldout
 	private readonly string? _textUpToDate;
 	
 	public PluginManagerFoldout(
+		StudioModel studioModel,
 		PluginManagerSettings                 settings,
 		PluginManagerCollections              collections,
 		PluginManagerCollections.CPluginsPair pluginsPair,
 		Action                                onChange
 	)
 	{
+		_studioModel = studioModel;
 		_settings    = settings;
 		_collections = collections;
 		_onChange    = onChange;
@@ -317,40 +322,52 @@ public class PluginManagerFoldout
 	#region Manipulation
 	private void Install()
 	{
+		_studioModel.Project.PauseWatchers();
 		_collections.CopyDependenciesFromRepositoryToProject(_repositoryPlugin!, _settings);
 		_repositoryPlugin!.CopyFromRepositoryToProject(_settings);
+		_studioModel.Project.ResumeWatchers();
 		_onChange();
 	}
 
 	private void Upgrade()
 	{
+		_studioModel.Project.PauseWatchers();
 		_collections.CopyDependenciesFromRepositoryToProject(_repositoryPlugin!, _settings);
 		_repositoryPlugin!.CopyFromRepositoryToProject(_settings);
+		_studioModel.Project.ResumeWatchers();
 		_onChange();
 	}
 
 	private void CopyToRepository()
 	{
+		_studioModel.Project.PauseWatchers();
 		_projectPlugin!.CopyFromProjectToRepository(_settings);
+		_studioModel.Project.ResumeWatchers();
 		_onChange();
 	}
 
 	private void Uninstall()
 	{
+		_studioModel.Project.PauseWatchers();
 		_projectPlugin!.RemoveFromProject();
+		_studioModel.Project.ResumeWatchers();
 		_onChange();
 	}
 
 	private void Downgrade()
 	{
+		_studioModel.Project.PauseWatchers();
 		_collections.CopyDependenciesFromRepositoryToProject(_repositoryPlugin!, _settings);
 		_repositoryPlugin!.CopyFromRepositoryToProject(_settings);
+		_studioModel.Project.ResumeWatchers();
 		_onChange();
 	}
 
 	private void CreateInRepository()
 	{
+		_studioModel.Project.PauseWatchers();
 		_projectPlugin!.CopyFromProjectToRepository(_settings);
+		_studioModel.Project.ResumeWatchers();
 		_onChange();
 	}
 	#endregion
