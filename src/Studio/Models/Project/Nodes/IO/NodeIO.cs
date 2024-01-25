@@ -12,10 +12,11 @@ public abstract class NodeIO
 		Owner = owner;
 	}
 
-	public abstract void Load();
-	public abstract void Save();
-	public abstract void ClearCache();
+	public abstract void Update();     // update only most important things that needs to be always up-to-date
+	public abstract void Load();       // load and parse whole file
+	public abstract void Save();       // save file to assets
+	public abstract void ClearCache(); // clear loaded file
 	
-	public abstract void Import(string resourcePath);
-	public abstract NodeIOSettings CreateImportSettings();
+	public abstract void           Import(string resourcePath); // import file to Resources
+	public abstract NodeIOSettings CreateImportSettings();      // create import settings instance
 }

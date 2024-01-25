@@ -13,6 +13,11 @@ public sealed class NodeIOAssetDefinition : NodeIO
 	{
 	}
 
+	public override void Update()
+	{
+		throw new NotImplementedException();
+	}
+
 	public override void Load()
 	{
 		if (_asset != null)
