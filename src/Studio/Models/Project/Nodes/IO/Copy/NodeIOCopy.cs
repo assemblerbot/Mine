@@ -15,7 +15,6 @@ public sealed class NodeIOCopy : NodeIO
 
 	public override void Update()
 	{
-		throw new NotImplementedException();
 	}
 
 	public override void Load()

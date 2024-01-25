@@ -30,6 +30,7 @@ public class ProjectScriptFileNode : ProjectNode
 		}
 
 		IO = StudioGlobals.NodeIORegistry.CreateNodeIO(this);
+		IO.Update();
 		
 		Meta = new Metadata
 		       {

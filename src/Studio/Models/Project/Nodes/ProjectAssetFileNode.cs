@@ -16,6 +16,7 @@ public sealed class ProjectAssetFileNode : ProjectNode
 	{
 		SetNodeType(ProjectNodeTypeExtensions.FromAssetExtension(Extension));
 		IO = StudioGlobals.NodeIORegistry.CreateNodeIO(this);
+		IO.Update();
 		
 		CreateMetaFile();
 		if (Meta == null)

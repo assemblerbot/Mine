@@ -15,7 +15,7 @@ public sealed class NodeIOScriptDefinition : NodeIO
 
 	public override void Update()
 	{
-		throw new NotImplementedException();
+		
 	}
 
 	public override void Load()
