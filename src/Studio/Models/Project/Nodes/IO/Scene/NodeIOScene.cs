@@ -7,11 +7,8 @@ using RedHerring.Studio.Models.ViewModels.Console;
 namespace Mine.Studio.Scene;
 
 [NodeIO(ProjectNodeType.AssetMesh)]
-public sealed class NodeIOScene : NodeIO
+public sealed class NodeIOScene : NodeIO<Assimp.Scene>
 {
-	private AssimpContext? _context = null;
-	private Assimp.Scene?  _scene   = null;
-	
 	public NodeIOScene(ProjectNode owner) : base(owner)
 	{
 	}
@@ -20,23 +17,18 @@ public sealed class NodeIOScene : NodeIO
 	{
 	}
 
-	public override void Load()
+	public override Assimp.Scene? Load()
 	{
 		NodeIOSceneSettings? settings = Owner.Meta?.NodeIOSettings as NodeIOSceneSettings;
 		if (settings == null)
 		{
-			return;
+			return null;
 		}
 
-		if (_context != null && _scene != null)
-		{
-			return;
-		}
+		AssimpContext context = new AssimpContext();
+		context.SetConfig(new NormalSmoothingAngleConfig(66.0f)); // just for testing
 
-		_context = new AssimpContext();
-		_context.SetConfig(new NormalSmoothingAngleConfig(66.0f)); // just for testing
-
-		_scene = _context.ImportFile(
+		Assimp.Scene? scene = context.ImportFile(
 			Owner.AbsolutePath,
 			PostProcessSteps.Triangulate
 		);
@@ -48,10 +40,10 @@ public sealed class NodeIOScene : NodeIO
 		// }
 		
 		bool settingsChanged = false;
-		for (int i = 0; i < _scene.Meshes.Count; ++i)
+		for (int i = 0; i < scene.Meshes.Count; ++i)
 		{
 			// update settings
-			Assimp.Mesh assimpMesh = _scene.Meshes[i];
+			Assimp.Mesh assimpMesh = scene.Meshes[i];
 			if (i == settings.Meshes.Count)
 			{
 				settings.Meshes.Add(new NodeIOMeshSettings(assimpMesh.Name));
@@ -65,30 +57,29 @@ public sealed class NodeIOScene : NodeIO
 		}
 
 		// cut the rest
-		if (settings.Meshes.Count > _scene.Meshes.Count)
+		if (settings.Meshes.Count > scene.Meshes.Count)
 		{
-			settings.Meshes.RemoveRange(_scene.Meshes.Count, settings.Meshes.Count - _scene.Meshes.Count);
+			settings.Meshes.RemoveRange(scene.Meshes.Count, settings.Meshes.Count - scene.Meshes.Count);
 			settingsChanged = true;
 		}
 
 		//return settingsChanged ? ImporterResult.FinishedSettingsChanged : ImporterResult.Finished;
+		return scene;
 	}
 
-	public override void Save()
+	public override void Save(Assimp.Scene data)
 	{
 		throw new InvalidOperationException();
 	}
 
 	public override void ClearCache()
 	{
-		_context = null;
-		_scene   = null;
 	}
 
 	public override void Import(string resourcePath)
 	{
-		Load();
-		if (_scene == null)
+		Assimp.Scene? scene = Load();
+		if (scene == null)
 		{
 			ConsoleViewModel.LogError($"Cannot import '{Owner.RelativePath}'. Mesh was not loaded!");
 			return;
@@ -96,7 +87,7 @@ public sealed class NodeIOScene : NodeIO
 
 		//Directory.CreateDirectory(Path.GetDirectoryName(resourcePath)!);
 
-		for (int i = 0; i < _scene.Meshes.Count; ++i)
+		for (int i = 0; i < scene.Meshes.Count; ++i)
 		{
 			/* TODO
 

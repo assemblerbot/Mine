@@ -8,6 +8,7 @@ using RedHerring.Studio.UserInterface.Attributes;
 
 namespace Mine.Studio;
 
+// serialized within definition asset!
 [Serializable, SerializedClassId("5dc4705e-0dd6-4ccc-858b-231b6d915ffd")]
 public sealed class DefinitionTemplate
 {
@@ -16,11 +17,17 @@ public sealed class DefinitionTemplate
 	private const string _dataBegin = "//--- data begin ---";
 	private const string _dataEnd   = "//--- data end ---";
 
+	[NonSerialized] private bool _declarationOnly = false;
+	public                  bool IsDeclarationOnly => _declarationOnly;
+	
 	[OdinSerialize] private ProjectScriptFileHeader _header = null!;
 	public                  ProjectScriptFileHeader Header => _header;
 	
 	[ShowInInspector, OdinSerialize] private string _namespaceName = null!;
-	[ShowInInspector, OdinSerialize] private string _className     = null!;
+	public                                   string NamespaceName => _namespaceName;
+	
+	[ShowInInspector, OdinSerialize] private string _className = null!;
+	public                                   string ClassName => _className;
 	
 	[ShowInInspector, OdinSerialize] private List<DefinitionTemplateField?>          _fields = new();
 	public                                   IReadOnlyList<DefinitionTemplateField?> Fields => _fields;
@@ -36,10 +43,10 @@ public sealed class DefinitionTemplate
 		_className     = className;
 	}
 
-	public static DefinitionTemplate? CreateFromFile(string absolutePath, ProjectModel projectModel)
+	public static DefinitionTemplate? CreateFromFile(string absolutePath, ProjectModel projectModel, bool declarationOnly)
 	{
 		DefinitionTemplate template = new();
-		return template.Read(absolutePath, projectModel) ? template : null;
+		return template.Read(absolutePath, projectModel, declarationOnly) ? template : null;
 	}
 
 	public string? Validate()
@@ -136,8 +143,10 @@ public sealed class DefinitionTemplate
 		stream.WriteLine("}");
 	}
 
-	public bool Read(string absolutePath, ProjectModel projectModel)
+	public bool Read(string absolutePath, ProjectModel projectModel, bool declarationOnly)
 	{
+		_declarationOnly = declarationOnly;
+
 		using StreamReader stream = File.OpenText(absolutePath);
 
 		// header
@@ -199,11 +208,31 @@ public sealed class DefinitionTemplate
 					string genericParameter = propertyMatch.Groups[2].Captures[0].ToString();
 					string propertyName     = propertyMatch.Groups[3].Captures[0].ToString();
 
-					// TODO - generic parameter class name to GUID
-					// hmm if we try to load every node we encounter, cyclic reference will cause infinite loop
-					// load just "declaration" instead
-					// maybe the whole project could be consistently updated, just declarations
-					DefinitionTemplateField field = new(propertyType.ToTemplateType(), propertyName, new StudioScriptDefinitionReference());
+					// generic parameter class name to GUID
+					ProjectNode? templateNode = projectModel.FindNode(
+						node => {
+							if (node.Type != ProjectNodeType.ScriptDefinition)
+							{
+								return false;
+							}
+
+							NodeIOScriptDefinition? io = node.GetNodeIO<NodeIOScriptDefinition>();
+							if (io is null || io.Template is null)
+							{
+								return false;
+							}
+
+							return $"{io.Template.NamespaceName}.{io.Template.ClassName}" == genericParameter;
+						},
+						false, true
+					);
+					
+					// create field
+					DefinitionTemplateField field = new(
+						propertyType.ToTemplateType(),
+						propertyName,
+						templateNode is not null && templateNode.Meta?.Guid is not null ? new StudioScriptDefinitionReference(templateNode.Meta!.Guid) : new StudioScriptDefinitionReference()
+					);
 					_fields.Add(field);
 				}
 			}
@@ -212,6 +241,11 @@ public sealed class DefinitionTemplate
 				// parsing class/namespace/marks
 				if (line.Contains(_dataBegin))
 				{
+					if (declarationOnly)
+					{
+						break; // skip the rest
+					}
+
 					parsingData = true;
 					continue;
 				}

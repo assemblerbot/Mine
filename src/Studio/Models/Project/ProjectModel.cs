@@ -68,36 +68,51 @@ public sealed class ProjectModel
 	// TODO - this is bad, kind of project database is needed, indexation in this class will be just too messy
 	public ProjectNode? FindNodeByGuid(string guid)
 	{
-		ProjectNode? resultNode = null;
+		return FindNode(node => node.Meta?.Guid == guid, true, true);
+	}
+	
+	// TODO - this is bad, kind of project database is needed, indexation in this class will be just too messy
+	public ProjectNode? FindNode(Func<ProjectNode, bool> predicate, bool inAssets, bool inScripts)
+	{
+		ProjectNode?            resultNode              = null;
+		CancellationTokenSource cancellationTokenSource = new();
 
-		_assetsFolder!.TraverseRecursive(
-			node =>
-			{
-				if (node.Meta?.Guid == guid)
-				{
-					resultNode = node;
-				}
-			},
-			TraverseFlags.Files | TraverseFlags.Directories,
-			new CancellationToken()
-		);
-		
-		if (resultNode != null)
+		if (inAssets)
 		{
-			return resultNode;
+			_assetsFolder!.TraverseRecursive(
+				node =>
+				{
+					if (predicate(node))
+					{
+						resultNode = node;
+						cancellationTokenSource.Cancel();
+					}
+				},
+				TraverseFlags.Files | TraverseFlags.Directories,
+				cancellationTokenSource.Token
+			);
+
+			if (resultNode != null)
+			{
+				return resultNode;
+			}
 		}
 
-		_scriptsFolder!.TraverseRecursive(
-			node =>
-			{
-				if (node.Meta?.Guid == guid)
+		if (inScripts)
+		{
+			_scriptsFolder!.TraverseRecursive(
+				node =>
 				{
-					resultNode = node;
-				}
-			},
-			TraverseFlags.Files | TraverseFlags.Directories,
-			new CancellationToken()
-		);
+					if (predicate(node))
+					{
+						resultNode = node;
+						cancellationTokenSource.Cancel();
+					}
+				},
+				TraverseFlags.Files | TraverseFlags.Directories,
+				cancellationTokenSource.Token
+			);
+		}
 
 		return resultNode;
 	}
@@ -230,6 +245,7 @@ public sealed class ProjectModel
 		_assetsWatcher.Created               += OnAssetCreated;
 		_assetsWatcher.Deleted               += OnAssetDeleted;
 		_assetsWatcher.Renamed               += OnAssetRenamed;
+		_assetsWatcher.Changed               += OnAssetChanged;
 		_assetsWatcher.Filter                =  "";
 		_assetsWatcher.IncludeSubdirectories =  true;
 		_assetsWatcher.EnableRaisingEvents   =  true;
@@ -239,6 +255,7 @@ public sealed class ProjectModel
 		_scriptsWatcher.Created               += OnScriptCreated;
 		_scriptsWatcher.Deleted               += OnScriptDeleted;
 		_scriptsWatcher.Renamed               += OnScriptRenamed;
+		_scriptsWatcher.Changed               += OnScriptChanged;
 		_scriptsWatcher.Filter                =  "";
 		_scriptsWatcher.IncludeSubdirectories =  true;
 		_scriptsWatcher.EnableRaisingEvents   =  true;
@@ -275,6 +292,16 @@ public sealed class ProjectModel
 		OnAssetCreated(evt.FullPath, evt.Name);
 	}
  
+	private void OnAssetChanged(object sender, FileSystemEventArgs evt)
+	{
+		if (evt.Name == null)
+		{
+			return;
+		}
+
+		OnAssetChanged(evt.FullPath, evt.Name);
+	}
+	
 	private void OnScriptCreated(object sender, FileSystemEventArgs evt)
 	{
 		if (evt.Name == null)
@@ -289,6 +316,7 @@ public sealed class ProjectModel
 
 		OnScriptCreated(evt.FullPath, evt.Name);
 	}
+	
 	private void OnScriptDeleted(object sender, FileSystemEventArgs evt)
 	{
 		if (evt.Name == null)
@@ -298,6 +326,7 @@ public sealed class ProjectModel
 
 		OnScriptDeleted(evt.FullPath, evt.Name);
 	}
+
 	private void OnScriptRenamed(object sender, RenamedEventArgs evt)
 	{
 		if (evt.Name == null || evt.OldName == null)
@@ -314,6 +343,16 @@ public sealed class ProjectModel
 		OnScriptCreated(evt.FullPath, evt.Name);
 	}
 
+	private void OnScriptChanged(object sender, FileSystemEventArgs evt)
+	{
+		if (evt.Name == null || !evt.Name.EndsWith(".cs"))
+		{
+			return;
+		}
+
+		OnScriptChanged(evt.FullPath, evt.Name);
+	}
+	
 	private void DisposeWatchers()
 	{
 		_assetsWatcher?.Dispose();
@@ -368,6 +407,19 @@ public sealed class ProjectModel
 	#endregion
 	
 	#region Asset manipulation
+
+	public void LoadAssetNode<TData>(ProjectAssetFileNode node, Action<TData?>? onComplete)
+	{
+		ProjectTask task = CreateLoadNodeTask(_assetsFolder!, node.RelativePath, onComplete);
+		EnqueueProjectTask(task);
+	}
+
+	public void SaveAssetNode<TData>(ProjectAssetFileNode node, TData data, Action<bool>? onComplete)
+	{
+		ProjectTask task = CreateSaveNodeTask(_assetsFolder!, node.RelativePath, data, onComplete);
+		EnqueueProjectTask(task);
+	}
+
 	private void RecursiveAssetScan(string path, string relativePath, ProjectFolderNode root, List<string> foundMetaFiles)
 	{
 		// scan directories
@@ -478,6 +530,16 @@ public sealed class ProjectModel
 		}
 	}
 
+	private void OnAssetChanged(string eventAbsolutePath, string eventRelativePath)
+	{
+		if (eventRelativePath.EndsWith(".meta"))
+		{
+			return;
+		}
+
+		EnqueueProjectTaskFromWatcher(CreateUpdateNodeTask(_assetsFolder!, eventRelativePath));
+	}
+	
 	private void MetaCleanup(List<string> metaFiles)
 	{
 		foreach (string metaFile in metaFiles)
@@ -495,6 +557,18 @@ public sealed class ProjectModel
 	#endregion
 	
 	#region Script manipulation
+	public void LoadScriptNode<TData>(ProjectScriptFileNode node, Action<TData?>? onComplete)
+	{
+		ProjectTask task = CreateLoadNodeTask(_scriptsFolder!, node.RelativePath, onComplete);
+		EnqueueProjectTask(task);
+	}
+
+	public void SaveScriptNode<TData>(ProjectScriptFileNode node, TData data, Action<bool>? onComplete)
+	{
+		ProjectTask task = CreateSaveNodeTask(_scriptsFolder!, node.RelativePath, data, onComplete);
+		EnqueueProjectTask(task);
+	}
+
 	public ProjectScriptFileNode? FindScriptNodeByGuid(string guid)
 	{
 		ProjectNode? resultNode = null;
@@ -581,6 +655,11 @@ public sealed class ProjectModel
 			string nodeName   = eventRelativePath.Substring(index + 1);
 			EnqueueProjectTaskFromWatcher(CreateDeleteNodeTask(_scriptsFolder!, parentPath, nodeName));
 		}
+	}
+	
+	private void OnScriptChanged(string eventAbsolutePath, string eventRelativePath)
+	{
+		EnqueueProjectTaskFromWatcher(CreateUpdateNodeTask(_scriptsFolder!, eventRelativePath));
 	}
 	#endregion
 	
@@ -844,6 +923,76 @@ public sealed class ProjectModel
 				catch (Exception e)
 				{
 					ConsoleViewModel.LogException(e.ToString());
+				}
+			}
+		);
+	}
+
+	private ProjectTask CreateLoadNodeTask<TData>(ProjectRootNode root, string path, Action<TData?>? onComplete)
+	{
+		return new ProjectTask(
+			cancellationToken =>
+			{
+				lock (ProjectTreeLock)
+				{
+					ProjectNode? node = root.FindNode(path);
+					if (node != null && node.Exists)
+					{
+						NodeIO<TData>? io = node.GetNodeIO<NodeIO<TData>>();
+						if (io is not null)
+						{
+							TData? data = io.Load();
+							onComplete?.Invoke(data);
+							return;
+						}
+					}
+
+					onComplete?.Invoke(default);
+				}
+			}
+		);
+	}
+
+	private ProjectTask CreateSaveNodeTask<TData>(ProjectRootNode root, string path, TData data, Action<bool>? onComplete)
+	{
+		return new ProjectTask(
+			cancellationToken =>
+			{
+				lock (ProjectTreeLock)
+				{
+					ProjectNode? node = root.FindNode(path);
+					if (node != null && node.Exists)
+					{
+						NodeIO<TData>? io = node.GetNodeIO<NodeIO<TData>>();
+						if (io is not null)
+						{
+							io.Save(data);
+							onComplete?.Invoke(true);
+							return;
+						}
+					}
+					onComplete?.Invoke(false);
+				}
+			}
+		);
+	}
+
+	private ProjectTask CreateUpdateNodeTask(ProjectRootNode root, string path)
+	{
+		return new ProjectTask(
+			cancellationToken =>
+			{
+				lock (ProjectTreeLock)
+				{
+					ProjectNode? node = root.FindNode(path);
+					if (node != null && node.Exists)
+					{
+						NodeIO? io = node.GetNodeIO<NodeIO>();
+						if (io is not null)
+						{
+							io.Update();
+						}
+					}
 				}
 			}
 		);

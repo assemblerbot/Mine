@@ -4,7 +4,7 @@ using RedHerring.Studio.Models.Project.Imports;
 namespace Mine.Studio;
 
 [NodeIO(ProjectNodeType.ScriptDefinition)]
-public sealed class NodeIOScriptDefinition : NodeIO
+public sealed class NodeIOScriptDefinition : NodeIO<DefinitionTemplate>
 {
 	private DefinitionTemplate? _template = null;
 	public  DefinitionTemplate? Template => _template;
@@ -15,27 +15,17 @@ public sealed class NodeIOScriptDefinition : NodeIO
 
 	public override void Update()
 	{
-		
+		_template = DefinitionTemplate.CreateFromFile(Owner.AbsolutePath, Owner.Project, true);
 	}
 
-	public override void Load()
+	public override DefinitionTemplate? Load()
 	{
-		if (_template is not null)
-		{
-			return;
-		}
-
-		_template = DefinitionTemplate.CreateFromFile(Owner.AbsolutePath, Owner.Project);
+		return DefinitionTemplate.CreateFromFile(Owner.AbsolutePath, Owner.Project, false);
 	}
 
-	public override void Save()
+	public override void Save(DefinitionTemplate data)
 	{
-		if (_template is null)
-		{
-			return;
-		}
-
-		_template.WriteToFile(Owner.AbsolutePath, Owner.Meta!.Guid, Owner.Project);
+		data.WriteToFile(Owner.AbsolutePath, Owner.Meta!.Guid, Owner.Project);
 	}
 
 	public override void ClearCache()

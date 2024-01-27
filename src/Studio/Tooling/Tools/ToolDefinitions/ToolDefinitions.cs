@@ -22,6 +22,8 @@ public sealed class ToolDefinitions : Tool
 
 	private readonly ProjectModel _projectModel;
 	
+	private object _semaphore = new();
+	
 	// template editor
 	private ProjectScriptFileNode?        _definitionTemplateNode   = null;
 	private DefinitionTemplate?           _definitionTemplate       = null;
@@ -50,24 +52,29 @@ public sealed class ToolDefinitions : Tool
 		bool isOpen = true;
 		if (ImGui.Begin(NameId, ref isOpen))
 		{
-			UpdateNodesFromSelection();
-			
-			if (ImGui.BeginTabBar(_tabBarId))
+			lock(_semaphore)
 			{
-				if (ImGui.BeginTabItem(_tabDefinitionNameId))
+				UpdateNodesFromSelection();
+
+				if (ImGui.BeginTabBar(_tabBarId))
 				{
-					UpdateTemplateEditorUI();
-					ImGui.EndTabItem();
+					if (ImGui.BeginTabItem(_tabDefinitionNameId))
+					{
+						UpdateTemplateEditorUI();
+						ImGui.EndTabItem();
+					}
+
+					if (ImGui.BeginTabItem(_tabDataNameId))
+					{
+						UpdateAssetEditorUI();
+						ImGui.EndTabItem();
+					}
+
+					ImGui.EndTabBar();
 				}
 
-				if (ImGui.BeginTabItem(_tabDataNameId))
-				{
-					UpdateAssetEditorUI();
-					ImGui.EndTabItem();
-				}
-				ImGui.EndTabBar();
+				ImGui.End();
 			}
-			ImGui.End();
 		}
 
 		return !isOpen;
@@ -75,7 +82,7 @@ public sealed class ToolDefinitions : Tool
 
 	private void UpdateTemplateEditorUI()
 	{
-		if (_definitionTemplateNode == null || _definitionTemplate == null)
+		if (_definitionTemplateNode == null || _definitionTemplate == null || _definitionTemplateEditor == null)
 		{
 			ImGui.TextColored(new Vector4(1f, 0.5f, 0.5f, 1f), "Select definition template.");
 			return;
@@ -86,7 +93,7 @@ public sealed class ToolDefinitions : Tool
 
 	private void UpdateAssetEditorUI()
 	{
-		if (_definitionTemplate == null || _definitionAssetNode == null || _definitionAsset == null)
+		if (_definitionTemplate == null || _definitionAssetNode == null || _definitionAsset == null || _definitionAssetEditor == null)
 		{
 			ImGui.TextColored(new Vector4(1f, 0.5f, 0.5f, 1f), "Select definition asset.");
 			return;
@@ -151,7 +158,46 @@ public sealed class ToolDefinitions : Tool
 		// try to read asset node
 		if(_definitionAssetNode != null)
 		{
-			DefinitionAsset? asset = DefinitionAsset.CreateFromFile(_definitionAssetNode.AbsolutePath, StudioGlobals.MigrationManager);
+			_projectModel.LoadAssetNode<DefinitionAsset>(_definitionAssetNode, OnAssetNodeLoaded);
+			_definitionAssetEditor  = null;
+			
+			// DefinitionAsset? asset = DefinitionAsset.CreateFromFile(_definitionAssetNode.AbsolutePath, StudioGlobals.MigrationManager);
+			// if (asset == null)
+			// {
+			// 	_definitionAssetNode = null;
+			// 	return;
+			// }
+			//
+			// _definitionAsset = asset;
+			//
+			// ProjectScriptFileNode? templateNode = StudioModel.Project.FindScriptNodeByGuid(_definitionAsset.Template.Header.Guid);
+			// _definitionTemplateNode = templateNode;
+			// _definitionAssetEditor  = new ToolDefinitionAssetEditor(StudioModel, StudioModel.Project, _definitionAssetNode, _definitionAsset, NameId + ".asset_editor");
+		}
+
+		// try to read script node
+		if (_definitionTemplateNode != null)
+		{
+			_projectModel.LoadScriptNode<DefinitionTemplate>(_definitionTemplateNode, OnScriptNodeLoaded);
+			_definitionTemplateEditor = null;
+			
+			// _definitionTemplate = DefinitionTemplate.CreateFromFile(_definitionTemplateNode.AbsolutePath, _projectModel, false);
+			// if (_definitionTemplate == null)
+			// {
+			// 	_definitionAsset        = null;
+			// 	_definitionTemplateNode = null;
+			// 	_definitionAssetNode    = null;
+			// 	return;
+			// }
+			//
+			// _definitionTemplateEditor = new ToolDefinitionTemplateEditor(StudioModel, _projectModel, _definitionTemplateNode, _definitionTemplate, NameId + ".template_editor");
+		}
+	}
+
+	private void OnAssetNodeLoaded(DefinitionAsset? asset)
+	{
+		lock (_semaphore)
+		{
 			if (asset == null)
 			{
 				_definitionAssetNode = null;
@@ -159,16 +205,24 @@ public sealed class ToolDefinitions : Tool
 			}
 
 			_definitionAsset = asset;
-			
+
 			ProjectScriptFileNode? templateNode = StudioModel.Project.FindScriptNodeByGuid(_definitionAsset.Template.Header.Guid);
 			_definitionTemplateNode = templateNode;
-			_definitionAssetEditor  = new ToolDefinitionAssetEditor(StudioModel, StudioModel.Project, _definitionAssetNode, _definitionAsset, NameId + ".asset_editor");
-		}
+			_definitionAssetEditor  = new ToolDefinitionAssetEditor(StudioModel, StudioModel.Project, _definitionAssetNode!, _definitionAsset, NameId + ".asset_editor");
 
-		// try to read script node
-		if (_definitionTemplateNode != null)
+			if (_definitionTemplateNode != null)
+			{
+				_projectModel.LoadScriptNode<DefinitionTemplate>(_definitionTemplateNode, OnScriptNodeLoaded);
+				_definitionTemplateEditor = null;
+			}
+		}
+	}
+
+	private void OnScriptNodeLoaded(DefinitionTemplate? template)
+	{
+		lock (_semaphore)
 		{
-			_definitionTemplate = DefinitionTemplate.CreateFromFile(_definitionTemplateNode.AbsolutePath, _projectModel);
+			_definitionTemplate = template;
 			if (_definitionTemplate == null)
 			{
 				_definitionAsset        = null;

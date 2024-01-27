@@ -5,10 +5,8 @@ using RedHerring.Studio.Models.ViewModels.Console;
 namespace Mine.Studio;
 
 [NodeIO]
-public sealed class NodeIOCopy : NodeIO
+public sealed class NodeIOCopy : NodeIO<byte[]>
 {
-	private byte[]? _cache = null;
-
 	public NodeIOCopy(ProjectNode owner) : base(owner)
 	{
 	}
@@ -17,38 +15,34 @@ public sealed class NodeIOCopy : NodeIO
 	{
 	}
 
-	public override void Load()
+	public override byte[]? Load()
 	{
-		if (_cache != null)
-		{
-			return;
-		}
-
 		try
 		{
-			_cache = File.ReadAllBytes(Owner.AbsolutePath);
+			return File.ReadAllBytes(Owner.AbsolutePath);
 		}
 		catch (Exception e)
 		{
 			ConsoleViewModel.LogException(e.ToString());
 		}
+
+		return null;
 	}
 
-	public override void Save()
+	public override void Save(byte[] data)
 	{
 		throw new InvalidOperationException();
 	}
 
 	public override void ClearCache()
 	{
-		_cache = null;
 	}
 
 	public override void Import(string resourcePath)
 	{
-		Load();
+		byte[]? data = Load();
 		
-		if (_cache == null)
+		if (data == null)
 		{
 			ConsoleViewModel.LogError($"Cannot import file {Owner.RelativePath}, file was not loaded!");
 			return;
@@ -57,7 +51,7 @@ public sealed class NodeIOCopy : NodeIO
 		try
 		{
 			Directory.CreateDirectory(Path.GetDirectoryName(resourcePath)!);
-			File.WriteAllBytes(resourcePath, _cache);
+			File.WriteAllBytes(resourcePath, data);
 		}
 		catch (Exception e)
 		{

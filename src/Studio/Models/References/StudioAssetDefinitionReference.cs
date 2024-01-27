@@ -1,5 +1,6 @@
 using Migration;
 using RedHerring.Studio.Models;
+using RedHerring.Studio.Models.Project;
 using RedHerring.Studio.Models.Project.FileSystem;
 
 namespace Mine.Studio;
@@ -7,7 +8,7 @@ namespace Mine.Studio;
 [Serializable, SerializedClassId("1d1cea4c-4339-4d76-a548-602210666e09")]
 public sealed class StudioAssetDefinitionReference : StudioReference
 {
-	public override string Name => $"Definition<{GenericParameterGuid}>";
+	public override string Name => GetName();
 	public          string GenericParameterGuid;
 
 	public StudioAssetDefinitionReference(string genericParameterGuid)
@@ -28,17 +29,27 @@ public sealed class StudioAssetDefinitionReference : StudioReference
 			return false;
 		}
 
-		if (io.Asset == null)
-		{
-			io.Load(); // TODO - other thread?
-		}
-
 		return io.Asset?.Template.Header.Guid == GenericParameterGuid;
 	}
 
 	public override StudioReference CreateCopy()
 	{
 		return new StudioAssetDefinitionReference(GenericParameterGuid) {Guid = Guid};
+	}
+
+	private string GetName()
+	{
+		ProjectNode? node = StudioModel.Instance.Project.FindNode(node => node.Type == ProjectNodeType.ScriptDefinition && node.Meta!.Guid == GenericParameterGuid, false, true);
+		if (node is not null)
+		{
+			NodeIOScriptDefinition? io = node.GetNodeIO<NodeIOScriptDefinition>();
+			if (io?.Template is not null)
+			{
+				return $"Definition<{io.Template.NamespaceName}.{io.Template.ClassName}>";
+			}
+		}
+
+		return $"Definition<{GenericParameterGuid}>";
 	}
 }
 

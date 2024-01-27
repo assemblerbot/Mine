@@ -1,3 +1,5 @@
+using RedHerring.Studio.Models.Project;
+
 namespace Mine.Studio;
 
 // !!! Don't rename without thinking! Enum values are used as data types for definition fields! !!!

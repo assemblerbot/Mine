@@ -4,7 +4,7 @@ using RedHerring.Studio.Models.Project.Imports;
 namespace Mine.Studio;
 
 [NodeIO(ProjectNodeType.AssetDefinition)]
-public sealed class NodeIOAssetDefinition : NodeIO
+public sealed class NodeIOAssetDefinition : NodeIO<DefinitionAsset>
 {
 	private DefinitionAsset? _asset = null;
 	public  DefinitionAsset? Asset => _asset;
@@ -15,21 +15,17 @@ public sealed class NodeIOAssetDefinition : NodeIO
 
 	public override void Update()
 	{
-	}
-
-	public override void Load()
-	{
-		if (_asset != null)
-		{
-			return;
-		}
-
 		_asset = DefinitionAsset.CreateFromFile(Owner.AbsolutePath, StudioGlobals.MigrationManager);
 	}
 
-	public override void Save()
+	public override DefinitionAsset? Load()
 	{
-		_asset.WriteToFile(Owner.AbsolutePath);
+		return DefinitionAsset.CreateFromFile(Owner.AbsolutePath, StudioGlobals.MigrationManager);
+	}
+
+	public override void Save(DefinitionAsset data)
+	{
+		data.WriteToFile(Owner.AbsolutePath);
 	}
 
 	public override void ClearCache()
@@ -39,13 +35,13 @@ public sealed class NodeIOAssetDefinition : NodeIO
 
 	public override void Import(string resourcePath)
 	{
-		Load();
-		if (_asset == null)
+		DefinitionAsset? data = Load();
+		if (data == null)
 		{
 			return;
 		}
 
-		_asset.ImportToResources(resourcePath);
+		data.ImportToResources(resourcePath);
 		ClearCache();
 	}
 

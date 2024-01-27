@@ -14,6 +14,9 @@ namespace RedHerring.Studio.Models;
 public class StudioModel
 {
 	private const int _threadsCount = 4;
+
+	private static StudioModel _instance;
+	public static  StudioModel Instance => _instance;
 	
 	private readonly ProjectModel _project;
 	public           ProjectModel Project => _project;
@@ -40,6 +43,7 @@ public class StudioModel
 
 	public StudioModel()
 	{
+		_instance  = this;
 		_project   = new ProjectModel(_eventAggregator);
 		_selection = new(_eventAggregator);
 	}
