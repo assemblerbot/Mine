@@ -21,6 +21,10 @@ public class DefinitionAssetValueReference : DefinitionAssetValue
 		// TODO
 		//stringWriter.Write(Value);
 	}
+
+	public override void ImportFrom(DefinitionAssetValue other)
+	{
+	}
 }
 
 #region Migration

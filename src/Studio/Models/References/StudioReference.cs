@@ -21,6 +21,41 @@ public abstract class StudioReference
 	{
 		//TODO
 	}
+
+	protected bool Equals(StudioReference other)
+	{
+		return Guid == other.Guid;
+	}
+
+	public override bool Equals(object? obj)
+	{
+		if (ReferenceEquals(null, obj))
+		{
+			return false;
+		}
+
+		if (ReferenceEquals(this, obj))
+		{
+			return true;
+		}
+
+		if (obj.GetType() != this.GetType())
+		{
+			return false;
+		}
+
+		return Equals((StudioReference) obj);
+	}
+
+	public static bool operator ==(StudioReference? left, StudioReference? right)
+	{
+		return Equals(left, right);
+	}
+
+	public static bool operator !=(StudioReference? left, StudioReference? right)
+	{
+		return !Equals(left, right);
+	}
 }
 
 #region Migration

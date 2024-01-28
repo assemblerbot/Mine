@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Reflection;
 using Migration;
 using RedHerring.Studio.UserInterface;
@@ -16,6 +17,19 @@ public sealed class DefinitionAssetValueString : DefinitionAssetValue
 		stringWriter.Write('"');
 		stringWriter.Write(Value);
 		stringWriter.Write('"');
+	}
+
+	public override void ImportFrom(DefinitionAssetValue other)
+	{
+		Value = other switch
+		{
+			DefinitionAssetValueBool otherBool => otherBool.Value.ToString(),
+			DefinitionAssetValueFloat otherFloat => otherFloat.Value.ToString(CultureInfo.InvariantCulture),
+			DefinitionAssetValueInt otherInt => otherInt.Value.ToString(),
+			DefinitionAssetValueReference otherReference => "",
+			DefinitionAssetValueString otherString => otherString.Value,
+			_ => throw new ArgumentOutOfRangeException(nameof(other))
+		};
 	}
 }
 

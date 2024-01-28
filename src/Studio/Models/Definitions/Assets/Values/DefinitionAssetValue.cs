@@ -8,7 +8,8 @@ public abstract class DefinitionAssetValue
 {
 	public abstract Type      InspectorControlType { get; }
 	public abstract FieldInfo EditableField        { get; }
-	public abstract void      WriteJsonValue(StringWriter stringWriter);
+	public abstract void      WriteJsonValue(StringWriter     stringWriter);
+	public abstract void      ImportFrom(DefinitionAssetValue other);
 }
 
 #region Migration

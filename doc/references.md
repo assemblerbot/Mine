@@ -37,7 +37,3 @@ To support reference control, new derived class was added `StudioInspector`.
 
 There are just too many cases where an access to `StudioModel` is needed.
 Many small classes need it, so I've decided to make a **singleton** from `StudioModel`.
-
-
-
-

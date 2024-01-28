@@ -554,6 +554,40 @@ public sealed class ProjectModel
 			File.Delete(metaFile);
 		}
 	}
+	
+	public void UpdateDefinitionAssets(DefinitionTemplate definitionTemplate)
+	{
+		DefinitionTemplate definitionTemplateCopy = definitionTemplate.CreateCopy(this); 
+		
+		lock (ProjectTreeLock)
+		{
+			_assetsFolder!.TraverseRecursive(
+				node =>
+				{
+					if (node.Type != ProjectNodeType.AssetDefinition)
+					{
+						return;
+					}
+
+					NodeIOAssetDefinition? io = node.GetNodeIO<NodeIOAssetDefinition>();
+					if (io?.Asset is null)
+					{
+						return;
+					}
+
+					if (io.Asset.Template.ClassName != definitionTemplate.ClassName || io.Asset.Template.NamespaceName != definitionTemplate.NamespaceName)
+					{
+						return;
+					}
+
+					ProjectTask task = CreateDefinitionUpdateTask(_assetsFolder, node.RelativePath, definitionTemplateCopy);
+					EnqueueProjectTask(task);
+				},
+				TraverseFlags.Files,
+				default
+			);
+		}
+	}
 	#endregion
 	
 	#region Script manipulation
@@ -993,6 +1027,43 @@ public sealed class ProjectModel
 							io.Update();
 						}
 					}
+				}
+			}
+		);
+	}
+
+	private ProjectTask CreateDefinitionUpdateTask(ProjectRootNode root, string path, DefinitionTemplate template)
+	{
+		return new ProjectTask(
+			cancellationToken =>
+			{
+				lock (ProjectTreeLock)
+				{
+					ProjectNode? node = root.FindNode(path);
+					if (node == null || !node.Exists || node.Type != ProjectNodeType.AssetDefinition)
+					{
+						return;
+					}
+
+					NodeIOAssetDefinition? io = node.GetNodeIO<NodeIOAssetDefinition>();
+					if (io is null)
+					{
+						return;
+					}
+
+					io.Update();
+					if (io.Asset is null)
+					{
+						return;
+					}
+
+					if (!io.Asset.UpdateTemplate(template))
+					{
+						return;
+					}
+
+					io.Asset.WriteToFile(node.AbsolutePath);
+					ConsoleViewModel.LogInfo($"Definition asset '{node.RelativePath}' updated.");
 				}
 			}
 		);

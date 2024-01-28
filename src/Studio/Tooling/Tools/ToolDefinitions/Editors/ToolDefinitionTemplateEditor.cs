@@ -49,13 +49,14 @@ public class ToolDefinitionTemplateEditor
 		}
 		else
 		{
-			ImGui.BeginDisabled();
+			//ImGui.BeginDisabled();
 		}
 
 		if (ImGui.Button("Apply changes"))
 		{
 			if (WriteToFile())
 			{
+				UpdateDefinitionAssets();
 				_commandHistory.ResetChange();
 			}
 		}
@@ -66,7 +67,7 @@ public class ToolDefinitionTemplateEditor
 		}
 		else
 		{
-			ImGui.EndDisabled();
+			//ImGui.EndDisabled();
 		}
 
 		ImGui.SameLine();
@@ -125,5 +126,10 @@ public class ToolDefinitionTemplateEditor
 
 		_definitionTemplate.WriteToFile(_definitionTemplateNode.AbsolutePath, _definitionTemplateNode.Meta?.Guid, _studioModel.Project); // it is safe to write here?
 		return true;
+	}
+
+	private void UpdateDefinitionAssets()
+	{
+		_studioModel.Project.UpdateDefinitionAssets(_definitionTemplate);
 	}
 }

@@ -15,6 +15,19 @@ public sealed class DefinitionAssetValueBool : DefinitionAssetValue
 	{
 		stringWriter.Write(Value ? "true" : "false");
 	}
+
+	public override void ImportFrom(DefinitionAssetValue other)
+	{
+		Value = other switch
+		{
+			DefinitionAssetValueBool otherBool => otherBool.Value,
+			DefinitionAssetValueFloat otherFloat => otherFloat.Value != 0,
+			DefinitionAssetValueInt otherInt => otherInt.Value != 0,
+			DefinitionAssetValueReference otherReference => false,
+			DefinitionAssetValueString otherString => !string.IsNullOrEmpty(otherString.Value),
+			_ => throw new ArgumentOutOfRangeException(nameof(other))
+		};
+	}
 }
 
 #region Migration

@@ -79,6 +79,100 @@ public sealed class DefinitionAsset
 
 		File.WriteAllText(absolutePath, stringWriter.ToString());
 	}
+
+	public bool UpdateTemplate(DefinitionTemplate newTemplate)
+	{
+		bool changeDetected = false;
+		
+		List<DefinitionAssetRow> newRows         = Rows.Select(_ => new DefinitionAssetRow()).ToList();
+
+		for (int newFieldIndex = 0; newFieldIndex < newTemplate.Fields.Count; ++newFieldIndex)
+		{
+			DefinitionTemplateField? newField = newTemplate.Fields[newFieldIndex];
+
+			// uninitialized field, basically an error, but we have to keep the data
+			if (newField == null)
+			{
+				changeDetected = true;
+				for (int i = 0; i < Rows.Count; ++i)
+				{
+					newRows[i].Values.Add(new DefinitionAssetValueInt()); // TODO - null?
+				}
+				continue;
+			}
+
+			// find field in old template
+			int oldFieldIndex = ((List<DefinitionTemplateField?>)_template.Fields).FindIndex( // nasty hack, but IReadOnlyList doesn't support basic search!
+				field => field is not null && field.Name == newField.Name && field.Type == newField.Type && field.GenericParameter == newField.GenericParameter
+			);
+
+			if (oldFieldIndex != -1)
+			{
+				changeDetected |= newFieldIndex != oldFieldIndex;
+				for (int i = 0; i < Rows.Count; ++i)
+				{
+					newRows[i].Values.Add(Rows[i].Values[oldFieldIndex]);
+				}
+				continue;
+			}
+
+			changeDetected = true;
+
+			// try to match the name and convert type
+			oldFieldIndex = ((List<DefinitionTemplateField?>)_template.Fields).FindIndex(
+				field => field is not null && field.Name == newField.Name
+			);
+
+			if (oldFieldIndex != -1)
+			{
+				for (int i = 0; i < Rows.Count; ++i)
+				{
+					DefinitionAssetValue value = newField.Type.ToDefinitionAssetValue(newField.GenericParameter);
+					newRows[i].Values.Add(value);
+					value.ImportFrom(Rows[i].Values[oldFieldIndex]);
+				}
+				continue;
+			}
+			
+			// if fields count doesn't match, use default values, probably new field was created
+			if (_template.Fields.Count != newTemplate.Fields.Count)
+			{
+				for (int i = 0; i < Rows.Count; ++i)
+				{
+					DefinitionAssetValue value = newField.Type.ToDefinitionAssetValue(newField.GenericParameter);
+					newRows[i].Values.Add(value);
+				}
+				continue;
+			}
+			
+			// count is the same, try to find field by type and use it (field name must be also be different than anything else in new fields, to avoid duplication)
+			oldFieldIndex = ((List<DefinitionTemplateField?>)_template.Fields).FindIndex(
+				field => field is not null && field.Type == newField.Type && field.GenericParameter == newField.GenericParameter && newTemplate.Fields.All(f => f?.Name != field.Name)
+			);
+
+			if (oldFieldIndex != -1)
+			{
+				for (int i = 0; i < Rows.Count; ++i)
+				{
+					newRows[i].Values.Add(Rows[i].Values[oldFieldIndex]);
+				}
+				continue;
+			}
+			
+			// fallback - nothing was found, create new value
+			for (int i = 0; i < Rows.Count; ++i)
+			{
+				DefinitionAssetValue value = newField.Type.ToDefinitionAssetValue(newField.GenericParameter);
+				newRows[i].Values.Add(value);
+			}
+		}
+		
+		// update template and rows
+		_template = newTemplate;
+		Rows      = newRows;
+
+		return changeDetected;
+	}
 }
 
 #region Migration

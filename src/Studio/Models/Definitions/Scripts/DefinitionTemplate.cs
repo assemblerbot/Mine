@@ -46,7 +46,7 @@ public sealed class DefinitionTemplate
 	public static DefinitionTemplate? CreateFromFile(string absolutePath, ProjectModel projectModel, bool declarationOnly)
 	{
 		DefinitionTemplate template = new();
-		return template.Read(absolutePath, projectModel, declarationOnly) ? template : null;
+		return template.ReadFromFile(absolutePath, projectModel, declarationOnly) ? template : null;
 	}
 
 	public string? Validate()
@@ -83,10 +83,35 @@ public sealed class DefinitionTemplate
 		return null;
 	}
 
+	public DefinitionTemplate CreateCopy(ProjectModel projectModel)
+	{
+		byte[] bytes;
+		{
+			using MemoryStream memoryStream = new();
+			using StreamWriter writer       = new(memoryStream);
+			WriteToStream(writer, _header.Guid, projectModel);
+			writer.Flush();
+			bytes = memoryStream.ToArray();
+		}
+
+		DefinitionTemplate result = new();
+		{
+			using MemoryStream memoryStream = new(bytes);
+			using StreamReader reader       = new(memoryStream);
+			result.ReadFromStream(reader, projectModel, false);
+		}
+
+		return result;
+	}
+
 	public void WriteToFile(string absolutePath, string? thisNodeGuid, ProjectModel projectModel)
 	{
 		using StreamWriter stream = File.CreateText(absolutePath);
-
+		WriteToStream(stream, thisNodeGuid, projectModel);
+	}
+	
+	public void WriteToStream(StreamWriter stream, string? thisNodeGuid, ProjectModel projectModel)
+	{
 		stream.WriteLine(_header.ToHeaderString());
 		stream.WriteLine("//THIS FILE WAS GENERATED! DON'T MODIFY IT. ONLY THE NAMESPACE AND THE CLASS NAME CAN BE MODIFIED SAFELY!");
 
@@ -143,11 +168,15 @@ public sealed class DefinitionTemplate
 		stream.WriteLine("}");
 	}
 
-	public bool Read(string absolutePath, ProjectModel projectModel, bool declarationOnly)
+	public bool ReadFromFile(string absolutePath, ProjectModel projectModel, bool declarationOnly)
+	{
+		using StreamReader stream = File.OpenText(absolutePath);
+		return ReadFromStream(stream, projectModel, declarationOnly);
+	}
+
+	public bool ReadFromStream(StreamReader stream, ProjectModel projectModel, bool declarationOnly)
 	{
 		_declarationOnly = declarationOnly;
-
-		using StreamReader stream = File.OpenText(absolutePath);
 
 		// header
 		string? headerLine = stream.ReadLine();
