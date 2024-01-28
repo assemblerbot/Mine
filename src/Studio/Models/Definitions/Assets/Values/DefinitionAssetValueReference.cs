@@ -1,5 +1,6 @@
 using System.Reflection;
 using Migration;
+using RedHerring.Studio.Models;
 using RedHerring.Studio.UserInterface;
 
 namespace Mine.Studio;
@@ -18,8 +19,20 @@ public class DefinitionAssetValueReference : DefinitionAssetValue
 
 	public override void WriteJsonValue(StringWriter stringWriter)
 	{
-		// TODO
-		//stringWriter.Write(Value);
+		stringWriter.Write("{\"Path\":");
+
+		if (Value.IsEmpty)
+		{
+			stringWriter.Write("null");
+		}
+		else
+		{
+			stringWriter.Write('"');
+			stringWriter.Write(StudioModel.Instance.Project.FindNodeByGuid(Value.Guid!)?.RelativePath);
+			stringWriter.Write('"');
+		}
+
+		stringWriter.Write("}");
 	}
 
 	public override void ImportFrom(DefinitionAssetValue other)

@@ -312,10 +312,11 @@ public sealed class GenericReference<T> where T : ReferenceTest
 public sealed class DefinitionTemplateTest
 {
 	//--- data begin ---
-	public int    IntField;
-	public float  FloatField;
-	public string StringField;
-	public bool   MyField;
+	public int     IntField;
+	public float   FloatField;
+	public string  StringField;
+	public bool    MyField;
+	public string? Empty = null;
 
 	public GenericReference<ReferenceTestInt> Reference = new GenericReference<ReferenceTestInt>() {Guid = "guid", Path = "path", Value = new ReferenceTestInt() {IntValue = 523}};
 	//--- data end ---
