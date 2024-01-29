@@ -49,6 +49,7 @@ public sealed class DefinitionTemplate
 		return template.ReadFromFile(absolutePath, projectModel, declarationOnly) ? template : null;
 	}
 
+	#region Validation
 	public string? Validate()
 	{
 		if (!IsValidIdentifier(_namespaceName))
@@ -83,6 +84,27 @@ public sealed class DefinitionTemplate
 		return null;
 	}
 
+	private bool IsValidIdentifier(string identifier)
+	{
+		if (string.IsNullOrEmpty(identifier))
+		{
+			return false;
+		}
+
+		if (identifier.Any(ch => ch <= 32))
+		{
+			return false;
+		}
+
+		if (identifier[0] >= '0' && identifier[0] <= '9')
+		{
+			return false;
+		}
+
+		return true;
+	}
+	#endregion
+	
 	public DefinitionTemplate CreateCopy(ProjectModel projectModel)
 	{
 		byte[] bytes;
@@ -104,6 +126,7 @@ public sealed class DefinitionTemplate
 		return result;
 	}
 
+	#region Write
 	public void WriteToFile(string absolutePath, string? thisNodeGuid, ProjectModel projectModel)
 	{
 		using StreamWriter stream = File.CreateText(absolutePath);
@@ -112,62 +135,118 @@ public sealed class DefinitionTemplate
 	
 	public void WriteToStream(StreamWriter stream, string? thisNodeGuid, ProjectModel projectModel)
 	{
+		// header
 		stream.WriteLine(_header.ToHeaderString());
 		stream.WriteLine("//THIS FILE WAS GENERATED! DON'T MODIFY IT. ONLY THE NAMESPACE AND THE CLASS NAME CAN BE MODIFIED SAFELY!");
 
+		// using
 		stream.WriteLine("using Mine.Framework;");
 		
+		// namespace
 		if (!string.IsNullOrEmpty(_namespaceName))
 		{
 			stream.WriteLine($"namespace {_namespaceName};");
 		}
 
+		// class
+		stream.WriteLine("[Serializable]");
 		stream.WriteLine($"public sealed class {_className} : Definition");
 		stream.WriteLine("{");
-		stream.WriteLine("	" + _dataBegin);
-		foreach (DefinitionTemplateField? field in _fields)
+		
+		// fields
 		{
-			if (field == null)
+			stream.WriteLine("	" + _dataBegin);
+			foreach (DefinitionTemplateField? field in _fields)
 			{
-				continue;
-			}
-
-			if (field.Type.HasGenericParameter())
-			{
-				string genericParameter = "";
-				if (field.GenericParameter.Guid == thisNodeGuid)
+				if (field == null)
 				{
-					genericParameter = $"{_namespaceName}.{_className}"; // self-reference
+					continue;
 				}
-				else
+
+				if (field.Type.HasGenericParameter())
 				{
-					ProjectNode? scriptNode = projectModel.FindNodeByGuid(field.GenericParameter.Guid ?? "");
-					if (scriptNode != null && scriptNode.Type == ProjectNodeType.ScriptDefinition)
+					string genericParameter = "";
+					if (field.GenericParameter.Guid == thisNodeGuid)
 					{
-						// TODO - translate generic parameter to class name
-						NodeIOScriptDefinition? io = scriptNode.GetNodeIO<NodeIOScriptDefinition>();
-						if (io != null)
+						genericParameter = $"{_namespaceName}.{_className}"; // self-reference
+					}
+					else
+					{
+						ProjectNode? scriptNode = projectModel.FindNodeByGuid(field.GenericParameter.Guid ?? "");
+						if (scriptNode != null && scriptNode.Type == ProjectNodeType.ScriptDefinition)
 						{
-							io.Load();
-							if (io.Template != null)
+							// TODO - translate generic parameter to class name
+							NodeIOScriptDefinition? io = scriptNode.GetNodeIO<NodeIOScriptDefinition>();
+							if (io != null)
 							{
-								genericParameter = $"{io.Template._namespaceName}.{io.Template._className}";
+								io.Load();
+								if (io.Template != null)
+								{
+									genericParameter = $"{io.Template._namespaceName}.{io.Template._className}";
+								}
 							}
 						}
 					}
+
+					stream.WriteLine($"	public {field.Type.ToCSharpType()}<{genericParameter}> {field.Name};");
+				}
+				else
+				{
+					stream.WriteLine($"	public {field.Type.ToCSharpType()} {field.Name};");
+				}
+			}
+
+			stream.WriteLine("	" + _dataEnd);
+		}
+		
+		// methods
+		{
+			stream.WriteLine("	public override void LoadDefinitionsRecursive()");
+			stream.WriteLine("	{");
+			foreach (DefinitionTemplateField? field in _fields)
+			{
+				if (field == null)
+				{
+					continue;
 				}
 
-				stream.WriteLine($"	public {field.Type.ToCSharpType()}<{genericParameter}> {field.Name};");
+				if (field.Type == DefinitionTemplateFieldType.Type_DefinitionReference)
+				{
+					stream.WriteLine($"		{field.Name}.LoadDefinitionsRecursive();");
+				}
 			}
-			else
-			{
-				stream.WriteLine($"	public {field.Type.ToCSharpType()} {field.Name};");
-			}
+			stream.WriteLine("	}");
 		}
-		stream.WriteLine("	" + _dataEnd);
+
+		{
+			stream.WriteLine("	public override void LoadAllRecursive()");
+			stream.WriteLine("	{");
+			foreach (DefinitionTemplateField? field in _fields)
+			{
+				if (field == null)
+				{
+					continue;
+				}
+
+				if (field.Type == DefinitionTemplateFieldType.Type_DefinitionReference)
+				{
+					stream.WriteLine($"		{field.Name}.LoadAllRecursive();");
+					continue;
+				}
+
+				if (field.Type == DefinitionTemplateFieldType.Type_AssetReference)
+				{
+					stream.WriteLine($"		{field.Name}.Load();");
+				}
+			}
+			stream.WriteLine("	}");
+		}
+		
 		stream.WriteLine("}");
 	}
+	#endregion
 
+	#region Read
 	public bool ReadFromFile(string absolutePath, ProjectModel projectModel, bool declarationOnly)
 	{
 		using StreamReader stream = File.OpenText(absolutePath);
@@ -305,26 +384,7 @@ public sealed class DefinitionTemplate
 
 		return true;
 	}
-
-	private bool IsValidIdentifier(string identifier)
-	{
-		if (string.IsNullOrEmpty(identifier))
-		{
-			return false;
-		}
-
-		if (identifier.Any(ch => ch <= 32))
-		{
-			return false;
-		}
-
-		if (identifier[0] >= '0' && identifier[0] <= '9')
-		{
-			return false;
-		}
-
-		return true;
-	}
+	#endregion
 }
 
 #region Migration

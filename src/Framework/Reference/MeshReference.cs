@@ -4,4 +4,9 @@ namespace Mine.Framework;
 public sealed class MeshReference : Reference
 {
 	//public          Mesh          ReferencedMesh;
+	public override bool Load()
+	{
+		// TODO
+		return true;
+	}
 }

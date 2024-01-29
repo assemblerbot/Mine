@@ -1,9 +1,9 @@
-using OdinSerializer;
-
 namespace Mine.Framework;
 
 [Serializable]
-public class Reference
+public abstract class Reference
 {
 	public string Path;
+
+	public abstract bool Load();
 }
