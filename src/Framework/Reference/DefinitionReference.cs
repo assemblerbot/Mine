@@ -1,5 +1,3 @@
-using System.Text.Json;
-
 namespace Mine.Framework;
 
 [Serializable]
@@ -10,23 +8,8 @@ public sealed class DefinitionReference<T> : Reference where T : Definition
 
 	public override bool Load()
 	{
-		try
-		{
-			byte[]? json = Engine.Resources.ReadResource(Path);
-			
-			JsonSerializerOptions options = new()
-			                                {
-				                                IncludeFields = true
-			                                };
-
-			_definitions = JsonSerializer.Deserialize<List<T>>(json, options);
-		}
-		catch (Exception e)
-		{
-			return false;
-		}
-
-		return true;
+		_definitions = Definition.Create<T>(Path);
+		return _definitions is not null;
 	}
 
 	public void LoadDefinitionsRecursive()

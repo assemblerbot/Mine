@@ -200,49 +200,98 @@ public sealed class DefinitionTemplate
 		}
 		
 		// methods
-		{
-			stream.WriteLine("	public override void LoadDefinitionsRecursive()");
-			stream.WriteLine("	{");
-			foreach (DefinitionTemplateField? field in _fields)
-			{
-				if (field == null)
-				{
-					continue;
-				}
 
-				if (field.Type == DefinitionTemplateFieldType.Type_DefinitionReference)
-				{
-					stream.WriteLine($"		{field.Name}.LoadDefinitionsRecursive();");
-				}
-			}
+		// static Create()
+		{
+			stream.WriteLine($"	public static List<{_className}>? Create(string path)");
+			stream.WriteLine("	{");
+			stream.WriteLine($"		return Definition.Create<{_className}>(path);");
 			stream.WriteLine("	}");
 		}
 
+		// static CreateDefinitionsRecursive()
+		{
+			stream.WriteLine($"	public static List<{_className}>? CreateDefinitionsRecursive(string path)");
+			stream.WriteLine("	{");
+			stream.WriteLine($"		List<{_className}>? result = Definition.Create<{_className}>(path);");
+			stream.WriteLine("		if (result is null) return null;");
+			stream.WriteLine("		foreach(var definition in result)");
+			stream.WriteLine("		{");
+			WriteLoadDefinitionsRecursive(stream, "			definition.");
+			stream.WriteLine("		}");
+			stream.WriteLine("		return result;");
+			stream.WriteLine("	}");
+		}
+
+		// static CreateAllRecursive()
+		{
+			stream.WriteLine($"	public static List<{_className}>? CreateAllRecursive(string path)");
+			stream.WriteLine("	{");
+			stream.WriteLine($"		List<{_className}>? result = Definition.Create<{_className}>(path);");
+			stream.WriteLine("		if (result is null) return null;");
+			stream.WriteLine("		foreach(var definition in result)");
+			stream.WriteLine("		{");
+			WriteLoadAllRecursive(stream, "			definition.");
+			stream.WriteLine("		}");
+			stream.WriteLine("		return result;");
+			stream.WriteLine("	}");
+		}
+		
+		// LoadDefinitionsRecursive()
+		{
+			stream.WriteLine("	public override void LoadDefinitionsRecursive()");
+			stream.WriteLine("	{");
+			WriteLoadDefinitionsRecursive(stream, "		");
+			stream.WriteLine("	}");
+		}
+
+		// LoadAllRecursive()
 		{
 			stream.WriteLine("	public override void LoadAllRecursive()");
 			stream.WriteLine("	{");
-			foreach (DefinitionTemplateField? field in _fields)
-			{
-				if (field == null)
-				{
-					continue;
-				}
-
-				if (field.Type == DefinitionTemplateFieldType.Type_DefinitionReference)
-				{
-					stream.WriteLine($"		{field.Name}.LoadAllRecursive();");
-					continue;
-				}
-
-				if (field.Type == DefinitionTemplateFieldType.Type_AssetReference)
-				{
-					stream.WriteLine($"		{field.Name}.Load();");
-				}
-			}
+			WriteLoadAllRecursive(stream, "		");
 			stream.WriteLine("	}");
 		}
 		
 		stream.WriteLine("}");
+	}
+
+	private void WriteLoadDefinitionsRecursive(StreamWriter stream, string prefix)
+	{
+		foreach (DefinitionTemplateField? field in _fields)
+		{
+			if (field == null)
+			{
+				continue;
+			}
+
+			if (field.Type == DefinitionTemplateFieldType.Type_DefinitionReference)
+			{
+				stream.WriteLine($"{prefix}{field.Name}.LoadDefinitionsRecursive();");
+			}
+		}
+	}
+
+	private void WriteLoadAllRecursive(StreamWriter stream, string prefix)
+	{
+		foreach (DefinitionTemplateField? field in _fields)
+		{
+			if (field == null)
+			{
+				continue;
+			}
+
+			if (field.Type == DefinitionTemplateFieldType.Type_DefinitionReference)
+			{
+				stream.WriteLine($"{prefix}{field.Name}.LoadAllRecursive();");
+				continue;
+			}
+
+			if (field.Type.IsReference())
+			{
+				stream.WriteLine($"{prefix}{field.Name}.Load();");
+			}
+		}
 	}
 	#endregion
 

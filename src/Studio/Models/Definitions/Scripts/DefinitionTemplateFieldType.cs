@@ -49,4 +49,12 @@ public static class DefinitionTemplateFiledTypeExtensions
 	{
 		return type == DefinitionTemplateFieldType.Type_DefinitionReference;
 	}
+
+	public static bool IsReference(this DefinitionTemplateFieldType type)
+	{
+		return
+			type == DefinitionTemplateFieldType.Type_AssetReference  ||
+			type == DefinitionTemplateFieldType.Type_FolderReference ||
+			type == DefinitionTemplateFieldType.Type_DefinitionReference;
+	}
 }

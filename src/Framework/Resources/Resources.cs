@@ -68,6 +68,7 @@ public sealed class Resources
 	{
 		if (!Directory.Exists(Engine.ResourcesPath))
 		{
+			Console.WriteLine("Resources folder not found!");
 			return;
 		}
 
