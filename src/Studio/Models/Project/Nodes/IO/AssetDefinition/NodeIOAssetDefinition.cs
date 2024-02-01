@@ -13,7 +13,7 @@ public sealed class NodeIOAssetDefinition : NodeIO<DefinitionAsset>
 	{
 	}
 
-	public override void Update()
+	public override void UpdateCache()
 	{
 		_asset = DefinitionAsset.CreateFromFile(Owner.AbsolutePath, StudioGlobals.MigrationManager);
 	}
@@ -48,5 +48,10 @@ public sealed class NodeIOAssetDefinition : NodeIO<DefinitionAsset>
 	public override NodeIOSettings CreateImportSettings()
 	{
 		return new NodeIOAssetDefinitionSettings();
+	}
+
+	public override bool UpdateImportSettings(NodeIOSettings settings)
+	{
+		return false;
 	}
 }

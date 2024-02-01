@@ -11,7 +11,7 @@ public sealed class NodeIOCopy : NodeIO<byte[]>
 	{
 	}
 
-	public override void Update()
+	public override void UpdateCache()
 	{
 	}
 
@@ -64,5 +64,10 @@ public sealed class NodeIOCopy : NodeIO<byte[]>
 	public override NodeIOSettings CreateImportSettings()
 	{
 		return new NodeIOCopySettings();
+	}
+
+	public override bool UpdateImportSettings(NodeIOSettings settings)
+	{
+		return false;
 	}
 }

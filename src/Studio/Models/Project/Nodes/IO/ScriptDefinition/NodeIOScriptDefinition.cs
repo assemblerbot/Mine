@@ -13,7 +13,7 @@ public sealed class NodeIOScriptDefinition : NodeIO<DefinitionTemplate>
 	{
 	}
 
-	public override void Update()
+	public override void UpdateCache()
 	{
 		_template = DefinitionTemplate.CreateFromFile(Owner.AbsolutePath, Owner.Project, true);
 	}
@@ -41,5 +41,10 @@ public sealed class NodeIOScriptDefinition : NodeIO<DefinitionTemplate>
 	public override NodeIOSettings CreateImportSettings()
 	{
 		return new NodeIOSettings();
+	}
+
+	public override bool UpdateImportSettings(NodeIOSettings settings)
+	{
+		return false;
 	}
 }

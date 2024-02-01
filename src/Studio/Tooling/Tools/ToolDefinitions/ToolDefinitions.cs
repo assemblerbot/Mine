@@ -160,19 +160,6 @@ public sealed class ToolDefinitions : Tool
 		{
 			_projectModel.LoadAssetNode<DefinitionAsset>(_definitionAssetNode, OnAssetNodeLoaded);
 			_definitionAssetEditor  = null;
-			
-			// DefinitionAsset? asset = DefinitionAsset.CreateFromFile(_definitionAssetNode.AbsolutePath, StudioGlobals.MigrationManager);
-			// if (asset == null)
-			// {
-			// 	_definitionAssetNode = null;
-			// 	return;
-			// }
-			//
-			// _definitionAsset = asset;
-			//
-			// ProjectScriptFileNode? templateNode = StudioModel.Project.FindScriptNodeByGuid(_definitionAsset.Template.Header.Guid);
-			// _definitionTemplateNode = templateNode;
-			// _definitionAssetEditor  = new ToolDefinitionAssetEditor(StudioModel, StudioModel.Project, _definitionAssetNode, _definitionAsset, NameId + ".asset_editor");
 		}
 
 		// try to read script node
@@ -180,17 +167,6 @@ public sealed class ToolDefinitions : Tool
 		{
 			_projectModel.LoadScriptNode<DefinitionTemplate>(_definitionTemplateNode, OnScriptNodeLoaded);
 			_definitionTemplateEditor = null;
-			
-			// _definitionTemplate = DefinitionTemplate.CreateFromFile(_definitionTemplateNode.AbsolutePath, _projectModel, false);
-			// if (_definitionTemplate == null)
-			// {
-			// 	_definitionAsset        = null;
-			// 	_definitionTemplateNode = null;
-			// 	_definitionAssetNode    = null;
-			// 	return;
-			// }
-			//
-			// _definitionTemplateEditor = new ToolDefinitionTemplateEditor(StudioModel, _projectModel, _definitionTemplateNode, _definitionTemplate, NameId + ".template_editor");
 		}
 	}
 

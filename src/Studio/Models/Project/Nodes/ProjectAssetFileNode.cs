@@ -16,7 +16,7 @@ public sealed class ProjectAssetFileNode : ProjectNode
 	{
 		SetNodeType(ProjectNodeTypeExtensions.FromAssetExtension(Extension));
 		IO = StudioGlobals.NodeIORegistry.CreateNodeIO(this);
-		IO.Update();
+		IO.UpdateCache();
 		
 		CreateMetaFile();
 		if (Meta == null)
@@ -24,9 +24,17 @@ public sealed class ProjectAssetFileNode : ProjectNode
 			return;
 		}
 
+		bool ioSettingsChanged = false;
 		if (Meta.NodeIOSettings == null)
 		{
 			Meta.NodeIOSettings = IO.CreateImportSettings();
+			ioSettingsChanged   = true;
+		}
+
+		ioSettingsChanged |= IO.UpdateImportSettings(Meta.NodeIOSettings);
+
+		if (ioSettingsChanged)
+		{
 			UpdateMetaFile();
 		}
 	}

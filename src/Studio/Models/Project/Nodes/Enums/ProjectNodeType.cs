@@ -6,7 +6,7 @@ public enum ProjectNodeType
 	
 	AssetFolder,
 	AssetImage,
-	AssetMesh,
+	AssetScene,
 	AssetBinary,
 	AssetDefinition,
 	
@@ -22,7 +22,7 @@ public static class ProjectNodeTypeExtensions
 		return
 			type == ProjectNodeType.AssetFolder ||
 			type == ProjectNodeType.AssetImage  ||
-			type == ProjectNodeType.AssetMesh   ||
+			type == ProjectNodeType.AssetScene  ||
 			type == ProjectNodeType.AssetBinary ||
 			type == ProjectNodeType.AssetDefinition;
 	}
@@ -42,6 +42,7 @@ public static class ProjectNodeTypeExtensions
 			".def" => ProjectNodeType.AssetDefinition,
 			".png" => ProjectNodeType.AssetImage,
 			".jpg" => ProjectNodeType.AssetImage,
+			".fbx" => ProjectNodeType.AssetScene,
 			_ => ProjectNodeType.AssetBinary
 		};
 	}

@@ -14,7 +14,7 @@ public static class ToolProjectViewNodeIcon
 			ProjectNodeType.AssetBinary => FontAwesome6.File,
 			ProjectNodeType.AssetFolder => FontAwesome6.Folder,
 			ProjectNodeType.AssetImage => FontAwesome6.FileImage,
-			ProjectNodeType.AssetMesh => FontAwesome6.Cube,
+			ProjectNodeType.AssetScene => FontAwesome6.Cube,
 			ProjectNodeType.AssetDefinition => FontAwesome6.Table,
 			
 			ProjectNodeType.ScriptFile => FontAwesome6.FileCode,

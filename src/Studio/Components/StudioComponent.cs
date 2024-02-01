@@ -1,4 +1,6 @@
+using System.Numerics;
 using System.Text.Json;
+using Assimp;
 using ImGuiNET;
 using Mine.Framework;
 using Mine.ImGuiPlugin;
@@ -233,15 +235,39 @@ public sealed class StudioComponent : Component, IUpdatable
 		// }
 	}
 
-	private void OnDebugSerializationTestClicked()
+	private struct TestVertex
+	{
+		public const int     Size = 3 * 4 + 3 * 4;
+		public       Vector3 Position;
+		public       Color3D Color;
+	}
+
+	private unsafe void OnDebugSerializationTestClicked()
 	{
 //		SerializationTests.Test();
-		List<DefinitionTemplateTest> templates = new() {new DefinitionTemplateTest(), new DefinitionTemplateTest(), new DefinitionTemplateTest()};
+		// List<DefinitionTemplateTest> templates = new() {new DefinitionTemplateTest(), new DefinitionTemplateTest(), new DefinitionTemplateTest()};
+		//
+		// string json = JsonSerializer.Serialize(templates, new JsonSerializerOptions{IncludeFields = true});
+		// File.WriteAllText("D:\\Tmp\\serialization_test.json", json);
+		//
+		// List<DefinitionTemplateTest>? deserialized = JsonSerializer.Deserialize<List<DefinitionTemplateTest>>(json, new JsonSerializerOptions {IncludeFields = true});
 
-		string json = JsonSerializer.Serialize(templates, new JsonSerializerOptions{IncludeFields = true});
-		File.WriteAllText("D:\\Tmp\\serialization_test.json", json);
+		TestVertex[] vertices = new[]
+		                        {
+			                        new TestVertex{Position = new Vector3(1, 2, 3),Color =new Color3D(0.1f, 0.2f, 0.3f)},
+			                        new TestVertex{Position = new Vector3(4, 5, 6),Color =new Color3D(0.4f, 0.5f, 0.6f)},
+			                        new TestVertex{Position = new Vector3(7, 8, 9),Color =new Color3D(0.7f, 0.8f, 0.9f)},
+		                        };
 
-		List<DefinitionTemplateTest>? deserialized = JsonSerializer.Deserialize<List<DefinitionTemplateTest>>(json, new JsonSerializerOptions {IncludeFields = true});
+		byte[] bytes;
+		fixed (TestVertex* pVertices = vertices)
+		{
+			//bytes = (byte*) pVertices;
+		}
+
+		using FileStream stream = new("D:\\Tmp\\serialization_test.bin", FileMode.Create);
+		using BinaryWriter     writer = new(stream);
+		//writer.Write(
 
 		int d = 0;
 	}

@@ -1024,7 +1024,7 @@ public sealed class ProjectModel
 						NodeIO? io = node.GetNodeIO<NodeIO>();
 						if (io is not null)
 						{
-							io.Update();
+							io.UpdateCache();
 						}
 					}
 				}
@@ -1051,7 +1051,7 @@ public sealed class ProjectModel
 						return;
 					}
 
-					io.Update();
+					io.UpdateCache();
 					if (io.Asset is null)
 					{
 						return;

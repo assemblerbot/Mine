@@ -12,12 +12,13 @@ public abstract class NodeIO
 		Owner = owner;
 	}
 
-	public abstract void Update(); // update only most important things that needs to be always up-to-date
-	
-	public abstract void ClearCache(); // clear loaded file
+	public abstract void UpdateCache();
+	public abstract void ClearCache();
 	
 	public abstract void           Import(string resourcePath); // import file to Resources
-	public abstract NodeIOSettings CreateImportSettings();      // create import settings instance
+
+	public abstract NodeIOSettings CreateImportSettings();
+	public abstract bool           UpdateImportSettings(NodeIOSettings settings); // returns true if settings were changed
 }
 
 public abstract class NodeIO<TData> : NodeIO
@@ -27,5 +28,5 @@ public abstract class NodeIO<TData> : NodeIO
 	}
 
 	public abstract TData? Load(); 
-	public abstract void   Save(TData data);
+	public abstract void   Save(TData                          data);
 }
