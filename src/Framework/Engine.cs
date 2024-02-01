@@ -16,7 +16,7 @@ public sealed class Engine
 	private readonly EngineWindow    _window;
 	private          Renderer        _renderer  = null!;
 	private          Input           _input     = null!;
-	private          Scene           _scene     = new();
+	private          World           _world     = new();
 	private readonly Resources       _resources = new();
 
 	public static Types     Types     => _instance._types;
@@ -24,7 +24,7 @@ public sealed class Engine
 	public static IWindow   Window    => _instance._window.NativeWindow;
 	public static Renderer  Renderer  => _instance._renderer;
 	public static Input     Input     => _instance._input;
-	public static Scene     Scene     => _instance._scene;
+	public static World     World     => _instance._world;
 	public static Resources Resources => _instance._resources;
 
 	#region Paths
@@ -89,7 +89,7 @@ public sealed class Engine
 	{
 		Vector2Int newSize = new(size.X, size.Y);
 		_renderer.Resize(newSize);
-		_scene.WindowSizeChanged(newSize);
+		_world.WindowSizeChanged(newSize);
 	}
 	
 	private void OnLoad()
@@ -102,7 +102,7 @@ public sealed class Engine
 
 	private void OnUpdate(double timeDelta)
 	{
-		_scene.Update(timeDelta);
+		_world.Update(timeDelta);
 		_input.EndOfFrame();
 
 		if (_exitRequested)
@@ -113,7 +113,7 @@ public sealed class Engine
 
 	private void OnRender(double timeDelta)
 	{
-		_scene.Render();
+		_world.Render();
 		_renderer.EndOfFrame();
 	}
 
@@ -124,8 +124,8 @@ public sealed class Engine
 		_config?.Save();
 		_onExit?.Invoke();
 
-		_scene?.Dispose();
-		_scene = null!;
+		_world?.Dispose();
+		_world = null!;
 
 		_input?.Dispose();
 		_input = null!;

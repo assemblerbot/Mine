@@ -2,7 +2,7 @@ using System.Numerics;
 
 namespace Mine.Framework;
 
-public sealed class GameObject
+public sealed class Entity
 {
 	private string _name;
 	public  string Name => _name;
@@ -15,17 +15,17 @@ public sealed class GameObject
 	private Vector3    _position;
 	private Quaternion _rotation;
 	
-	private GameObject?      _parent   = null;
-	private List<GameObject> _children = new();
+	private Entity?      _parent   = null;
+	private List<Entity> _children = new();
 	
 	private List<Component> _components = new();
 
-	public GameObject()
+	public Entity()
 	{
-		_name = "(GameObject)";
+		_name = "(Entity)";
 	}
 
-	public GameObject(string name)
+	public Entity(string name)
 	{
 		_name = name;
 	}
@@ -100,7 +100,7 @@ public sealed class GameObject
 	{
 		Component component = new T();
 		
-		component.SetGameObject(this);
+		component.SetEntity(this);
 		_components.Add(component);
 
 		component.OnInstantiate();
@@ -121,29 +121,29 @@ public sealed class GameObject
 	#endregion
 
 	#region Scene Add/Remove
-	internal void AfterAddedToScene()
+	internal void AfterAddedToWorld()
 	{
 		for (int i = 0; i < _components.Count; ++i)
 		{
-			_components[i].AfterAddedToScene();
+			_components[i].AfterAddedToWorld();
 		}
 		
 		for (int i = 0; i < _children.Count; ++i)
 		{
-			_children[i].AfterAddedToScene();
+			_children[i].AfterAddedToWorld();
 		}
 	}
 
-	internal void BeforeRemovedFromScene()
+	internal void BeforeRemovedFromWorld()
 	{
 		for (int i = 0; i < _children.Count; ++i)
 		{
-			_children[i].BeforeRemovedFromScene();
+			_children[i].BeforeRemovedFromWorld();
 		}
 
 		for (int i = 0; i < _components.Count; ++i)
 		{
-			_components[i].BeforeRemovedFromScene();
+			_components[i].BeforeRemovedFromWorld();
 		}
 	}
 

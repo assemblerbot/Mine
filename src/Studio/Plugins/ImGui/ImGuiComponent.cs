@@ -40,16 +40,16 @@ public sealed class ImGuiComponent : Component, IUpdatable, IRenderable
 		LoadFonts();
 	}
 
-	public override void AfterAddedToScene()
+	public override void AfterAddedToWorld()
 	{
-		Scene.RegisterUpdatable(this);
-		Scene.RegisterRenderable(this);
+		World.RegisterUpdatable(this);
+		World.RegisterRenderable(this);
 	}
 
-	public override void BeforeRemovedFromScene()
+	public override void BeforeRemovedFromWorld()
 	{
-		Scene.UnregisterUpdatable(this);
-		Scene.UnregisterRenderable(this);
+		World.UnregisterUpdatable(this);
+		World.UnregisterRenderable(this);
 	}
 
 	private void LoadFonts()
@@ -148,7 +148,7 @@ public sealed class ImGuiComponent : Component, IUpdatable, IRenderable
 	
 	public void WindowResized(Vector2Int size)
 	{
-		_renderer.WindowResized(size.x, size.y);
+		_renderer.WindowResized(size.X, size.Y);
 	}
 	
 	private void UpdateCursor()

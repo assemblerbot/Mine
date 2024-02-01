@@ -20,7 +20,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Scene\BuiltInComponents\" />
+      <Folder Include="World\BuiltInComponents\" />
     </ItemGroup>
 
     <ItemGroup>

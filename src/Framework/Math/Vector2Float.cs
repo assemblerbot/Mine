@@ -6,8 +6,8 @@ namespace Mine.Framework;
 [StructLayout(LayoutKind.Explicit)]
 public partial record struct Vector2Float
 {
-	[FieldOffset(sizeof(float) * 0)] public float x;
-	[FieldOffset(sizeof(float) * 1)] public float y;
+	[FieldOffset(sizeof(float) * 0)] public float X;
+	[FieldOffset(sizeof(float) * 1)] public float Y;
 	
 	#region Constants
 	public static Vector2Float Zero => new (0, 0);
@@ -16,21 +16,21 @@ public partial record struct Vector2Float
 	
 	public Vector2Float(float x, float y)
 	{
-		this.x = x;
-		this.y = y;
+		X = x;
+		Y = y;
 	}
 	
 	#region Operators
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static Vector2Float operator +(Vector2Float a, Vector2Float b)
 	{
-		return new Vector2Float(a.x + b.x, a.y + b.y);
+		return new Vector2Float(a.X + b.X, a.Y + b.Y);
 	}
 	
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static Vector2Float operator -(Vector2Float a, Vector2Float b)
 	{
-		return new Vector2Float(a.x - b.x, a.y - b.y);
+		return new Vector2Float(a.X - b.X, a.Y - b.Y);
 	}
 	#endregion
 	
@@ -38,14 +38,14 @@ public partial record struct Vector2Float
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public void Deconstruct(out float x, out float y)
 	{
-		x = this.x;
-		y = this.y;
+		x = this.X;
+		y = this.Y;
 	}
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public float SquareMagnitude()
 	{
-		return x * x + y * y;
+		return X * X + Y * Y;
 	}
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -58,15 +58,15 @@ public partial record struct Vector2Float
 	public Vector2Float Normalized()
 	{
 		float magnitude = Magnitude();
-		return new Vector2Float(x / magnitude, y / magnitude);
+		return new Vector2Float(X / magnitude, Y / magnitude);
 	}
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public void Normalize()
 	{
 		float magnitude = Magnitude();
-		x /= magnitude;
-		y /= magnitude;
+		X /= magnitude;
+		Y /= magnitude;
 	}
 	#endregion
 }

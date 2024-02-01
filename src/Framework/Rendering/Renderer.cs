@@ -36,7 +36,7 @@ public class Renderer : IDisposable
 
 	public void Resize(Vector2Int size)
 	{
-		_device.ResizeMainWindow((uint)size.x, (uint)size.y);
+		_device.ResizeMainWindow((uint)size.X, (uint)size.Y);
 	}
 
 	public void Dispose()

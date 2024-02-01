@@ -1,5 +1,7 @@
 using Assimp;
 using Assimp.Configs;
+using Mine.Framework;
+using OdinSerializer;
 using RedHerring.Studio.Models.Project.FileSystem;
 using RedHerring.Studio.Models.Project.Imports;
 using RedHerring.Studio.Models.ViewModels.Console;
@@ -78,57 +80,65 @@ public sealed class NodeIOScene : NodeIO<Assimp.Scene>
 
 	public override void Import(string resourcePath)
 	{
-		Assimp.Scene? scene = Load();
-		if (scene == null)
+		Assimp.Scene? assimpScene = Load(); // TODO - this is wrong
+		if (assimpScene == null)
 		{
 			ConsoleViewModel.LogError($"Cannot import '{Owner.RelativePath}'. Mesh was not loaded!");
 			return;
 		}
 
-		//Directory.CreateDirectory(Path.GetDirectoryName(resourcePath)!);
-
-		for (int i = 0; i < scene.Meshes.Count; ++i)
-		{
-/*
-			// import
-			Model model = new();
-
-			model.Vertices = new(assimpMesh.VertexCount);
-			foreach (Assimp.Vector3D vertex in assimpMesh.Vertices)
-			{
-				model.Vertices.Add(new Vector3D<float>(vertex.X, vertex.Y, vertex.Z));
-			}
-
-			model.Normals = new(assimpMesh.VertexCount);
-			foreach (Assimp.Vector3D normal in assimpMesh.Normals)
-			{
-				model.Normals.Add(new Vector3D<float>(normal.X, normal.Y, normal.Z));
-			}
-
-			model.Indices = new(assimpMesh.Faces.Count * 3);
-			foreach(Assimp.Face face in assimpMesh.Faces)
-			{
-				model.Indices.Add(face.Indices[0]);
-				model.Indices.Add(face.Indices[1]);
-				model.Indices.Add(face.Indices[2]);
-			}
-
-			Mesh mesh = new()
-			            {
-				            Name          = assimpMesh.Name,
-				            MaterialIndex = 0,
-				            IndexStart    = 0,
-				            TriStart      = 0,
-				            TriCount      = model.Indices.Count / 3
-			            };
-			model.Meshes = new() { mesh };
-
-			byte[] json = SerializationUtility.SerializeValue(model, DataFormat.JSON);
-			File.WriteAllBytes($"{resourcePath}_{mesh.Name}_.mesh", json);
-*/			
-		}
+		Mine.Framework.Scene scene = new();
 		
-		ClearCache();
+		// meshes
+		if (assimpScene.HasMeshes)
+		{
+			scene.Meshes = new List<SceneMesh>();
+			for (int i = 0; i < assimpScene.Meshes.Count; ++i)
+			{
+				Mesh assimpMesh = assimpScene.Meshes[i];
+
+				SceneMesh mesh = new();
+				scene.Meshes.Add(mesh);
+
+				if (assimpMesh.PrimitiveType != PrimitiveType.Triangle)
+				{
+					continue; // ignore this mesh and keep empty in scene
+				}
+
+				if (assimpMesh.HasVertices)
+				{
+					mesh.Vertices = assimpMesh.Vertices.Select(v => new Point3Float(v.X, v.Y, v.Z)).ToList();
+				}
+
+				if (assimpMesh.HasNormals)
+				{
+					mesh.Normals = assimpMesh.Normals.Select(n => new Vector3Float(n.X, n.Y, n.Z)).ToList();
+				}
+
+				if (assimpMesh.HasTangentBasis)
+				{
+					mesh.Tangents = assimpMesh.Tangents.Select(t => new Vector3Float(t.X, t.Y, t.Z)).ToList();
+					mesh.BiTangents = assimpMesh.BiTangents.Select(b => new Vector3Float(b.X, b.Y, b.Z)).ToList();
+				}
+
+				// TODO - rest
+
+				if (assimpMesh.HasFaces)
+				{
+					if (mesh.Vertices is not null && mesh.Vertices.Count <= 0xffff)
+					{
+						mesh.UShortIndices = assimpMesh.GetUnsignedIndices().Select(idx => (ushort)idx).ToArray();
+					}
+					else
+					{
+						mesh.UIntIndices = assimpMesh.GetUnsignedIndices();
+					}
+				}
+			}
+		}
+
+		byte[] json = SerializationUtility.SerializeValue(scene, DataFormat.Binary);
+		File.WriteAllBytes($"{resourcePath}.scene", json);
 	}
 
 	public override NodeIOSettings CreateImportSettings()

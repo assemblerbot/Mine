@@ -1,0 +1,31 @@
+namespace Mine.Framework;
+
+public class Component
+{
+	protected World World => Engine.World;
+
+	private Entity _entity = null!;
+	public Entity Entity => _entity;
+
+	public void SetEntity(Entity entity)
+	{
+		_entity = entity;
+	}
+
+	// 'event' functions
+	public virtual void OnInstantiate()
+	{
+	}
+
+	public virtual void AfterAddedToWorld()
+	{
+	}
+	
+	public virtual void BeforeRemovedFromWorld()
+	{
+	}
+
+	public virtual void Dispose()
+	{
+	}
+}

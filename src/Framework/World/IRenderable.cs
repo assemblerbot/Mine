@@ -2,7 +2,7 @@ namespace Mine.Framework;
 
 public interface IRenderable
 {
-	GameObject GameObject { get; }
+	Entity Entity { get; }
 
 	int  GetRenderOrder();
 	void Render();

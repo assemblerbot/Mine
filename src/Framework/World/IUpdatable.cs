@@ -2,7 +2,7 @@ namespace Mine.Framework;
 
 public interface IUpdatable
 {
-	GameObject GameObject { get; }
+	Entity Entity { get; }
 
 	int GetUpdateOrder();
 	void Update(double timeDelta);

@@ -8,9 +8,9 @@ namespace Mine.Framework;
 [StructLayout(LayoutKind.Explicit)]
 public partial record struct Vector3Float
 {
-	[FieldOffset(sizeof(float) * 0)] public float x;
-	[FieldOffset(sizeof(float) * 1)] public float y;
-	[FieldOffset(sizeof(float) * 2)] public float z;
+	[FieldOffset(sizeof(float) * 0)] public float X;
+	[FieldOffset(sizeof(float) * 1)] public float Y;
+	[FieldOffset(sizeof(float) * 2)] public float Z;
 	
 	#region Constants
 	public static Vector3Float Zero => new (0, 0, 0);
@@ -19,22 +19,22 @@ public partial record struct Vector3Float
 	
 	public Vector3Float(float x, float y, float z)
 	{
-		this.x = x;
-		this.y = y;
-		this.z = z;
+		X = x;
+		Y = y;
+		Z = z;
 	}
 	
 	#region Operators
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static Vector3Float operator +(Vector3Float a, Vector3Float b)
 	{
-		return new Vector3Float(a.x + b.x, a.y + b.y, a.z + b.z);
+		return new Vector3Float(a.X + b.X, a.Y + b.Y, a.Z + b.Z);
 	}
 	
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static Vector3Float operator -(Vector3Float a, Vector3Float b)
 	{
-		return new Vector3Float(a.x - b.x, a.y - b.y, a.z - b.z);
+		return new Vector3Float(a.X - b.X, a.Y - b.Y, a.Z - b.Z);
 	}
 	#endregion
 	
@@ -42,15 +42,15 @@ public partial record struct Vector3Float
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public void Deconstruct(out float x, out float y, out float z)
 	{
-		x = this.x;
-		y = this.y;
-		z = this.z;
+		x = this.X;
+		y = this.Y;
+		z = this.Z;
 	}
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public float SquareMagnitude()
 	{
-		return x * x + y * y + z * z;
+		return X * X + Y * Y + Z * Z;
 	}
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -63,16 +63,16 @@ public partial record struct Vector3Float
 	public Vector3Float Normalized()
 	{
 		float magnitude = Magnitude();
-		return new Vector3Float(x / magnitude, y / magnitude, z / magnitude);
+		return new Vector3Float(X / magnitude, Y / magnitude, Z / magnitude);
 	}
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public void Normalize()
 	{
 		float magnitude = Magnitude();
-		x /= magnitude;
-		y /= magnitude;
-		z /= magnitude;
+		X /= magnitude;
+		Y /= magnitude;
+		Z /= magnitude;
 	}
 	#endregion
 }

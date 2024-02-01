@@ -1,8 +1,8 @@
 namespace Mine.Framework;
 
-public sealed class Scene : IDisposable
+public sealed class World : IDisposable
 {
-	private List<GameObject> _gameObjects = new();
+	private List<Entity> _entities = new();
 
 	private readonly List<IUpdatable>  _updatables  = new();	// sorted by update order
 	private readonly List<IRenderable> _renderables = new();	// sorted by render order
@@ -11,22 +11,22 @@ public sealed class Scene : IDisposable
 	private readonly List<IRenderable> _renderablesToRemove = new();
 	
 	#region Add/Remove
-	public void Add(GameObject gameObject)
+	public void Add(Entity entity)
 	{
-		_gameObjects.Add(gameObject);
-		gameObject.AfterAddedToScene();
+		_entities.Add(entity);
+		entity.AfterAddedToWorld();
 	}
 
-	public void Remove(GameObject gameObject)
+	public void Remove(Entity entity)
 	{
-		int index = _gameObjects.IndexOf(gameObject);
+		int index = _entities.IndexOf(entity);
 		if (index == -1)
 		{
 			return;
 		}
 
-		gameObject.BeforeRemovedFromScene();
-		_gameObjects.Remove(gameObject);
+		entity.BeforeRemovedFromWorld();
+		_entities.Remove(entity);
 	}
 	#endregion
 	
@@ -35,7 +35,7 @@ public sealed class Scene : IDisposable
 	{
 		for(int i=0;i<_updatables.Count;++i)
 		{
-			if (_updatables[i].GameObject.ActiveInHierarchy)
+			if (_updatables[i].Entity.ActiveInHierarchy)
 			{
 				_updatables[i].Update(timeDelta);
 			}
@@ -83,7 +83,7 @@ public sealed class Scene : IDisposable
 	{
 		for(int i=0;i<_renderables.Count; ++i)
 		{
-			if(_renderables[i].GameObject.ActiveInHierarchy)
+			if(_renderables[i].Entity.ActiveInHierarchy)
 			{
 				_renderables[i].Render();
 			}
@@ -134,11 +134,11 @@ public sealed class Scene : IDisposable
 	
 	public void Dispose()
 	{
-		for (int i = 0; i < _gameObjects.Count; ++i)
+		for (int i = 0; i < _entities.Count; ++i)
 		{
-			_gameObjects[i].BeforeRemovedFromScene();
-			_gameObjects[i].Dispose();
+			_entities[i].BeforeRemovedFromWorld();
+			_entities[i].Dispose();
 		}
-		_gameObjects.Clear();
+		_entities.Clear();
 	}
 }

@@ -36,9 +36,9 @@ public sealed class StudioComponent : Component, IUpdatable
 		_statusBarMessageHandler = new StatusBarMessageHandler(_statusBar, _studioModel);
 	}
 
-	public override void AfterAddedToScene()
+	public override void AfterAddedToWorld()
 	{
-		Engine.Scene.RegisterUpdatable(this);
+		Engine.World.RegisterUpdatable(this);
 		Engine.Instance.OnFocusChanged += OnFocusChanged;
 		
 		InitImGui();
@@ -52,7 +52,7 @@ public sealed class StudioComponent : Component, IUpdatable
 
 		LoadSettings();
 		
-		Engine.Scene.Add(new GameObject("Test Object").AddComponent<TestRenderComponent>().GameObject);
+		Engine.World.Add(new Entity("Test Object").AddComponent<TestRenderComponent>().Entity);
 
 		// List<int> test   = new() {2, 4, 6, 8, 10, 12, 13};
 		// int       index0 = test.FindInsertionIndexBinary(x => x.CompareTo(0));
@@ -63,16 +63,14 @@ public sealed class StudioComponent : Component, IUpdatable
 		// int       index5 = test.FindInsertionIndexBinary(x => x.CompareTo(12));
 		//
 		// int d=0;
-
-		//Engine.Window.
 	}
 
-	public override void BeforeRemovedFromScene()
+	public override void BeforeRemovedFromWorld()
 	{
 		SaveSettings();
 		
 		_studioModel.Close();
-		Engine.Scene.UnregisterUpdatable(this);
+		Engine.World.UnregisterUpdatable(this);
 		Engine.Instance.OnFocusChanged -= OnFocusChanged;
 	}
 
@@ -103,7 +101,7 @@ public sealed class StudioComponent : Component, IUpdatable
 	
 	private void InitImGui()
 	{
-		Engine.Scene.Add(new GameObject("ImGui").AddComponent<ImGuiComponent>().GameObject);
+		Engine.World.Add(new Entity("ImGui").AddComponent<ImGuiComponent>().Entity);
 		ImGui.GetIO().ConfigFlags |= ImGuiConfigFlags.DockingEnable;
 	}
 	

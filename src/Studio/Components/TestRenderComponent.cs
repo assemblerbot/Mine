@@ -59,13 +59,13 @@ void main()
 
 	private string _text = "";
 	
-	public override void AfterAddedToScene()
+	public override void AfterAddedToWorld()
 	{
 		Vector3Float test = new(1.111f, 2.222f, 3.333f);
 		Vector3      v3   = test.NumericsVector3;
 		
-		Engine.Scene.RegisterUpdatable(this);
-		Engine.Scene.RegisterRenderable(this);
+		Engine.World.RegisterUpdatable(this);
+		Engine.World.RegisterRenderable(this);
 
 		ResourceFactory factory = Engine.Renderer.Factory;
 		
@@ -82,12 +82,31 @@ void main()
 		_vertexBuffer = factory.CreateBuffer(new BufferDescription(4 * VertexPositionColor.SizeInBytes, BufferUsage.VertexBuffer));
 		_indexBuffer  = factory.CreateBuffer(new BufferDescription(4 * sizeof(ushort),                  BufferUsage.IndexBuffer));
 
-		Engine.Renderer.Device.UpdateBuffer(_vertexBuffer, 0, quadVertices);
+		byte[] bytesQuadVertices = new byte[4 * VertexPositionColor.SizeInBytes];
+		{
+			using MemoryStream memory = new MemoryStream(bytesQuadVertices);
+			using BinaryWriter writer = new BinaryWriter(memory);
+			for (int i = 0; i < quadVertices.Length; ++i)
+			{
+				writer.Write(quadVertices[i].Position.X);
+				writer.Write(quadVertices[i].Position.Y);
+				writer.Write(quadVertices[i].Color.R);
+				writer.Write(quadVertices[i].Color.G);
+				writer.Write(quadVertices[i].Color.B);
+				writer.Write(quadVertices[i].Color.A);
+			}
+
+			writer.Flush();
+		}
+
+		//Engine.Renderer.Device.UpdateBuffer(_vertexBuffer, 0, quadVertices);
+		Engine.Renderer.Device.UpdateBuffer(_vertexBuffer, 0, bytesQuadVertices);
 		Engine.Renderer.Device.UpdateBuffer(_indexBuffer,  0, quadIndices);
 
 		VertexLayoutDescription vertexLayout = new VertexLayoutDescription(
 			new VertexElementDescription("Position", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2),
-			new VertexElementDescription("Color",    VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float4));
+			new VertexElementDescription("Color",    VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float4)
+		);
 
 		ShaderDescription vertexShaderDesc = new ShaderDescription(
 			ShaderStages.Vertex,
@@ -134,7 +153,7 @@ void main()
 		_commandList.SetFramebuffer(Engine.Renderer.Device.SwapchainFramebuffer);
 		_commandList.ClearColorTarget(0, RgbaFloat.Black);
 		
-		/*
+
 		_commandList.SetVertexBuffer(0, _vertexBuffer);
 		_commandList.SetIndexBuffer(_indexBuffer, IndexFormat.UInt16);
 		_commandList.SetPipeline(_pipeline);
@@ -144,7 +163,7 @@ void main()
 			indexStart: 0,
 			vertexOffset: 0,
 			instanceStart: 0);
-		*/
+
 		_commandList.End();
 		Engine.Renderer.Device.SubmitCommands(_commandList);
 	}

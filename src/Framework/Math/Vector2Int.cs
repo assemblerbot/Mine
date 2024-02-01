@@ -6,8 +6,8 @@ namespace Mine.Framework;
 [StructLayout(LayoutKind.Explicit)]
 public record struct Vector2Int
 {
-	[FieldOffset(sizeof(int) * 0)] public int x;
-	[FieldOffset(sizeof(int) * 1)] public int y;
+	[FieldOffset(sizeof(int) * 0)] public int X;
+	[FieldOffset(sizeof(int) * 1)] public int Y;
 	
 	#region Constants
 	public static Vector2Int Zero => new (0, 0);
@@ -16,21 +16,21 @@ public record struct Vector2Int
 	
 	public Vector2Int(int x, int y)
 	{
-		this.x = x;
-		this.y = y;
+		X = x;
+		Y = y;
 	}
 	
 	#region Operators
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static Vector2Int operator +(Vector2Int a, Vector2Int b)
 	{
-		return new Vector2Int(a.x + b.x, a.y + b.y);
+		return new Vector2Int(a.X + b.X, a.Y + b.Y);
 	}
 	
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static Vector2Int operator -(Vector2Int a, Vector2Int b)
 	{
-		return new Vector2Int(a.x - b.x, a.y - b.y);
+		return new Vector2Int(a.X - b.X, a.Y - b.Y);
 	}
 	#endregion
 	
