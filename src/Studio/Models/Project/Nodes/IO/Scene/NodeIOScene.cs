@@ -105,33 +105,74 @@ public sealed class NodeIOScene : NodeIO<Assimp.Scene>
 					continue; // ignore this mesh and keep empty in scene
 				}
 
+				// positions
 				if (assimpMesh.HasVertices)
 				{
-					mesh.Vertices = assimpMesh.Vertices.Select(v => new Point3Float(v.X, v.Y, v.Z)).ToList();
+					mesh.Positions = assimpMesh.Vertices.Select(v => new Point3Float(v.X, v.Y, v.Z)).ToList();
 				}
 
+				// normals
 				if (assimpMesh.HasNormals)
 				{
 					mesh.Normals = assimpMesh.Normals.Select(n => new Vector3Float(n.X, n.Y, n.Z)).ToList();
 				}
 
+				// tangents and bitangents
 				if (assimpMesh.HasTangentBasis)
 				{
 					mesh.Tangents = assimpMesh.Tangents.Select(t => new Vector3Float(t.X, t.Y, t.Z)).ToList();
 					mesh.BiTangents = assimpMesh.BiTangents.Select(b => new Vector3Float(b.X, b.Y, b.Z)).ToList();
 				}
 
-				// TODO - rest
+				// UV
+				if (assimpMesh.TextureCoordinateChannelCount > 0)
+				{
+					mesh.TextureCoordinateChannels = new List<SceneMeshTextureCoordinateChannel>();
+					for (int channelIndex = 0; channelIndex < assimpMesh.TextureCoordinateChannelCount; ++channelIndex)
+					{
+						SceneMeshTextureCoordinateChannel channel = new ();
+						
+						if (assimpMesh.UVComponentCount[channelIndex] == 2)
+						{
+							channel.UV = assimpMesh.TextureCoordinateChannels[channelIndex].Select(uv => new Point2Float(uv.X, uv.Y)).ToList();
+						}
+						else if (assimpMesh.UVComponentCount[channelIndex] == 3)
+						{
+							channel.UVW = assimpMesh.TextureCoordinateChannels[channelIndex].Select(uv => new Point3Float(uv.X, uv.Y, uv.Z)).ToList();
+						}
+						else
+						{
+							continue;
+						}
 
+						mesh.TextureCoordinateChannels.Add(channel);
+					}
+				}
+				
+				// colors
+				if (assimpMesh.VertexColorChannelCount > 0)
+				{
+					mesh.VertexColorChannels = new List<SceneMeshVertexColorChannel>();
+					for (int channelIndex = 0; channelIndex < assimpMesh.VertexColorChannelCount; ++channelIndex)
+					{
+						SceneMeshVertexColorChannel channel = new();
+						mesh.VertexColorChannels.Add(channel);
+						channel.Colors = assimpMesh.VertexColorChannels[channelIndex].Select(color => new Color4FloatRGBA(color.R, color.G, color.B, color.A)).ToList();
+					}
+				}
+				
+				// TODO - rest: bones, animation, morphing
+
+				// faces
 				if (assimpMesh.HasFaces)
 				{
-					if (mesh.Vertices is not null && mesh.Vertices.Count <= 0xffff)
+					if (mesh.Positions is not null && mesh.Positions.Count <= 0xffff)
 					{
-						mesh.UShortIndices = assimpMesh.GetUnsignedIndices().Select(idx => (ushort)idx).ToArray();
+						mesh.UShortIndices = assimpMesh.GetUnsignedIndices().Select(idx => (ushort)idx).ToList();
 					}
 					else
 					{
-						mesh.UIntIndices = assimpMesh.GetUnsignedIndices();
+						mesh.UIntIndices = assimpMesh.GetUnsignedIndices().ToList();
 					}
 				}
 			}

@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 
 namespace Mine.Framework;
 
-[StructLayout(LayoutKind.Explicit)]
+[Serializable, StructLayout(LayoutKind.Explicit)]
 public partial record struct Vector3Float
 {
 	[FieldOffset(sizeof(float) * 0)] public float X;

@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace Mine.Framework;
 
-[StructLayout(LayoutKind.Explicit)]
+[Serializable, StructLayout(LayoutKind.Explicit)]
 public record struct Vector2Int
 {
 	[FieldOffset(sizeof(int) * 0)] public int X;
