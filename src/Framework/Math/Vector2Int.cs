@@ -6,6 +6,8 @@ namespace Mine.Framework;
 [Serializable, StructLayout(LayoutKind.Explicit)]
 public record struct Vector2Int
 {
+	public const int Size = 2 * sizeof(int);
+	
 	[FieldOffset(sizeof(int) * 0)] public int X;
 	[FieldOffset(sizeof(int) * 1)] public int Y;
 	

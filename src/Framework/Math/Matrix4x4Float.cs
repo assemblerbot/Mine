@@ -5,6 +5,8 @@ namespace Mine.Framework;
 [Serializable, StructLayout(LayoutKind.Explicit)]
 public record struct Matrix4x4Float
 {
+	public const int Size = 16 * sizeof(float);
+	
 	[FieldOffset(sizeof(float) * 00)] public float        A0;
 	[FieldOffset(sizeof(float) * 01)] public float        A1;
 	[FieldOffset(sizeof(float) * 02)] public float        A2;
@@ -28,6 +30,8 @@ public record struct Matrix4x4Float
 	[FieldOffset(sizeof(float) * 14)] public float       D2;
 	[FieldOffset(sizeof(float) * 15)] public float       D3;
 	[FieldOffset(sizeof(float) * 12)] public Point4Float Row3;
+	[FieldOffset(sizeof(float) * 12)] public Point4Float Position;
+	[FieldOffset(sizeof(float) * 12)] public Vector4Float Translation;
 
 	public float this[int i, int j]
 	{
@@ -153,4 +157,9 @@ public record struct Matrix4x4Float
 		D2 = d2;
 		D3 = d3;
 	}
+
+	// public void Decompose(out Point3Float translation, out QuaternionFloat rotation, out Vector3Float scale)
+	// {
+	// 	
+	// }
 }

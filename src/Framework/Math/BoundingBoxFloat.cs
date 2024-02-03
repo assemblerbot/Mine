@@ -3,6 +3,8 @@ namespace Mine.Framework;
 [Serializable]
 public record struct BoundingBoxFloat
 {
+	public const int Size = 2 * Point3Float.Size;
+	
 	public Point3Float Min;
 	public Point3Float Max;
 

@@ -102,7 +102,7 @@ public sealed class NodeIOScene : NodeIO<Assimp.Scene>
 
 		Mine.Framework.Scene scene = new();
 		
-		// meshes
+		// meshes ---------------------------------------
 		if (assimpScene.HasMeshes)
 		{
 			scene.Meshes = new List<SceneMesh>();
@@ -196,9 +196,55 @@ public sealed class NodeIOScene : NodeIO<Assimp.Scene>
 				}
 			}
 		}
+		
+		// hierarchy ----------------------------------------
+		if (assimpScene.RootNode != null)
+		{
+			scene.Root      = new SceneNode();
+			ImportNode(scene.Root, assimpScene.RootNode);
+			ImportChildNodesRecursive(scene.Root, assimpScene.RootNode);
+		}
 
 		byte[] json = SerializationUtility.SerializeValue(scene, DataFormat.Binary);
 		File.WriteAllBytes($"{resourcePath}.scene", json);
+	}
+
+	private void ImportChildNodesRecursive(SceneNode targetNode, Assimp.Node source)
+	{
+		if (source.Children == null)
+		{
+			return;
+		}
+
+		foreach (Node sourceChild in source.Children)
+		{
+			targetNode.Children ??= new List<SceneNode>();
+
+			SceneNode child = new();
+			ImportNode(child, sourceChild);
+			targetNode.Children.Add(child);
+
+			ImportChildNodesRecursive(child, sourceChild);
+		}
+	}
+
+	private void ImportNode(SceneNode targetNode, Assimp.Node source)
+	{
+		targetNode.Name = source.Name;
+
+		source.Transform.Decompose(out Vector3D scale, out Quaternion rotation, out Vector3D translation);
+		targetNode.Translation = new Vector3Float(translation.X, translation.Y, translation.Z);
+		targetNode.Rotation    = new QuaternionFloat(rotation.X, rotation.Y, rotation.Z, rotation.W);
+		targetNode.Scale       = new Vector3Float(scale.X, scale.Y, scale.Z);
+
+		if (source.HasMeshes)
+		{
+			targetNode.MeshIndices = new List<int>();
+			for (int i = 0; i < source.MeshIndices.Count; ++i)
+			{
+				targetNode.MeshIndices.Add(source.MeshIndices[i]);
+			}
+		}
 	}
 
 	public override NodeIOSettings CreateImportSettings()
