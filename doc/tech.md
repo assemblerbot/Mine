@@ -1,5 +1,7 @@
 # 3rd party
 
+Technology used in project:
+
 | Category  | Technology                            | Source | Framework | Studio  | Plugin  |
 |-----------|---------------------------------------|--------|-----------|---------|---------|
 | Core      | Silk.NET.Core                         | nuget  | &check;   | &check; |         |
@@ -14,3 +16,4 @@
 | Windowing | Silk.NET.Windowing.Common             | nuget  | &check;   | &check; |         |
 | IO        | NativeFileDialogSharp                 | nuget  |           | &check; |         |
 | IO        | Odin serializer                       | git    | &check;   | &check; |         |
+| Misc      | NativeFileDialogSharp                 | nuget  |           | &check; |         |

@@ -43,6 +43,7 @@ public static class ProjectNodeTypeExtensions
 			".png" => ProjectNodeType.AssetImage,
 			".jpg" => ProjectNodeType.AssetImage,
 			".fbx" => ProjectNodeType.AssetScene,
+			".obj" => ProjectNodeType.AssetScene,
 			_ => ProjectNodeType.AssetBinary
 		};
 	}

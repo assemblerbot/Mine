@@ -3,6 +3,8 @@ namespace Mine.Framework;
 [Serializable]
 public sealed class SceneMesh
 {
+	public string           Name = "";
+	public BoundingBoxFloat BoundingBox;
 	public List<Point3Float>?                       Positions;
 	public List<Vector3Float>?                      Normals;
 	public List<Vector3Float>?                      Tangents;

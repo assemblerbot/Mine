@@ -9,6 +9,13 @@ public partial record struct Point3Float
 	[FieldOffset(sizeof(float) * 1)] public float Y;
 	[FieldOffset(sizeof(float) * 2)] public float Z;
 
+	public Point3Float(float xyz)
+	{
+		X = xyz;
+		Y = xyz;
+		Z = xyz;
+	}
+
 	public Point3Float(float x, float y, float z)
 	{
 		X = x;

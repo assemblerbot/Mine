@@ -28,24 +28,23 @@ public sealed class NodeIOScene : NodeIO<Assimp.Scene>
 		}
 
 		AssimpContext context = new AssimpContext();
-		context.SetConfig(new NormalSmoothingAngleConfig(66.0f)); // just for testing
 
-		Assimp.Scene? scene = context.ImportFile(
+		Assimp.Scene? assimpScene = context.ImportFile(
 			Owner.AbsolutePath,
 			PostProcessSteps.Triangulate
 		);
 		
-		// if(!_scene.HasMeshes) // should be covered by the loop
-		// {
-		// 	settings.Meshes.Clear();
-		// 	return;
-		// }
+		if(!assimpScene.HasMeshes)
+		{
+			settings.Meshes.Clear();
+			return assimpScene;
+		}
 		
 		bool settingsChanged = false;
-		for (int i = 0; i < scene.Meshes.Count; ++i)
+		for (int i = 0; i < assimpScene.Meshes.Count; ++i)
 		{
 			// update settings
-			Assimp.Mesh assimpMesh = scene.Meshes[i];
+			Assimp.Mesh assimpMesh = assimpScene.Meshes[i];
 			if (i == settings.Meshes.Count)
 			{
 				settings.Meshes.Add(new NodeIOMeshSettings(assimpMesh.Name));
@@ -59,14 +58,14 @@ public sealed class NodeIOScene : NodeIO<Assimp.Scene>
 		}
 
 		// cut the rest
-		if (settings.Meshes.Count > scene.Meshes.Count)
+		if (settings.Meshes.Count > assimpScene.Meshes.Count)
 		{
-			settings.Meshes.RemoveRange(scene.Meshes.Count, settings.Meshes.Count - scene.Meshes.Count);
+			settings.Meshes.RemoveRange(assimpScene.Meshes.Count, settings.Meshes.Count - assimpScene.Meshes.Count);
 			settingsChanged = true;
 		}
 
 		//return settingsChanged ? ImporterResult.FinishedSettingsChanged : ImporterResult.Finished;
-		return scene;
+		return assimpScene;
 	}
 
 	public override void Save(Assimp.Scene data)
@@ -80,7 +79,21 @@ public sealed class NodeIOScene : NodeIO<Assimp.Scene>
 
 	public override void Import(string resourcePath)
 	{
-		Assimp.Scene? assimpScene = Load(); // TODO - this is wrong
+		NodeIOSceneSettings? settings = Owner.Meta?.NodeIOSettings as NodeIOSceneSettings;
+		if (settings == null)
+		{
+			ConsoleViewModel.LogError($"Cannot import '{Owner.RelativePath}'. There are now settings!");
+			return;
+		}
+
+		AssimpContext context = new AssimpContext();
+		context.SetConfig(new NormalSmoothingAngleConfig(settings.NormalSmoothingAngle));
+
+		Assimp.Scene? assimpScene = context.ImportFile(
+			Owner.AbsolutePath,
+			PostProcessSteps.Triangulate // always - only triangles are supported
+		);
+
 		if (assimpScene == null)
 		{
 			ConsoleViewModel.LogError($"Cannot import '{Owner.RelativePath}'. Mesh was not loaded!");
@@ -100,11 +113,17 @@ public sealed class NodeIOScene : NodeIO<Assimp.Scene>
 				SceneMesh mesh = new();
 				scene.Meshes.Add(mesh);
 
+				mesh.Name        = assimpMesh.Name;
+				mesh.BoundingBox = new BoundingBoxFloat(
+					new Point3Float(assimpMesh.BoundingBox.Min.X, assimpMesh.BoundingBox.Min.Y, assimpMesh.BoundingBox.Min.Z),
+					new Point3Float(assimpMesh.BoundingBox.Max.X, assimpMesh.BoundingBox.Max.Y, assimpMesh.BoundingBox.Max.Z)
+				);
+				
 				if (assimpMesh.PrimitiveType != PrimitiveType.Triangle)
 				{
 					continue; // ignore this mesh and keep empty in scene
 				}
-
+				
 				// positions
 				if (assimpMesh.HasVertices)
 				{
