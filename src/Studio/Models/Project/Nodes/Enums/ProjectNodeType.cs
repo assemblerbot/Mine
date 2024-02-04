@@ -9,6 +9,7 @@ public enum ProjectNodeType
 	AssetScene,
 	AssetBinary,
 	AssetDefinition,
+	AssetMaterial,
 	
 	ScriptFolder,
 	ScriptFile,
@@ -20,11 +21,13 @@ public static class ProjectNodeTypeExtensions
 	public static bool IsAssetsRelated(this ProjectNodeType type)
 	{
 		return
-			type == ProjectNodeType.AssetFolder ||
-			type == ProjectNodeType.AssetImage  ||
-			type == ProjectNodeType.AssetScene  ||
-			type == ProjectNodeType.AssetBinary ||
-			type == ProjectNodeType.AssetDefinition;
+			type == ProjectNodeType.AssetFolder     ||
+			type == ProjectNodeType.AssetImage      ||
+			type == ProjectNodeType.AssetScene      ||
+			type == ProjectNodeType.AssetBinary     ||
+			type == ProjectNodeType.AssetDefinition ||
+			type == ProjectNodeType.AssetMaterial
+			;
 	}
 
 	public static bool IsScriptsRelated(this ProjectNodeType type)
@@ -44,6 +47,7 @@ public static class ProjectNodeTypeExtensions
 			".jpg" => ProjectNodeType.AssetImage,
 			".fbx" => ProjectNodeType.AssetScene,
 			".obj" => ProjectNodeType.AssetScene,
+			".material" => ProjectNodeType.AssetMaterial,
 			_ => ProjectNodeType.AssetBinary
 		};
 	}

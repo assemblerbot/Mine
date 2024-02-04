@@ -1,4 +1,5 @@
 ﻿using Migration;
+using Mine.Studio;
 using RedHerring.Studio.Models.Project.FileSystem;
 using RedHerring.Studio.UserInterface.Attributes;
 
@@ -9,7 +10,9 @@ public sealed class NodeIOSceneSettings : NodeIOSettings
 {
 	public float NormalSmoothingAngle = 15f;
 	
-	[ReadOnlyInInspector] public List<NodeIOMeshSettings> Meshes = new();
+	[ReadOnlyInInspector] public List<NodeIOSceneMeshSettings> Meshes = new();
+
+	[ReadOnlyInInspector] public List<NodeIOMaterialSettings> Materials = new();
 }
 
 #region Migration
@@ -21,6 +24,8 @@ public class NodeIOSceneSettings_000 : NodeIOSettings_000, INodeIOSceneSettingsM
 {
 	public float SmoothingAngle;
 	
-	public List<INodeIOMeshSettingsMigratable> Meshes;
+	[MigrateField] public List<INodeIOSceneMeshSettingsMigratable> Meshes;
+
+	[MigrateField] public List<IStudioAssetMaterialReferenceMigratable> Materials;
 }
 #endregion

@@ -47,12 +47,12 @@ public sealed class NodeIOScene : NodeIO<Assimp.Scene>
 			Assimp.Mesh assimpMesh = assimpScene.Meshes[i];
 			if (i == settings.Meshes.Count)
 			{
-				settings.Meshes.Add(new NodeIOMeshSettings(assimpMesh.Name));
+				settings.Meshes.Add(new NodeIOSceneMeshSettings(assimpMesh.Name));
 				settingsChanged = true;
 			}
 			else if(settings.Meshes[i].Name != assimpMesh.Name)
 			{
-				settings.Meshes[i] = new NodeIOMeshSettings(assimpMesh.Name);
+				settings.Meshes[i] = new NodeIOSceneMeshSettings(assimpMesh.Name);
 				settingsChanged    = true;
 			}
 		}
@@ -205,6 +205,7 @@ public sealed class NodeIOScene : NodeIO<Assimp.Scene>
 			ImportChildNodesRecursive(scene.Root, assimpScene.RootNode);
 		}
 
+		// import
 		byte[] json = SerializationUtility.SerializeValue(scene, DataFormat.Binary);
 		File.WriteAllBytes($"{resourcePath}.scene", json);
 	}
@@ -263,11 +264,10 @@ public sealed class NodeIOScene : NodeIO<Assimp.Scene>
 		}
 
 		AssimpContext context = new AssimpContext();
-		//context.SetConfig(new NormalSmoothingAngleConfig(66.0f)); // just for testing
 
 		Assimp.Scene? scene = context.ImportFile(
 			Owner.AbsolutePath,
-			PostProcessSteps.Triangulate
+			PostProcessSteps.None
 		);
 		
 		// if(!_scene.HasMeshes) // should be covered by the loop
@@ -285,12 +285,12 @@ public sealed class NodeIOScene : NodeIO<Assimp.Scene>
 			Assimp.Mesh assimpMesh = scene.Meshes[i];
 			if (i == sceneSettings.Meshes.Count)
 			{
-				sceneSettings.Meshes.Add(new NodeIOMeshSettings(assimpMesh.Name));
+				sceneSettings.Meshes.Add(new NodeIOSceneMeshSettings(assimpMesh.Name));
 				settingsChanged = true;
 			}
 			else if(sceneSettings.Meshes[i].Name != assimpMesh.Name)
 			{
-				sceneSettings.Meshes[i] = new NodeIOMeshSettings(assimpMesh.Name);
+				sceneSettings.Meshes[i] = new NodeIOSceneMeshSettings(assimpMesh.Name);
 				settingsChanged    = true;
 			}
 		}
@@ -301,6 +301,8 @@ public sealed class NodeIOScene : NodeIO<Assimp.Scene>
 			sceneSettings.Meshes.RemoveRange(scene.Meshes.Count, sceneSettings.Meshes.Count - scene.Meshes.Count);
 			settingsChanged = true;
 		}
+		
+		
 
 		return settingsChanged;
 	}
