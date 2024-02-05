@@ -38,27 +38,29 @@ public sealed class NodeIOCopy : NodeIO<byte[]>
 	{
 	}
 
-	public override void Import(string resourcePath)
+	public override string? Import(string resourcesRootPath)
 	{
 		byte[]? data = Load();
 		
 		if (data == null)
 		{
 			ConsoleViewModel.LogError($"Cannot import file {Owner.RelativePath}, file was not loaded!");
-			return;
+			return null;
 		}
 
+		string path = Path.Join(resourcesRootPath, Owner.RelativePath);
+		
 		try
 		{
-			Directory.CreateDirectory(Path.GetDirectoryName(resourcePath)!);
-			File.WriteAllBytes(resourcePath, data);
+			Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+			File.WriteAllBytes(path, data);
 		}
 		catch (Exception e)
 		{
 			ConsoleViewModel.LogException(e.ToString());
 		}
 
-		ClearCache();
+		return Owner.RelativePath;
 	}
 
 	public override NodeIOSettings CreateImportSettings()

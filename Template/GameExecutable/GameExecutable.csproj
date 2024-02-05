@@ -16,6 +16,9 @@
       <Reference Include="Framework">
         <HintPath>..\Libraries\Framework.dll</HintPath>
       </Reference>
+      <Reference Include="OdinSerializer">
+        <HintPath>..\Libraries\OdinSerializer.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
 </Project>

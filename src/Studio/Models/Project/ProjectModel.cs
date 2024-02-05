@@ -2,7 +2,9 @@ using System.Collections.Concurrent;
 using System.Reflection;
 using System.Security.Cryptography;
 using Migration;
+using Mine.Framework;
 using Mine.Studio;
+using OdinSerializer;
 using RedHerring.Studio.Models.Project.FileSystem;
 using RedHerring.Studio.Models.ViewModels.Console;
 
@@ -20,9 +22,9 @@ public sealed class ProjectModel
 	}
 	#endregion
 	
-	private const           string _assetsFolderName  = "Assets";
-	private const           string _scriptsFolderName = "GameLibrary";
-	private const           string _settingsFileName  = "Project.json";
+	private const           string ASSETS_FOLDER_NAME  = "Assets";
+	private const           string SCRIPTS_FOLDER_NAME = "GameLibrary";
+	private const           string SETTINGS_FILE_NAME  = "Project.json";
 	private static readonly char[] _slash             = {'/', '\\'};
 	
 	public static           Assembly      Assembly => typeof(ProjectModel).Assembly; 
@@ -43,6 +45,8 @@ public sealed class ProjectModel
 
 	private ProjectSettings? _projectSettings;
 	public  ProjectSettings  ProjectSettings => _projectSettings!;
+
+	private AssetDatabase? _resourcesAssetDatabase;
 
 	public bool IsOpened               => !string.IsNullOrEmpty(_projectSettings?.ProjectFolderPath);
 	public bool NeedsUpdateEngineFiles { get; private set; } = false;
@@ -128,6 +132,7 @@ public sealed class ProjectModel
 		_assetsFolder  = null;
 		_scriptsFolder = null;
 		_nodesIndex.Clear();
+		_resourcesAssetDatabase = null;
 		_eventAggregator.Trigger(new ClosedEvent());
 	}
 	
@@ -136,12 +141,12 @@ public sealed class ProjectModel
 		lock (ProjectTreeLock)
 		{
 			// create roots
-			string          assetsPath   = Path.Join(projectPath, _assetsFolderName);
-			ProjectRootNode assetsFolder = new ProjectRootNode(this, _assetsFolderName, assetsPath, ProjectNodeType.AssetFolder);
+			string          assetsPath   = Path.Join(projectPath, ASSETS_FOLDER_NAME);
+			ProjectRootNode assetsFolder = new ProjectRootNode(this, ASSETS_FOLDER_NAME, assetsPath, ProjectNodeType.AssetFolder);
 			_assetsFolder = assetsFolder;
 
-			string          scriptsGameLibraryPath   = Path.Join(projectPath, _scriptsFolderName);
-			ProjectRootNode scriptsGameLibraryFolder = new ProjectRootNode(this, _scriptsFolderName, scriptsGameLibraryPath, ProjectNodeType.ScriptFolder);
+			string          scriptsGameLibraryPath   = Path.Join(projectPath, SCRIPTS_FOLDER_NAME);
+			ProjectRootNode scriptsGameLibraryFolder = new ProjectRootNode(this, SCRIPTS_FOLDER_NAME, scriptsGameLibraryPath, ProjectNodeType.ScriptFolder);
 			_scriptsFolder = scriptsGameLibraryFolder;
 
 			// check
@@ -156,6 +161,9 @@ public sealed class ProjectModel
 
 			// load / create settings
 			LoadSettings(projectPath);
+			
+			// load / create asset database
+			_resourcesAssetDatabase = AssetDatabase.LoadOrCreate(_projectSettings!.AbsoluteResourcesPath);
 
 			// read assets
 			try
@@ -211,10 +219,18 @@ public sealed class ProjectModel
 		lock (ProjectTreeLock)
 		{
 			_assetsFolder!.TraverseRecursive(
-				node => EnqueueProjectTask(CreateImportTask(_assetsFolder!, node.RelativePath)),
+				node => EnqueueProjectTask(CreateImportFileTask(_assetsFolder!, node.RelativePath)),
 				TraverseFlags.Files,
 				default
 			);
+
+			_assetsFolder!.TraverseRecursive(
+				node => EnqueueProjectTask(CreateImportFolderTask(_assetsFolder!, node.RelativePath)),
+				TraverseFlags.Directories,
+				default
+			);
+
+			EnqueueProjectTask(CreateSaveAssetDatabaseTask());
 		}
 	}
 	#endregion
@@ -383,12 +399,12 @@ public sealed class ProjectModel
 		}
 
 		byte[] json = MigrationSerializer.SerializeAsync(_projectSettings, SerializedDataFormat.JSON, Assembly).GetAwaiter().GetResult();
-		File.WriteAllBytes(Path.Join(_projectSettings.ProjectFolderPath, _settingsFileName), json);
+		File.WriteAllBytes(Path.Join(_projectSettings.ProjectFolderPath, SETTINGS_FILE_NAME), json);
 	}
 
 	public void LoadSettings(string projectPath)
 	{
-		string path = Path.Join(projectPath, _settingsFileName);
+		string path = Path.Join(projectPath, SETTINGS_FILE_NAME);
 		if(!File.Exists(path))
 		{
 			_projectSettings = new ProjectSettings
@@ -407,7 +423,6 @@ public sealed class ProjectModel
 	#endregion
 	
 	#region Asset manipulation
-
 	public void LoadAssetNode<TData>(ProjectAssetFileNode node, Action<TData?>? onComplete)
 	{
 		ProjectTask task = CreateLoadNodeTask(_assetsFolder!, node.RelativePath, onComplete);
@@ -791,6 +806,19 @@ public sealed class ProjectModel
 		);
 	}
 	
+	private ProjectTask CreateSaveAssetDatabaseTask()
+	{
+		return new ProjectTask(
+			cancellationToken =>
+			{
+				lock (ProjectTreeLock)
+				{
+					_resourcesAssetDatabase!.Save(_projectSettings!.AbsoluteResourcesPath);
+				}
+			}
+		);
+	}
+	
 	private ProjectTask CreateInitNodeTask(ProjectRootNode root, string path)
 	{
 		return new ProjectTask(
@@ -825,71 +853,103 @@ public sealed class ProjectModel
 		);
 	}
 
-	private ProjectTask CreateImportTask(ProjectRootNode root, string path)
+	private ProjectTask CreateImportFileTask(ProjectRootNode root, string path)
 	{
 		return new ProjectTask(
 			cancellationToken =>
 			{
-				// check node
-				ProjectAssetFileNode? node = root.FindNode(path) as ProjectAssetFileNode;
-				if (node == null || node.Meta == null)
+				lock (ProjectTreeLock)
 				{
-					return;
-				}
+					// check node
+					ProjectAssetFileNode? node = root.FindNode(path) as ProjectAssetFileNode;
+					if (node == null || node.Meta == null)
+					{
+						return;
+					}
 
-				// check file
-				if (!File.Exists(node.AbsolutePath))
-				{
-					return;
-				}
+					// check file
+					if (!File.Exists(node.AbsolutePath))
+					{
+						return;
+					}
 
-				// calculate hash
-				string? hash = null;
-				try
-				{
-					using FileStream file = new(node.AbsolutePath, FileMode.Open);
-					hash = Convert.ToBase64String(_hashAlgorithm.ComputeHash(file)); // how to cancel compute hash?
-				}
-				catch (Exception e)
-				{
-					return;
-				}
+					// calculate hash
+					string? hash = null;
+					try
+					{
+						using FileStream file = new(node.AbsolutePath, FileMode.Open);
+						hash = Convert.ToBase64String(_hashAlgorithm.ComputeHash(file)); // how to cancel compute hash?
+					}
+					catch (Exception e)
+					{
+						return;
+					}
 
-				// check hash
-				if (node.Meta.Hash == hash)
-				{
-					return;
-				}
- 
-				// import
-				// Importer importer = _importerRegistry.GetImporter(node.Extension);
-				// node.Meta!.ImporterSettings ??= importer.CreateSettings();
+					// check hash
+					if (node.Meta.Hash == hash)
+					{
+						return;
+					}
 
-				string resourcePath = Path.Combine(_projectSettings!.AbsoluteResourcesPath, node.RelativePath);
+					try
+					{
+						string? resourcePath = node.GetNodeIO<NodeIO>()!.Import(_projectSettings!.AbsoluteResourcesPath);
+						if (resourcePath is not null)
+						{
+							_resourcesAssetDatabase![node.Meta.Guid!] = new AssetDatabaseItem(node.Meta.Guid!, resourcePath, true);
+						}
+					}
+					catch (Exception e)
+					{
+						ConsoleViewModel.LogError($"While importing file {node.AbsolutePath} an exception occured: {e}");
+						return;
+					}
 
-				try
-				{
-					node.GetNodeIO<NodeIO>()!.Import(resourcePath);
-					// using Stream   stream = File.OpenRead(node.AbsolutePath);
-					// ImporterResult result = importer.Import(stream, node.Meta.ImporterSettings, resourcePath, _migrationManager, cancellationToken);
-					//
-					// if (result == ImporterResult.FinishedSettingsChanged)
-					// {
-					// 	node.UpdateMetaFile();
-					// }
+					// update hash
+					node.Meta.SetHash(hash);
 				}
-				catch (Exception e)
-				{
-					ConsoleViewModel.LogError($"While importing file {node.AbsolutePath} an exception occured: {e}");
-					return;
-				}
-
-				// update hash
-				node.Meta.SetHash(hash);
 			}
 		);
 	}
-	
+
+	private ProjectTask CreateImportFolderTask(ProjectRootNode root, string path)
+	{
+		return new ProjectTask(
+			cancellationToken =>
+			{
+				lock (ProjectTreeLock)
+				{
+					// check node
+					ProjectFolderNode? node = root.FindNode(path) as ProjectFolderNode;
+					if (node == null || node.Meta == null)
+					{
+						return;
+					}
+
+					// check file
+					if (!Directory.Exists(node.AbsolutePath))
+					{
+						return;
+					}
+
+					// just create folder
+					try
+					{
+						string resourcePath = Path.Join(_projectSettings!.AbsoluteResourcesPath, node.RelativePath);
+						Directory.CreateDirectory(resourcePath);
+					}
+					catch (Exception e)
+					{
+						ConsoleViewModel.LogException(e.ToString());
+					}
+					
+					// add to database
+					_resourcesAssetDatabase![node.Meta.Guid!] = new AssetDatabaseItem(node.Meta.Guid!, node.RelativePath, false);
+				}
+			}
+		);
+	}
+
 	private ProjectTask CreateDeleteNodeTask(ProjectRootNode root, string parentPath, string name)
 	{
 		return new ProjectTask(

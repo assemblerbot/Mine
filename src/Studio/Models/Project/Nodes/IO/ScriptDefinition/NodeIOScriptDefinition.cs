@@ -33,7 +33,7 @@ public sealed class NodeIOScriptDefinition : NodeIO<DefinitionTemplate>
 		_template = null;
 	}
 
-	public override void Import(string resourcePath)
+	public override string? Import(string resourcesRootPath)
 	{
 		throw new InvalidOperationException();
 	}

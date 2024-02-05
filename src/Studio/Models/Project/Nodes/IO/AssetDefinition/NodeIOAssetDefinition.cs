@@ -33,16 +33,18 @@ public sealed class NodeIOAssetDefinition : NodeIO<DefinitionAsset>
 		_asset = null;
 	}
 
-	public override void Import(string resourcePath)
+	public override string? Import(string resourcesRootPath)
 	{
-		DefinitionAsset? data = Load();
+		DefinitionAsset? data = DefinitionAsset.CreateFromFile(Owner.AbsolutePath, StudioGlobals.MigrationManager);
 		if (data == null)
 		{
-			return;
+			return null;
 		}
 
-		data.ImportToResources(resourcePath);
-		ClearCache();
+		string path = Path.Join(resourcesRootPath, Owner.RelativePath);
+		data.ImportToResources(path);
+
+		return Owner.RelativePath;
 	}
 
 	public override NodeIOSettings CreateImportSettings()

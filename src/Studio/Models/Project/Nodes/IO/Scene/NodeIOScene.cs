@@ -77,13 +77,13 @@ public sealed class NodeIOScene : NodeIO<Assimp.Scene>
 	{
 	}
 
-	public override void Import(string resourcePath)
+	public override string? Import(string resourcesRootPath)
 	{
 		NodeIOSceneSettings? settings = Owner.Meta?.NodeIOSettings as NodeIOSceneSettings;
 		if (settings == null)
 		{
 			ConsoleViewModel.LogError($"Cannot import '{Owner.RelativePath}'. There are now settings!");
-			return;
+			return null;
 		}
 
 		AssimpContext context = new AssimpContext();
@@ -97,7 +97,7 @@ public sealed class NodeIOScene : NodeIO<Assimp.Scene>
 		if (assimpScene == null)
 		{
 			ConsoleViewModel.LogError($"Cannot import '{Owner.RelativePath}'. Mesh was not loaded!");
-			return;
+			return null;
 		}
 
 		Mine.Framework.Scene scene = new();
@@ -206,8 +206,12 @@ public sealed class NodeIOScene : NodeIO<Assimp.Scene>
 		}
 
 		// import
-		byte[] json = SerializationUtility.SerializeValue(scene, DataFormat.Binary);
-		File.WriteAllBytes($"{resourcePath}.scene", json);
+		byte[] json         = SerializationUtility.SerializeValue(scene, DataFormat.Binary);
+		string relativePath = $"{Owner.RelativePath}.scene";
+		string absolutePath         = Path.Join(resourcesRootPath, relativePath);
+		File.WriteAllBytes(absolutePath, json);
+		
+		return relativePath;
 	}
 
 	private void ImportChildNodesRecursive(SceneNode targetNode, Assimp.Node source)
