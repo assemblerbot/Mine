@@ -6,8 +6,11 @@ namespace RedHerring.Studio.Models.Project.FileSystem;
 
 public abstract class ProjectNode
 {
+	// TODO - type of node should be System.Type - not enum and it should contain the type of referenced class
+	
 	[HideInInspector]     public readonly ProjectModel    Project;
 	[ReadOnlyInInspector] public          ProjectNodeType Type = ProjectNodeType.Uninitialized;
+	[HideInInspector]     public          Type?           ContentType = null;
 
 	public          string Name { get; }
 	public readonly string AbsolutePath;
@@ -41,7 +44,7 @@ public abstract class ProjectNode
 	public void UpdateMetaFile()
 	{
 		string metaPath = $"{AbsolutePath}.meta";
-		byte[] json     = MigrationSerializer.SerializeAsync(Meta, SerializedDataFormat.JSON, StudioGlobals.Assembly).GetAwaiter().GetResult();
+		byte[] json     = MigrationSerializer.Serialize(Meta, SerializedDataFormat.JSON, StudioGlobals.Assembly);
 		File.WriteAllBytes(metaPath, json);
 	}
 

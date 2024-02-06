@@ -2,9 +2,11 @@ using System.Numerics;
 using System.Text.Json;
 using Assimp;
 using ImGuiNET;
+using Migration;
 using Mine.Framework;
 using Mine.ImGuiPlugin;
 using NativeFileDialogSharp;
+using OdinSerializer;
 using RedHerring.Studio.Models;
 using RedHerring.Studio.Tools;
 using RedHerring.Studio.UserInterface;
@@ -250,23 +252,29 @@ public sealed class StudioComponent : Component, IUpdatable
 		//
 		// List<DefinitionTemplateTest>? deserialized = JsonSerializer.Deserialize<List<DefinitionTemplateTest>>(json, new JsonSerializerOptions {IncludeFields = true});
 
-		TestVertex[] vertices = new[]
-		                        {
-			                        new TestVertex{Position = new Vector3(1, 2, 3),Color =new Color3D(0.1f, 0.2f, 0.3f)},
-			                        new TestVertex{Position = new Vector3(4, 5, 6),Color =new Color3D(0.4f, 0.5f, 0.6f)},
-			                        new TestVertex{Position = new Vector3(7, 8, 9),Color =new Color3D(0.7f, 0.8f, 0.9f)},
-		                        };
+		// TestVertex[] vertices = new[]
+		//                         {
+		// 	                        new TestVertex{Position = new Vector3(1, 2, 3),Color =new Color3D(0.1f, 0.2f, 0.3f)},
+		// 	                        new TestVertex{Position = new Vector3(4, 5, 6),Color =new Color3D(0.4f, 0.5f, 0.6f)},
+		// 	                        new TestVertex{Position = new Vector3(7, 8, 9),Color =new Color3D(0.7f, 0.8f, 0.9f)},
+		//                         };
+		//
+		// byte[] bytes;
+		// fixed (TestVertex* pVertices = vertices)
+		// {
+		// 	//bytes = (byte*) pVertices;
+		// }
+		//
+		// using FileStream stream = new("D:\\Tmp\\serialization_test.bin", FileMode.Create);
+		// using BinaryWriter     writer = new(stream);
 
-		byte[] bytes;
-		fixed (TestVertex* pVertices = vertices)
-		{
-			//bytes = (byte*) pVertices;
-		}
+		TestData data = new TestData();
+		data.Init();
 
-		using FileStream stream = new("D:\\Tmp\\serialization_test.bin", FileMode.Create);
-		using BinaryWriter     writer = new(stream);
-		//writer.Write(
-
+		byte[] bytes = MigrationSerializer.Serialize(data, SerializedDataFormat.JSON, StudioGlobals.Assembly);
+		//byte[] bytes = SerializationUtility.SerializeValue(data, DataFormat.JSON);
+		File.WriteAllBytes("c:\\tmp\\test.json", bytes);
+		
 		int d = 0;
 	}
 
@@ -312,61 +320,85 @@ public sealed class StudioComponent : Component, IUpdatable
 	#endregion
 }
 
-public class ReferenceTest
+//--------------------------
+public interface ReferenceTest
 {
 }
 
+[MigratableInterface(typeof(ReferenceTest))]
+public interface IReferenceTestMigratable
+{
+}
+
+//--------------------------
+[Serializable, SerializedClassId("reference-test-string")]
 public class ReferenceTestString : ReferenceTest
+{
+	public string StrValue = "";
+}
+
+[MigratableInterface(typeof(ReferenceTestString))]
+public interface IReferenceTestStringMigratable : IReferenceTestMigratable;
+
+[Serializable, LatestVersion(typeof(ReferenceTestString))]
+public class ReferenceTestString_000 : IReferenceTestStringMigratable
 {
 	public string StrValue;
 }
 
+//--------------------------
+[Serializable, SerializedClassId("reference-test-int")]
 public class ReferenceTestInt : ReferenceTest
 {
-	public int IntValue;
+	public int IntValue = 0;
 }
 
-public sealed class GenericReference<T> where T : ReferenceTest
+[MigratableInterface(typeof(ReferenceTestInt))]
+public interface IReferenceTestIntMigratable : IReferenceTestMigratable;
+
+[Serializable, LatestVersion(typeof(ReferenceTestInt))]
+public class ReferenceTestInt_000 : IReferenceTestIntMigratable
 {
-	public string Guid;
-	public string Path;
-	public T      Value;
+	public string IntValue;
 }
 
-public sealed class DefinitionTemplateTest
+//--------------------------
+[Serializable, SerializedClassId("generic-reference-test")]
+public sealed class GenericReferenceTest<T> where T : ReferenceTest
 {
-	//--- data begin ---
-	public int     IntField;
-	public float   FloatField;
-	public string  StringField;
-	public bool    MyField;
-	public string? Empty = null;
-
-	public GenericReference<ReferenceTestInt> Reference = new GenericReference<ReferenceTestInt>() {Guid = "guid", Path = "path", Value = new ReferenceTestInt() {IntValue = 523}};
-	//--- data end ---
+	public string? Guid = null;
+	[NonSerialized] public T?      Data = default(T);
 }
 
-/*
- 
- [
-    {
-        "IntField": 0,
-        "FloatField": 0,
-        "StringField": null,
-        "MyField": false
-    },
-    {
-        "IntField": 0,
-        "FloatField": 0,
-        "StringField": null,
-        "MyField": false
-    },
-    {
-        "IntField": 0,
-        "FloatField": 0,
-        "StringField": null,
-        "MyField": false
-    }
-]
- 
- */
+[MigratableInterface(typeof(GenericReferenceTest<>))]
+public interface IGenericReferenceTestMigratable;
+
+[Serializable, LatestVersion(typeof(GenericReferenceTest<>))]
+public class GenericReferenceTest_000 : IGenericReferenceTestMigratable
+{
+	public string? Guid;
+}
+
+//--------------------------
+[Serializable, SerializedClassId("test-data")]
+public class TestData
+{
+	public GenericReferenceTest<ReferenceTestInt>    IntReference = new();
+	public GenericReferenceTest<ReferenceTestString> StringReference = new();
+
+	public void Init()
+	{
+		IntReference    = new GenericReferenceTest<ReferenceTestInt> {Guid    = "1234-1234-1234", Data = new ReferenceTestInt {IntValue    = 1234}};
+		StringReference = new GenericReferenceTest<ReferenceTestString> {Guid = "55678-5678-5678", Data = new ReferenceTestString {StrValue = "asdf"}};
+	}
+}
+
+[MigratableInterface(typeof(TestData))]
+public interface ITestDataMigratable;
+    
+[Serializable, LatestVersion(typeof(TestData))]
+public class GenericData_000 : ITestDataMigratable
+{
+	public IGenericReferenceTestMigratable IntReference;
+	public IGenericReferenceTestMigratable StringReference;
+}
