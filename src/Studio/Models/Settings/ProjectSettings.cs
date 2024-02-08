@@ -1,6 +1,5 @@
 ﻿using Migration;
 using Mine.Framework;
-using RedHerring.Studio.Models.Project;
 using RedHerring.Studio.UserInterface.Attributes;
 
 namespace RedHerring.Studio.Models;
@@ -8,18 +7,22 @@ namespace RedHerring.Studio.Models;
 [Serializable, SerializedClassId("project-settings")]
 public sealed class ProjectSettings
 {
+	// TODO - add template project settings json to template, so the namespace will be renamed to project name
+	public string AssetsDatabaseSourcePath = "AssetsDatabase.cs";
+	public string AssetsDatabaseNamespace  = "MyGame";
+	
 	[ReadOnlyInInspector, NonSerialized] public string ProjectFolderPath = "";
 
-	[NonSerialized] private string? _relativeResourcesPath;
+	[ReadOnlyInInspector, ShowInInspector, NonSerialized] private string? _relativeResourcesPath;
 	public                  string  RelativeResourcesPath => _relativeResourcesPath ??= Engine.ResourcesPath;
 
-	[NonSerialized] private string? _absoluteResourcesPath;
+	[ReadOnlyInInspector, ShowInInspector, NonSerialized] private string? _absoluteResourcesPath;
 	public                  string  AbsoluteResourcesPath => _absoluteResourcesPath ??= Path.Combine(ProjectFolderPath, RelativeResourcesPath);
 
-	[NonSerialized] private string? _absoluteScriptsPath;
+	[ReadOnlyInInspector, ShowInInspector, NonSerialized] private string? _absoluteScriptsPath;
 	public                  string  AbsoluteScriptsPath => _absoluteScriptsPath ??= Path.Combine(ProjectFolderPath, "GameLibrary");
 
-	[NonSerialized] private string? _absoluteAssetsPath;
+	[ReadOnlyInInspector, ShowInInspector, NonSerialized] private string? _absoluteAssetsPath;
 	public                  string  AbsoluteAssetsPath => _absoluteAssetsPath ??= Path.Combine(ProjectFolderPath, "Assets");
 }
 

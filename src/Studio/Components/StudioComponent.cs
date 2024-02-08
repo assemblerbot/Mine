@@ -25,7 +25,7 @@ public sealed class StudioComponent : Component, IUpdatable
 	private readonly DockSpace               _dockSpace        = new();
 	private readonly Menu                    _menu             = new(MenuStyle.MainMenu);
 	private readonly StatusBar               _statusBar        = new();
-	private          ObjectDialog            _projectSettings  = null!;
+	private          ObjectDialog?           _projectSettings  = null;
 	private          ObjectDialog            _studioSettings   = null!;
 	private          NewProjectDialog        _newProjectDialog = null!;
 	private readonly MessageBox              _messageBox       = new();
@@ -48,7 +48,7 @@ public sealed class StudioComponent : Component, IUpdatable
 
 		_toolManager.Init(_studioModel);
 
-		_projectSettings  = new ObjectDialog("Project settings", _studioModel.CommandHistory, _studioModel.Project.ProjectSettings);
+		//_projectSettings  = new ObjectDialog("Project settings", _studioModel.CommandHistory, _studioModel.Project.ProjectSettings);
 		_studioSettings   = new ObjectDialog("Studio settings",  _studioModel.CommandHistory, _studioModel.StudioSettings);
 		_newProjectDialog = new NewProjectDialog(_studioModel);
 
@@ -88,7 +88,7 @@ public sealed class StudioComponent : Component, IUpdatable
 		_menu.InvokeClickActions();
 		_statusBarMessageHandler.Update();
 		_statusBar.Update();
-		_projectSettings.Update();
+		_projectSettings?.Update();
 		_studioSettings.Update();
 		_messageBox.Update();
 		_newProjectDialog.Update();
@@ -116,7 +116,7 @@ public sealed class StudioComponent : Component, IUpdatable
 
 		_menu.AddItem("Edit/Undo",               _studioModel.CommandHistory.Undo);
 		_menu.AddItem("Edit/Redo",               _studioModel.CommandHistory.Redo);
-		_menu.AddItem("Edit/Project settings..", OnEditProjectSettingsClicked);
+		_menu.AddItem("Edit/Project settings..", OnEditProjectSettingsClicked, () => _studioModel.Project.IsOpened);
 		_menu.AddItem("Edit/Studio settings..",  OnEditStudioSettingsClicked);
 
 		_menu.AddItem("View/Project",     OnViewProjectClicked);
@@ -173,6 +173,7 @@ public sealed class StudioComponent : Component, IUpdatable
 
 	private void OnEditProjectSettingsClicked()
 	{
+		_projectSettings = new ObjectDialog("Project settings", _studioModel.CommandHistory, _studioModel.Project.ProjectSettings);
 		_projectSettings.Open();
 	}
 

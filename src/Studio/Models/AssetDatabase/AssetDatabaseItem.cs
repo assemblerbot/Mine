@@ -1,4 +1,4 @@
-namespace Mine.Framework;
+namespace Mine.Studio;
 
 [Serializable]
 public sealed class AssetDatabaseItem

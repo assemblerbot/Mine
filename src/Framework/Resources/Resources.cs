@@ -9,15 +9,11 @@ public sealed class Resources
 	private readonly List<string>                           _resourcePackages   = new();
 	private readonly Dictionary<string, ResourceDescriptor> _resourceDictionary = new();
 
-	private AssetDatabase _assetDatabase = new();
-	
 	public void Init()
 	{
 		ScanResourcePackages();
 		BuildDictionaryFromPackages();
 		BuildDictionaryFromFiles();
-
-		_assetDatabase = AssetDatabase.LoadOrCreate(Engine.ResourcesPath);
 
 		//debug
 		foreach(var pair in _resourceDictionary)
@@ -27,22 +23,6 @@ public sealed class Resources
 	}
 
 	#region Reading
-	public string? GetPathByGuid(string guid)
-	{
-		return _assetDatabase[guid]?.Path;
-	}
-
-	public byte[]? ReadResourceByGuid(string guid)
-	{
-		string? path = _assetDatabase[guid]?.Path;
-		if (path is null)
-		{
-			return null;
-		}
-
-		return ReadResource(path);
-	}
-
 	public byte[]? ReadResource(string path)
 	{
 		if (!_resourceDictionary.TryGetValue(path, out ResourceDescriptor descriptor))

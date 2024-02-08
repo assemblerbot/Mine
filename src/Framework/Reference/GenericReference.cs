@@ -1,3 +1,4 @@
+/*
 using Migration;
 using OdinSerializer;
 
@@ -37,3 +38,4 @@ public class GenericReference_000 : IGenericReferenceMigratable
 	public string Guid;
 }
 #endregion
+*/

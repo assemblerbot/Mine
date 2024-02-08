@@ -1,7 +1,8 @@
 using System.Text.Json.Serialization;
+using Mine.Framework;
 using OdinSerializer;
 
-namespace Mine.Framework;
+namespace Mine.Studio;
 
 [Serializable]
 public sealed class AssetDatabase

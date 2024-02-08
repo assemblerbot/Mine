@@ -20,7 +20,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Plugins\" />
       <Folder Include="World\BuiltInComponents\" />
     </ItemGroup>
 

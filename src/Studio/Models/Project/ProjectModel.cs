@@ -398,7 +398,7 @@ public sealed class ProjectModel
 			return;
 		}
 
-		byte[] json = MigrationSerializer.SerializeAsync(_projectSettings, SerializedDataFormat.JSON, Assembly).GetAwaiter().GetResult();
+		byte[] json = MigrationSerializer.Serialize(_projectSettings, SerializedDataFormat.JSON, Assembly);
 		File.WriteAllBytes(Path.Join(_projectSettings.ProjectFolderPath, SETTINGS_FILE_NAME), json);
 	}
 
@@ -415,7 +415,7 @@ public sealed class ProjectModel
 		}
 		
 		byte[] json = File.ReadAllBytes(path);
-		ProjectSettings settings = MigrationSerializer.DeserializeAsync<ProjectSettings, IStudioSettingsMigratable>(StudioGlobals.MigrationManager.TypesHash, json, SerializedDataFormat.JSON, StudioGlobals.MigrationManager, false, Assembly).GetAwaiter().GetResult();
+		ProjectSettings settings = MigrationSerializer.Deserialize<ProjectSettings, IStudioSettingsMigratable>(StudioGlobals.MigrationManager.TypesHash, json, SerializedDataFormat.JSON, StudioGlobals.MigrationManager, false, Assembly);
 		settings.ProjectFolderPath = projectPath;
 		
 		_projectSettings = settings;
