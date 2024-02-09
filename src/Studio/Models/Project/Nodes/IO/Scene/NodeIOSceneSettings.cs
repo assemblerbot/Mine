@@ -12,7 +12,7 @@ public sealed class NodeIOSceneSettings : NodeIOSettings
 	
 	[ReadOnlyInInspector] public List<NodeIOSceneMeshSettings> Meshes = new();
 
-	[ReadOnlyInInspector] public List<NodeIOMaterialSettings> Materials = new();
+	[ReadOnlyInInspector] public List<NodeIOSceneMaterialSettings> Materials = new();
 }
 
 #region Migration
@@ -26,6 +26,6 @@ public class NodeIOSceneSettings_000 : NodeIOSettings_000, INodeIOSceneSettingsM
 	
 	[MigrateField] public List<INodeIOSceneMeshSettingsMigratable> Meshes;
 
-	[MigrateField] public List<IStudioAssetMaterialReferenceMigratable> Materials;
+	[MigrateField] public List<INodeIOSceneMaterialSettingsMigratable> Materials;
 }
 #endregion

@@ -172,8 +172,8 @@ public sealed class ToolProjectView : Tool
 	#region Context menu
 	private void CreateContextMenu()
 	{
-		_contextMenu.AddItem("Create/DefinitionTemplate", OnCreateDefinitionTemplate, CanCreateScript);
-		_contextMenu.AddItem("Create/DefinitionAsset",    OnCreateDefinitionAsset,    CanCreateAsset);
+		// _contextMenu.AddItem("Create/DefinitionTemplate", OnCreateDefinitionTemplate, CanCreateScript);
+		// _contextMenu.AddItem("Create/DefinitionAsset",    OnCreateDefinitionAsset,    CanCreateAsset);
 		
 		_contextMenu.AddItem("Edit/Rename", OnContextMenuEditRename, IsChangeOfContextItemPossible);
 		_contextMenu.AddItem("Edit/Copy",   OnContextMenuEditCopy,   IsChangeOfContextItemPossible);
@@ -183,56 +183,56 @@ public sealed class ToolProjectView : Tool
 	}
 
 	#region Create
-	private void OnCreateDefinitionTemplate()
-	{
-		_createScriptDialog.Open("Definition template", _contextMenuActivatedAt!.RelativeDirectoryPath, OnCreateDefinitionTemplateFile);
-	}
-	private void OnCreateDefinitionTemplateFile(string path, string namespaceName, string className)
-	{
-		StudioModel.Project.PauseWatchers();
-
-		try
-		{
-			DefinitionTemplate template = new(namespaceName, className);
-			template.WriteToFile(path, null, StudioModel.Project);
-		}
-		catch (Exception e)
-		{
-			ConsoleViewModel.LogException(e.ToString());
-		}
-
-		StudioModel.Project.ResumeWatchers();
-	}
-
-	private void OnCreateDefinitionAsset()
-	{
-		_createDefinitionAssetDialog.Open(_contextMenuActivatedAt!.RelativeDirectoryPath, OnCreateDefinitionAssetFile);
-	}
-
-	private void OnCreateDefinitionAssetFile(string path, string name, ProjectScriptFileNode templateFileNode)
-	{
-		StudioModel.Project.PauseWatchers();
-		
-		try
-		{
-			DefinitionTemplate? template = DefinitionTemplate.CreateFromFile(templateFileNode.AbsolutePath, StudioModel.Project, false);
-			if (template == null)
-			{
-				ConsoleViewModel.LogError($"Cannot read template file: {templateFileNode.AbsolutePath}");
-			}
-			else
-			{
-				DefinitionAsset asset = new (template);
-				asset.WriteToFile(path);
-			}
-		}
-		catch (Exception e)
-		{
-			ConsoleViewModel.LogException(e.ToString());
-		}
-
-		StudioModel.Project.ResumeWatchers();
-	}
+	// private void OnCreateDefinitionTemplate()
+	// {
+	// 	_createScriptDialog.Open("Definition template", _contextMenuActivatedAt!.RelativeDirectoryPath, OnCreateDefinitionTemplateFile);
+	// }
+	// private void OnCreateDefinitionTemplateFile(string path, string namespaceName, string className)
+	// {
+	// 	StudioModel.Project.PauseWatchers();
+	//
+	// 	try
+	// 	{
+	// 		DefinitionTemplate template = new(namespaceName, className);
+	// 		template.WriteToFile(path, null, StudioModel.Project);
+	// 	}
+	// 	catch (Exception e)
+	// 	{
+	// 		ConsoleViewModel.LogException(e.ToString());
+	// 	}
+	//
+	// 	StudioModel.Project.ResumeWatchers();
+	// }
+	//
+	// private void OnCreateDefinitionAsset()
+	// {
+	// 	_createDefinitionAssetDialog.Open(_contextMenuActivatedAt!.RelativeDirectoryPath, OnCreateDefinitionAssetFile);
+	// }
+	//
+	// private void OnCreateDefinitionAssetFile(string path, string name, ProjectScriptFileNode templateFileNode)
+	// {
+	// 	StudioModel.Project.PauseWatchers();
+	// 	
+	// 	try
+	// 	{
+	// 		DefinitionTemplate? template = DefinitionTemplate.CreateFromFile(templateFileNode.AbsolutePath, StudioModel.Project, false);
+	// 		if (template == null)
+	// 		{
+	// 			ConsoleViewModel.LogError($"Cannot read template file: {templateFileNode.AbsolutePath}");
+	// 		}
+	// 		else
+	// 		{
+	// 			DefinitionAsset asset = new (template);
+	// 			asset.WriteToFile(path);
+	// 		}
+	// 	}
+	// 	catch (Exception e)
+	// 	{
+	// 		ConsoleViewModel.LogException(e.ToString());
+	// 	}
+	//
+	// 	StudioModel.Project.ResumeWatchers();
+	// }
 
 	#endregion
 

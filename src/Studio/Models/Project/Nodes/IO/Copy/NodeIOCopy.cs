@@ -1,3 +1,4 @@
+using Mine.Framework;
 using RedHerring.Studio.Models.Project.FileSystem;
 using RedHerring.Studio.Models.Project.Imports;
 using RedHerring.Studio.Models.ViewModels.Console;
@@ -7,6 +8,8 @@ namespace Mine.Studio;
 [NodeIO]
 public sealed class NodeIOCopy : NodeIO<byte[]>
 {
+	public override string ReferenceType => nameof(AssetReference);
+	
 	public NodeIOCopy(ProjectNode owner) : base(owner)
 	{
 	}

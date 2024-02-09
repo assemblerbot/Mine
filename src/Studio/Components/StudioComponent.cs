@@ -123,7 +123,6 @@ public sealed class StudioComponent : Component, IUpdatable
 		_menu.AddItem("View/Console",     OnViewConsoleClicked);
 		_menu.AddItem("View/Inspector",   OnViewInspectorClicked);
 		_menu.AddItem("View/Plugins",     OnViewPluginsClicked);
-		_menu.AddItem("View/Definitions", OnViewDefinitionsClicked);
 
 		_menu.AddItem("Project/Update engine files", OnProjectUpdateEngineFilesClicked, () => _studioModel.Project.IsOpened);
 		_menu.AddItem("Project/Clear Resources",     OnProjectClearResourcesClicked,    () => _studioModel.Project.IsOpened);
@@ -202,11 +201,6 @@ public sealed class StudioComponent : Component, IUpdatable
 		_toolManager.Activate(ToolPlugins.ToolName);
 	}
 	
-	private void OnViewDefinitionsClicked()
-	{
-		_toolManager.Activate(ToolDefinitions.ToolName);
-	}
-
 	private void OnProjectUpdateEngineFilesClicked()
 	{
 		_studioModel.Project.UpdateEngineFiles();

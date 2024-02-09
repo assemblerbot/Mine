@@ -7,9 +7,9 @@ namespace RedHerring.Studio.Models;
 [Serializable, SerializedClassId("project-settings")]
 public sealed class ProjectSettings
 {
-	// TODO - add template project settings json to template, so the namespace will be renamed to project name
-	public string AssetsDatabaseSourcePath = "AssetsDatabase.cs";
-	public string AssetsDatabaseNamespace  = "MyGame";
+	public string AssetDatabaseSourcePath = "AssetDatabase.cs";
+	public string AssetDatabaseNamespace  = "MyGame";
+	public string AssetDatabaseClass      = "AssetDatabase";
 	
 	[ReadOnlyInInspector, NonSerialized] public string ProjectFolderPath = "";
 

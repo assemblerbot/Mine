@@ -1,21 +1,22 @@
 namespace Mine.Framework;
 
 [Serializable]
-public sealed class AssetReference : Reference
+public sealed class AssetReference : Reference<byte[]>
 {
-	public byte[]? Bytes = null;
-	
-	public override bool Load()
+	public AssetReference(string path) : base(path)
+	{
+	}
+
+	public override byte[]? LoadValue()
 	{
 		try
 		{
-			Bytes = Engine.Resources.ReadResource(Path);
+			byte[]? bytes = Engine.Resources.ReadResource(Path);
+			return bytes;
 		}
 		catch (Exception e)
 		{
-			return false;
+			return null;
 		}
-
-		return true;
 	}
 }

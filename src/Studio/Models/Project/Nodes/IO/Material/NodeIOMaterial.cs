@@ -7,6 +7,8 @@ namespace Mine.Studio;
 [NodeIO(ProjectNodeType.AssetMaterial)]
 public sealed class NodeIOMaterial : NodeIO<Material>
 {
+	public override string ReferenceType => nameof(AssetReference); // TODO - remove ?
+	
 	public NodeIOMaterial(ProjectNode owner) : base(owner)
 	{
 	}

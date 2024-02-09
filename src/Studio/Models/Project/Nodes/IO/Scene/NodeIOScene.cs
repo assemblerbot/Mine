@@ -11,6 +11,8 @@ namespace Mine.Studio.Scene;
 [NodeIO(ProjectNodeType.AssetScene)]
 public sealed class NodeIOScene : NodeIO<Assimp.Scene>
 {
+	public override string ReferenceType => nameof(SceneReference);
+	
 	public NodeIOScene(ProjectNode owner) : base(owner)
 	{
 	}

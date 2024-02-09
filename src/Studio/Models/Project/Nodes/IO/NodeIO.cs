@@ -6,6 +6,7 @@ namespace Mine.Studio;
 public abstract class NodeIO
 {
 	protected readonly ProjectNode Owner;
+	public abstract    string      ReferenceType { get; }
 
 	protected NodeIO(ProjectNode owner)
 	{
@@ -14,7 +15,7 @@ public abstract class NodeIO
 
 	public abstract void UpdateCache();
 	public abstract void ClearCache();
-	
+
 	public abstract string? Import(string resourcesRootPath); // import file to Resources, returns relative path to resource or null
 
 	public abstract NodeIOSettings CreateImportSettings();

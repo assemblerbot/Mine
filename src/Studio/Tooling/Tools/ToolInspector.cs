@@ -46,6 +46,9 @@ public sealed class ToolInspector : Tool
 			}
 
 			_inspector.Update();
+
+			ApplyChanges();
+
 			Gui.End();
 		}
 		else
@@ -55,10 +58,26 @@ public sealed class ToolInspector : Tool
 				UnsubscribeFromChange();
 			}
 		}
-
+		
 		return !isOpen;
 	}
-	
+
+	private void ApplyChanges()
+	{
+		if (!_studioModel.CommandHistory.WasChange)
+		{
+			return;
+		}
+
+		IReadOnlyList<ISelectable> selection = StudioModel.Selection.GetAllSelectedTargets();
+		foreach (ISelectable selectable in selection)
+		{
+			selectable.ApplyChanges();
+		}
+
+		_studioModel.CommandHistory.ResetChange();
+	}
+
 	#region Event handlers
 
 	private void SubscribeToChange()

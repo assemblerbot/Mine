@@ -6,17 +6,17 @@ public sealed class SelectionViewModel
 	public struct SelectionChanged : IStudioModelEvent { }
 	#endregion
 	
-	private readonly StudioModelEventAggregator                _eventAggregator;
-	private          Dictionary<string, WeakReference<object>> _selection = new();
+	private readonly StudioModelEventAggregator                     _eventAggregator;
+	private          Dictionary<string, WeakReference<ISelectable>> _selection = new();
 	
 	public SelectionViewModel(StudioModelEventAggregator eventAggregator)
 	{
 		_eventAggregator = eventAggregator;
 	}
 
-	public void Select(string id, object target)
+	public void Select(string id, ISelectable target)
 	{
-		_selection[id] = new WeakReference<object>(target);
+		_selection[id] = new WeakReference<ISelectable>(target);
 		_eventAggregator.Trigger(new SelectionChanged());
 	}
 	
@@ -26,7 +26,7 @@ public sealed class SelectionViewModel
 		_eventAggregator.Trigger(new SelectionChanged());
 	}
 
-	public void Flip(string id, object target)
+	public void Flip(string id, ISelectable target)
 	{
 		if (_selection.ContainsKey(id))
 		{
@@ -46,24 +46,24 @@ public sealed class SelectionViewModel
 
 	public bool IsSelected(string id)
 	{
-		return _selection.TryGetValue(id, out WeakReference<object>? targetRef) && targetRef.TryGetTarget(out _);
+		return _selection.TryGetValue(id, out WeakReference<ISelectable>? targetRef) && targetRef.TryGetTarget(out _);
 	}
 
 	public object? SelectedTarget(string id)
 	{
-		return _selection.TryGetValue(id, out WeakReference<object>? targetRef) ? (targetRef.TryGetTarget(out object? target) ? target : null) : null;
+		return _selection.TryGetValue(id, out WeakReference<ISelectable>? targetRef) ? (targetRef.TryGetTarget(out ISelectable? target) ? target : null) : null;
 	}
 	
-	public IReadOnlyList<object> GetAllSelectedTargets()
+	public IReadOnlyList<ISelectable> GetAllSelectedTargets()
 	{
-		return _selection.Values.Select(reference => reference.TryGetTarget(out object? target) ? target : null).Where(target => target != null).ToList()!;
+		return _selection.Values.Select(reference => reference.TryGetTarget(out ISelectable? target) ? target : null).Where(target => target != null).ToList()!;
 	}
 
 	public object? GetFirstSelectedTarget()
 	{
-		foreach (WeakReference<object> reference in _selection.Values)
+		foreach (WeakReference<ISelectable> reference in _selection.Values)
 		{
-			if (reference.TryGetTarget(out object? target))
+			if (reference.TryGetTarget(out ISelectable? target))
 			{
 				return target;
 			}
@@ -75,5 +75,10 @@ public sealed class SelectionViewModel
 	public int GetSelectedCount()
 	{
 		return GetAllSelectedTargets().Count;
+	}
+
+	public void SaveAllSelectedTargets()
+	{
+		
 	}
 }

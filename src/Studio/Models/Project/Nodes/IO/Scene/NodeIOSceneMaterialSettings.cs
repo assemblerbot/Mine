@@ -7,7 +7,6 @@ namespace Mine.Studio;
 public sealed class NodeIOSceneMaterialSettings
 {
 	[ReadOnlyInInspector] public string                       Name;
-	public                       StudioAssetMaterialReference Material;
 }
 
 #region Migration
@@ -19,6 +18,5 @@ public interface INodeIOSceneMaterialSettingsMigratable;
 public class NodeIOSceneMaterialSettings_000 : INodeIOSceneMaterialSettingsMigratable
 {
 	public string                                  Name;
-	public IStudioAssetMaterialReferenceMigratable Material;
 }
 #endregion

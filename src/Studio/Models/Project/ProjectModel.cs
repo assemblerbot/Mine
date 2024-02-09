@@ -25,7 +25,7 @@ public sealed class ProjectModel
 	private const           string ASSETS_FOLDER_NAME  = "Assets";
 	private const           string SCRIPTS_FOLDER_NAME = "GameLibrary";
 	private const           string SETTINGS_FILE_NAME  = "Project.json";
-	private static readonly char[] _slash             = {'/', '\\'};
+	private static readonly char[] _slash              = {'/', '\\'};
 	
 	public static           Assembly      Assembly => typeof(ProjectModel).Assembly; 
 	private static readonly HashAlgorithm _hashAlgorithm = SHA1.Create();
@@ -46,7 +46,7 @@ public sealed class ProjectModel
 	private ProjectSettings? _projectSettings;
 	public  ProjectSettings  ProjectSettings => _projectSettings!;
 
-	private AssetDatabase? _resourcesAssetDatabase;
+	private StudioAssetDatabase? _assetDatabase;
 
 	public bool IsOpened               => !string.IsNullOrEmpty(_projectSettings?.ProjectFolderPath);
 	public bool NeedsUpdateEngineFiles { get; private set; } = false;
@@ -61,7 +61,7 @@ public sealed class ProjectModel
 	
 	public ProjectModel(StudioModelEventAggregator eventAggregator)
 	{
-		_eventAggregator  = eventAggregator;
+		_eventAggregator = eventAggregator;
 	}
 
 	public void Cancel()
@@ -132,7 +132,7 @@ public sealed class ProjectModel
 		_assetsFolder  = null;
 		_scriptsFolder = null;
 		_nodesIndex.Clear();
-		_resourcesAssetDatabase = null;
+		_assetDatabase = null;
 		_eventAggregator.Trigger(new ClosedEvent());
 	}
 	
@@ -162,8 +162,8 @@ public sealed class ProjectModel
 			// load / create settings
 			LoadSettings(projectPath);
 			
-			// load / create asset database
-			_resourcesAssetDatabase = AssetDatabase.LoadOrCreate(_projectSettings!.AbsoluteResourcesPath);
+			// create asset database
+			_assetDatabase = new StudioAssetDatabase();
 
 			// read assets
 			try
@@ -570,39 +570,6 @@ public sealed class ProjectModel
 		}
 	}
 	
-	public void UpdateDefinitionAssets(DefinitionTemplate definitionTemplate)
-	{
-		DefinitionTemplate definitionTemplateCopy = definitionTemplate.CreateCopy(this); 
-		
-		lock (ProjectTreeLock)
-		{
-			_assetsFolder!.TraverseRecursive(
-				node =>
-				{
-					if (node.Type != ProjectNodeType.AssetDefinition)
-					{
-						return;
-					}
-
-					NodeIOAssetDefinition? io = node.GetNodeIO<NodeIOAssetDefinition>();
-					if (io?.Asset is null)
-					{
-						return;
-					}
-
-					if (io.Asset.Template.ClassName != definitionTemplate.ClassName || io.Asset.Template.NamespaceName != definitionTemplate.NamespaceName)
-					{
-						return;
-					}
-
-					ProjectTask task = CreateDefinitionUpdateTask(_assetsFolder, node.RelativePath, definitionTemplateCopy);
-					EnqueueProjectTask(task);
-				},
-				TraverseFlags.Files,
-				default
-			);
-		}
-	}
 	#endregion
 	
 	#region Script manipulation
@@ -813,7 +780,7 @@ public sealed class ProjectModel
 			{
 				lock (ProjectTreeLock)
 				{
-					_resourcesAssetDatabase!.Save(_projectSettings!.AbsoluteResourcesPath);
+					_assetDatabase!.Save(_projectSettings!);
 				}
 			}
 		);
@@ -893,10 +860,11 @@ public sealed class ProjectModel
 
 					try
 					{
-						string? resourcePath = node.GetNodeIO<NodeIO>()!.Import(_projectSettings!.AbsoluteResourcesPath);
+						NodeIO  io           = node.GetNodeIO<NodeIO>()!;
+						string? resourcePath = io.Import(_projectSettings!.AbsoluteResourcesPath);
 						if (resourcePath is not null)
 						{
-							_resourcesAssetDatabase![node.Meta.Guid!] = new AssetDatabaseItem(node.Meta.Guid!, resourcePath, true);
+							_assetDatabase![node.Meta.Guid!] = new StudioAssetDatabaseItem(node.Meta.Guid!, node.Meta.Field, resourcePath, io.ReferenceType);
 						}
 					}
 					catch (Exception e)
@@ -926,7 +894,7 @@ public sealed class ProjectModel
 						return;
 					}
 
-					// check file
+					// check folder
 					if (!Directory.Exists(node.AbsolutePath))
 					{
 						return;
@@ -944,7 +912,10 @@ public sealed class ProjectModel
 					}
 					
 					// add to database
-					_resourcesAssetDatabase![node.Meta.Guid!] = new AssetDatabaseItem(node.Meta.Guid!, node.RelativePath, false);
+					if (node != root)
+					{
+						_assetDatabase![node.Meta.Guid!] = new StudioAssetDatabaseItem(node.Meta.Guid!, node.Meta.Field, node.RelativePath, nameof(FolderReference));
+					}
 				}
 			}
 		);
@@ -1092,41 +1063,5 @@ public sealed class ProjectModel
 		);
 	}
 
-	private ProjectTask CreateDefinitionUpdateTask(ProjectRootNode root, string path, DefinitionTemplate template)
-	{
-		return new ProjectTask(
-			cancellationToken =>
-			{
-				lock (ProjectTreeLock)
-				{
-					ProjectNode? node = root.FindNode(path);
-					if (node == null || !node.Exists || node.Type != ProjectNodeType.AssetDefinition)
-					{
-						return;
-					}
-
-					NodeIOAssetDefinition? io = node.GetNodeIO<NodeIOAssetDefinition>();
-					if (io is null)
-					{
-						return;
-					}
-
-					io.UpdateCache();
-					if (io.Asset is null)
-					{
-						return;
-					}
-
-					if (!io.Asset.UpdateTemplate(template))
-					{
-						return;
-					}
-
-					io.Asset.WriteToFile(node.AbsolutePath);
-					ConsoleViewModel.LogInfo($"Definition asset '{node.RelativePath}' updated.");
-				}
-			}
-		);
-	}
 	#endregion
 }

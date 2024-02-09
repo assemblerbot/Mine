@@ -1,15 +1,16 @@
 using Migration;
 using Mine.Studio;
+using RedHerring.Studio.Models.ViewModels;
 using RedHerring.Studio.UserInterface.Attributes;
 
 namespace RedHerring.Studio.Models.Project.FileSystem;
 
-public abstract class ProjectNode
+public abstract class ProjectNode : ISelectable
 {
 	// TODO - type of node should be System.Type - not enum and it should contain the type of referenced class
 	
 	[HideInInspector]     public readonly ProjectModel    Project;
-	[ReadOnlyInInspector] public          ProjectNodeType Type = ProjectNodeType.Uninitialized;
+	[ReadOnlyInInspector] public          ProjectNodeType Type        = ProjectNodeType.Uninitialized;
 	[HideInInspector]     public          Type?           ContentType = null;
 
 	public          string Name { get; }
@@ -19,7 +20,7 @@ public abstract class ProjectNode
 
 	[ReadOnlyInInspector] public bool HasMetaFile;
 	
-	public Metadata? Meta;
+	public    Metadata? Meta;
 	protected NodeIO?   IO;
 
 	public          string Extension => Path.GetExtension(AbsolutePath).ToLower(); // cache if needed
@@ -27,7 +28,7 @@ public abstract class ProjectNode
 
 	protected ProjectNode(ProjectModel project, string name, string absolutePath, string relativePath, bool hasMetaFile)
 	{
-		Project = project;
+		Project      = project;
 		Name         = name;
 		AbsolutePath = absolutePath;
 		RelativePath = relativePath;
@@ -39,6 +40,11 @@ public abstract class ProjectNode
 	public void ResetMetaHash()
 	{
 		Meta?.SetHash(null);
+	}
+
+	public void ApplyChanges()
+	{
+		UpdateMetaFile();
 	}
 
 	public void UpdateMetaFile()

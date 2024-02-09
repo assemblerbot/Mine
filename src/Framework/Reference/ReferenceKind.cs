@@ -8,11 +8,9 @@ public enum ReferenceKind
 	AssetImage,
 	AssetMesh,
 	AssetBinary,
-	AssetDefinition,
 	
 	ScriptFolder,
 	ScriptFile,
-	ScriptDefinition,
 }
 
 public static class ReferenceKindExtensions
@@ -23,15 +21,13 @@ public static class ReferenceKindExtensions
 			type == ReferenceKind.AssetFolder ||
 			type == ReferenceKind.AssetImage  ||
 			type == ReferenceKind.AssetMesh   ||
-			type == ReferenceKind.AssetBinary ||
-			type == ReferenceKind.AssetDefinition;
+			type == ReferenceKind.AssetBinary;
 	}
 
 	public static bool IsScriptsRelated(this ReferenceKind type)
 	{
 		return
 			type == ReferenceKind.ScriptFolder ||
-			type == ReferenceKind.ScriptFile   ||
-			type == ReferenceKind.ScriptDefinition;
+			type == ReferenceKind.ScriptFile;
 	}
 }

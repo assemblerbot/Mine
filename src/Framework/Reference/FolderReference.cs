@@ -3,8 +3,7 @@ namespace Mine.Framework;
 [Serializable]
 public sealed class FolderReference : Reference
 {
-	public override bool Load()
+	public FolderReference(string path) : base(path)
 	{
-		return true;
 	}
 }

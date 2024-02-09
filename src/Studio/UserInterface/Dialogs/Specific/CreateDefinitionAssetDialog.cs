@@ -7,6 +7,7 @@ using RedHerring.Studio.UserInterface.Attributes;
 
 namespace Mine.Studio;
 
+// todo - remove or rework to something useful
 public class CreateDefinitionAssetDialog
 {
 	private readonly ProjectModel _projectModel;
@@ -78,16 +79,16 @@ public class CreateDefinitionAssetDialog
 	{
 		_templates.Clear();
 
-		_projectModel.ScriptsFolder!.TraverseRecursive(
-			node =>
-			{
-				if (node.Type == ProjectNodeType.ScriptDefinition)
-				{
-					_templates.Add((ProjectScriptFileNode)node);
-				}
-			},
-			TraverseFlags.Files,
-			new CancellationToken()
-		);
+		// _projectModel.ScriptsFolder!.TraverseRecursive(
+		// 	node =>
+		// 	{
+		// 		if (node.Type == ProjectNodeType.ScriptDefinition)
+		// 		{
+		// 			_templates.Add((ProjectScriptFileNode)node);
+		// 		}
+		// 	},
+		// 	TraverseFlags.Files,
+		// 	new CancellationToken()
+		// );
 	}
 }

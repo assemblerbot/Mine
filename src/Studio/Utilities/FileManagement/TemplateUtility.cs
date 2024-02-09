@@ -17,7 +17,7 @@ public static class TemplateUtility
 		
 		File.Move(Path.Combine(targetPath, "Template.sln"), Path.Combine(targetPath, $"{projectName}.sln"));
 		
-		FileUtility.ReplaceTextInFilesRecursive(targetPath, fileName => fileName.EndsWith(".cs"), "Template", projectName);
+		FileUtility.ReplaceTextInFilesRecursive(targetPath, fileName => fileName.EndsWith(".cs") || fileName.EndsWith(".json"), "Template", projectName);
 
 		//UpdateLibrariesFromTemplate(targetPath);
 	}

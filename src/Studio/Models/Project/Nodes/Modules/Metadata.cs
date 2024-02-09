@@ -7,8 +7,9 @@ namespace RedHerring.Studio.Models.Project.FileSystem;
 [Serializable, SerializedClassId("0714ba10-3363-4221-ae09-53ad37dc2628")]
 public class Metadata
 {
-	[ReadOnlyInInspector] public string? Guid = null;
-	[ReadOnlyInInspector] public string? Hash = null;
+	[ReadOnlyInInspector] public string? Guid  = null;
+	[ReadOnlyInInspector] public string? Hash  = null;
+	public                       string? Field = null;
 
 	public NodeIOSettings? NodeIOSettings = null;
 
@@ -49,8 +50,8 @@ public class Metadata_001 : IMetadataMigratable
 	
 	public void Migrate(Metadata_000 prev)
 	{
-		Guid = prev.Guid;
-		Hash = null; // to force reimport
+		Guid  = prev.Guid;
+		Hash  = null; // to force reimport
 		
 		NodeIOSettings = new List<INodeIOSettingsMigratable>();
 	}
@@ -61,13 +62,15 @@ public class Metadata_002 : IMetadataMigratable
 {
 	public string? Guid;
 	public string? Hash;
+	public string? Field;
 	
 	[MigrateField] public INodeIOSettingsMigratable? NodeIOSettings;
 	
 	public void Migrate(Metadata_001 prev)
 	{
-		Guid = prev.Guid;
-		Hash = null; // to force reimport
+		Guid  = prev.Guid;
+		Hash  = null; // to force reimport
+		Field = null;
 		
 		NodeIOSettings = null;
 	}

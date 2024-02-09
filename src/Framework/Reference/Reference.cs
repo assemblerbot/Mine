@@ -1,9 +1,23 @@
 namespace Mine.Framework;
 
-[Serializable]
 public abstract class Reference
 {
-	public string Path;
+	public readonly string Path;
 
-	public abstract bool Load();
+	public Reference(string path)
+	{
+		Path = path;
+	}
+}
+
+public abstract class Reference<T> : Reference where T : class
+{
+	private T? _value = null;
+	public  T? Value => _value ??= LoadValue();
+	
+	protected Reference(string path) : base(path)
+	{
+	}
+
+	public abstract T? LoadValue();
 }

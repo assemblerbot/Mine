@@ -1,12 +1,11 @@
 namespace Mine.Framework;
 
 [Serializable]
-public sealed class MeshReference : Reference
+public sealed class SceneReference : Reference
 {
 	//public          Mesh          ReferencedMesh;
-	public override bool Load()
+
+	public SceneReference(string path) : base(path)
 	{
-		// TODO
-		return true;
 	}
 }

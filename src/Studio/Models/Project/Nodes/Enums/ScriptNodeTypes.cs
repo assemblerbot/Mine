@@ -2,5 +2,5 @@ namespace RedHerring.Studio.Models.Project.FileSystem;
 
 public static class ScriptNodeTypes
 {
-	public const string DEFINITION = "DefinitionTemplate";
+	//public const string DEFINITION = "DefinitionTemplate";
 }
