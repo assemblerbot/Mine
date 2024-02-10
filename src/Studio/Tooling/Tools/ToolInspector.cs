@@ -46,9 +46,7 @@ public sealed class ToolInspector : Tool
 			}
 
 			_inspector.Update();
-
 			ApplyChanges();
-
 			Gui.End();
 		}
 		else

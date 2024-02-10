@@ -28,9 +28,6 @@ public sealed class Engine
 	public static Resources Resources => _instance._resources;
 
 	#region Paths
-	private const string _resourcesDirectory = "Resources";
-	public static string ResourcesPath       = _resourcesDirectory;
-	
 	public static readonly string? HomeDirectory = 
 		(Environment.OSVersion.Platform == PlatformID.Unix || Environment.OSVersion.Platform == PlatformID.MacOSX)
 			? (Environment.GetEnvironmentVariable("XDG_CONFIG_HOME") ?? "~/Library/Application Support")
@@ -146,9 +143,11 @@ public sealed class Engine
 		{
 			if (arguments[i] == "--resources")
 			{
-				ResourcesPath = arguments[++i];
+				Resources.RootPath = arguments[++i];
 				continue;
 			}
+			
+			
 		}
 	}
 

@@ -219,14 +219,14 @@ public sealed class ProjectModel
 		lock (ProjectTreeLock)
 		{
 			_assetsFolder!.TraverseRecursive(
-				node => EnqueueProjectTask(CreateImportFileTask(_assetsFolder!, node.RelativePath)),
-				TraverseFlags.Files,
+				node => EnqueueProjectTask(CreateImportFolderTask(_assetsFolder!, node.RelativePath)),
+				TraverseFlags.Directories,
 				default
 			);
 
 			_assetsFolder!.TraverseRecursive(
-				node => EnqueueProjectTask(CreateImportFolderTask(_assetsFolder!, node.RelativePath)),
-				TraverseFlags.Directories,
+				node => EnqueueProjectTask(CreateImportFileTask(_assetsFolder!, node.RelativePath)),
+				TraverseFlags.Files,
 				default
 			);
 
@@ -413,10 +413,21 @@ public sealed class ProjectModel
 			                   };
 			return;
 		}
-		
-		byte[] json = File.ReadAllBytes(path);
-		ProjectSettings settings = MigrationSerializer.Deserialize<ProjectSettings, IStudioSettingsMigratable>(StudioGlobals.MigrationManager.TypesHash, json, SerializedDataFormat.JSON, StudioGlobals.MigrationManager, false, Assembly);
-		settings.ProjectFolderPath = projectPath;
+
+		ProjectSettings? settings = null;
+		try
+		{
+			byte[] json = File.ReadAllBytes(path);
+			settings = MigrationSerializer.Deserialize<ProjectSettings, IStudioSettingsMigratable>(StudioGlobals.MigrationManager.TypesHash, json,
+				SerializedDataFormat.JSON, StudioGlobals.MigrationManager, false, Assembly);
+		}
+		catch(Exception e)
+		{
+			ConsoleViewModel.LogException(e.ToString());
+		}
+
+		settings                   ??= new ProjectSettings();
+		settings.ProjectFolderPath =   projectPath;
 		
 		_projectSettings = settings;
 	}
@@ -540,7 +551,7 @@ public sealed class ProjectModel
 		{
 			int    index      = eventRelativePath.LastIndexOfAny(_slash);
 			string parentPath = index == -1 ? "" : eventRelativePath.Substring(0, index);
-			string nodeName   = eventRelativePath.Substring(index + 1);
+			string nodeName   = index == -1 ? eventRelativePath : eventRelativePath.Substring(index + 1);
 			EnqueueProjectTaskFromWatcher(CreateDeleteNodeTask(_assetsFolder!, parentPath, nodeName));
 		}
 	}
@@ -864,7 +875,7 @@ public sealed class ProjectModel
 						string? resourcePath = io.Import(_projectSettings!.AbsoluteResourcesPath);
 						if (resourcePath is not null)
 						{
-							_assetDatabase![node.Meta.Guid!] = new StudioAssetDatabaseItem(node.Meta.Guid!, node.Meta.Field, resourcePath, io.ReferenceType);
+							_assetDatabase![node.Meta.Guid!] = new StudioAssetDatabaseItem(node.Meta.Guid!, node.Meta.ReferenceField, node.RelativePath, io.ReferenceType);
 						}
 					}
 					catch (Exception e)
@@ -914,7 +925,7 @@ public sealed class ProjectModel
 					// add to database
 					if (node != root)
 					{
-						_assetDatabase![node.Meta.Guid!] = new StudioAssetDatabaseItem(node.Meta.Guid!, node.Meta.Field, node.RelativePath, nameof(FolderReference));
+						_assetDatabase![node.Meta.Guid!] = new StudioAssetDatabaseItem(node.Meta.Guid!, node.Meta.ReferenceField, node.RelativePath, nameof(FolderReference));
 					}
 				}
 			}

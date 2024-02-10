@@ -9,7 +9,7 @@ public class Metadata
 {
 	[ReadOnlyInInspector] public string? Guid  = null;
 	[ReadOnlyInInspector] public string? Hash  = null;
-	public                       string? Field = null;
+	public                       string? ReferenceField = null;
 
 	public NodeIOSettings? NodeIOSettings = null;
 
@@ -62,7 +62,7 @@ public class Metadata_002 : IMetadataMigratable
 {
 	public string? Guid;
 	public string? Hash;
-	public string? Field;
+	public string? ReferenceField;
 	
 	[MigrateField] public INodeIOSettingsMigratable? NodeIOSettings;
 	
@@ -70,7 +70,7 @@ public class Metadata_002 : IMetadataMigratable
 	{
 		Guid  = prev.Guid;
 		Hash  = null; // to force reimport
-		Field = null;
+		ReferenceField = null;
 		
 		NodeIOSettings = null;
 	}

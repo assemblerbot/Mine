@@ -7,7 +7,7 @@ public sealed class SelectionViewModel
 	#endregion
 	
 	private readonly StudioModelEventAggregator                     _eventAggregator;
-	private          Dictionary<string, WeakReference<ISelectable>> _selection = new();
+	private readonly Dictionary<string, WeakReference<ISelectable>> _selection = new();
 	
 	public SelectionViewModel(StudioModelEventAggregator eventAggregator)
 	{

@@ -5,6 +5,8 @@ namespace Mine.Framework;
 public sealed class Resources
 {
 	private const string DefaultResourcePackageExtension = ".zip";
+	private const string ResourcesDirectory              = "Resources";
+	public static string RootPath                        = ResourcesDirectory;
 	
 	private readonly List<string>                           _resourcePackages   = new();
 	private readonly Dictionary<string, ResourceDescriptor> _resourceDictionary = new();
@@ -66,13 +68,13 @@ public sealed class Resources
 	#region Scanning
 	private void ScanResourcePackages()
 	{
-		if (!Directory.Exists(Engine.ResourcesPath))
+		if (!Directory.Exists(RootPath))
 		{
 			Console.WriteLine("Resources folder not found!");
 			return;
 		}
 
-		foreach (string fileName in Directory.EnumerateFiles(Engine.ResourcesPath))
+		foreach (string fileName in Directory.EnumerateFiles(RootPath))
 		{
 			if (!fileName.EndsWith(DefaultResourcePackageExtension))
 			{
@@ -104,7 +106,7 @@ public sealed class Resources
 	
 	private void BuildDictionaryFromFiles()
 	{
-		if (!Directory.Exists(Engine.ResourcesPath))
+		if (!Directory.Exists(RootPath))
 		{
 			return;
 		}
@@ -114,9 +116,9 @@ public sealed class Resources
 
 	private void BuildDictionaryFromFilesInDirectoryRecursive(string relativePath)
 	{
-		int resourceDirectoryLength = Engine.ResourcesPath.Length + 1;
+		int resourceDirectoryLength = RootPath.Length + 1;
 		
-		string absolutePath = Path.Combine(Engine.ResourcesPath, relativePath);
+		string absolutePath = Path.Combine(RootPath, relativePath);
 		foreach (string absoluteFilePath in Directory.EnumerateFiles(absolutePath))
 		{
 			if (absoluteFilePath.EndsWith(DefaultResourcePackageExtension))

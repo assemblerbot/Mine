@@ -14,7 +14,7 @@ public sealed class ProjectSettings
 	[ReadOnlyInInspector, NonSerialized] public string ProjectFolderPath = "";
 
 	[ReadOnlyInInspector, ShowInInspector, NonSerialized] private string? _relativeResourcesPath;
-	public                  string  RelativeResourcesPath => _relativeResourcesPath ??= Engine.ResourcesPath;
+	public                  string  RelativeResourcesPath => _relativeResourcesPath ??= Resources.RootPath;
 
 	[ReadOnlyInInspector, ShowInInspector, NonSerialized] private string? _absoluteResourcesPath;
 	public                  string  AbsoluteResourcesPath => _absoluteResourcesPath ??= Path.Combine(ProjectFolderPath, RelativeResourcesPath);
@@ -35,5 +35,8 @@ public interface IProjectSettingsMigratable
 [Serializable, LatestVersion(typeof(ProjectSettings))]
 public class ProjectSettings_000 : IProjectSettingsMigratable
 {
+	public string AssetDatabaseSourcePath = null!;
+	public string AssetDatabaseNamespace = null!;
+	public string AssetDatabaseClass = null!;
 }
 #endregion

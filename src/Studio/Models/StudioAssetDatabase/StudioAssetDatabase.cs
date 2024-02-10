@@ -36,6 +36,7 @@ public sealed class StudioAssetDatabase
 			using StreamWriter writer = new(stream);
 
 			writer.WriteLine("// this file is generated in Mine Studio");
+			writer.WriteLine("using Mine.Framework;");
 			writer.WriteLine($"namespace {projectSettings.AssetDatabaseNamespace};");
 			writer.WriteLine($"public static class {projectSettings.AssetDatabaseClass}");
 			writer.WriteLine("{");
@@ -47,15 +48,15 @@ public sealed class StudioAssetDatabase
 					continue;
 				}
 
-				writer.WriteLine($"	public static {item.ReferenceType} {item.Field} = new(\"{item.Path}\");");
+				writer.WriteLine($"	public static {item.ReferenceType} {item.Field} = new(@\"{item.Path}\");");
 			}
 
 			writer.WriteLine();
 
-			writer.WriteLine("	public static Dictionary<string, Reference> Assets = {");
+			writer.WriteLine("	public static Dictionary<string, Reference> Assets = new() {");
 			foreach (StudioAssetDatabaseItem item in _items.Values)
 			{
-				writer.WriteLine($"		{{\"{item.Guid}\",new {item.ReferenceType}(\"{item.Path}\")}},");
+				writer.WriteLine($"		{{\"{item.Guid}\",new {item.ReferenceType}(@\"{item.Path}\")}},");
 			}
 			writer.WriteLine("	};");
 			

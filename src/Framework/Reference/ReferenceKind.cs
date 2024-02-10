@@ -1,5 +1,6 @@
 namespace Mine.Framework;
 
+/*
 public enum ReferenceKind
 {
 	Uninitialized,
@@ -31,3 +32,4 @@ public static class ReferenceKindExtensions
 			type == ReferenceKind.ScriptFile;
 	}
 }
+*/

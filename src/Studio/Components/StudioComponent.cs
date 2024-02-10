@@ -282,10 +282,19 @@ public sealed class StudioComponent : Component, IUpdatable
 	{
 		_showImGuiDemoWindow = !_showImGuiDemoWindow;
 	}
-	
+
+
+	private enum TestByteEnum : byte
+	{
+		Abc = 1,
+		Def = 2,
+	}
+
 	private void OnDebugTestClicked()
 	{
-		
+		TestByteEnum b = TestByteEnum.Def;
+		int          t = (int) b;
+		int          d = 0;
 	}
 	#endregion
 
