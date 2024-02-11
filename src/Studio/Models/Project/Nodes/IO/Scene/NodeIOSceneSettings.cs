@@ -1,9 +1,7 @@
 ﻿using Migration;
 using Mine.Studio;
-using RedHerring.Studio.Models.Project.FileSystem;
-using RedHerring.Studio.UserInterface.Attributes;
 
-namespace RedHerring.Studio.Models.Project.Imports;
+namespace Mine.Studio;
 
 [Serializable, SerializedClassId("ea019557-3078-4cf2-8bb1-f3ffe8d84e73")]
 public sealed class NodeIOSceneSettings : NodeIOSettings

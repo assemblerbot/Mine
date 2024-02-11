@@ -1,14 +1,9 @@
 ﻿using ImGuiNET;
 using Mine.ImGuiPlugin;
 using Mine.Studio;
-using RedHerring.Studio.Models;
-using RedHerring.Studio.Models.Project;
-using RedHerring.Studio.Models.Project.FileSystem;
-using RedHerring.Studio.Models.ViewModels.Console;
-using RedHerring.Studio.UserInterface;
 using Gui = ImGuiNET.ImGui;
 
-namespace RedHerring.Studio.Tools;
+namespace Mine.Studio;
 
 [Tool(ToolName)]
 public sealed class ToolProjectView : Tool

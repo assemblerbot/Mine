@@ -1,4 +1,4 @@
-﻿namespace RedHerring.Studio.Commands;
+﻿namespace CommandProcessorPlugin;
 
 public sealed class AnonymousCommand : Command
 {

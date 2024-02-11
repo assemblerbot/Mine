@@ -1,6 +1,4 @@
-﻿using RedHerring.Studio.Models;
-
-namespace RedHerring.Studio.Tools;
+﻿namespace Mine.Studio;
 
 public abstract class Tool
 {

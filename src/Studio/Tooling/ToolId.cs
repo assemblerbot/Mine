@@ -1,4 +1,4 @@
-﻿namespace RedHerring.Studio.Tools;
+﻿namespace Mine.Studio;
 
 public readonly struct ToolId
 {

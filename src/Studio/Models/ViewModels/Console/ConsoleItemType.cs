@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 
-namespace RedHerring.Studio.Models.ViewModels.Console;
+namespace Mine.Studio;
 
 public enum ConsoleItemType
 {

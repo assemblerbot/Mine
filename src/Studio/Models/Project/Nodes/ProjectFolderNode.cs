@@ -1,6 +1,6 @@
 using Mine.Studio;
 
-namespace RedHerring.Studio.Models.Project.FileSystem;
+namespace Mine.Studio;
 
 public class ProjectFolderNode : ProjectNode
 {

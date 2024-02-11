@@ -1,7 +1,6 @@
 ﻿using Migration;
-using RedHerring.Studio.Models.Project.FileSystem;
 
-namespace RedHerring.Studio.Models.Project.Imports;
+namespace Mine.Studio;
 
 [Serializable, SerializedClassId("d6112cef-1810-416d-b26b-9e9b75529b64")]
 public sealed class NodeIOCopySettings : NodeIOSettings

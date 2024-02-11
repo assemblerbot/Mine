@@ -1,12 +1,10 @@
 ﻿using System.Collections;
+using System.Reflection;
 using ImGuiNET;
+using Mine.ImGuiPlugin;
 using Gui = ImGuiNET.ImGui;
 
-using System.Reflection;
-using Mine.ImGuiPlugin;
-using RedHerring.Studio.UserInterface.Attributes;
-
-namespace RedHerring.Studio.UserInterface;
+namespace Mine.Studio;
 
 /*
 	Notes:

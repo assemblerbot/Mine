@@ -1,4 +1,4 @@
-﻿namespace RedHerring.Studio.Models.Project;
+﻿namespace Mine.Studio;
 
 public sealed class ProjectTask
 {

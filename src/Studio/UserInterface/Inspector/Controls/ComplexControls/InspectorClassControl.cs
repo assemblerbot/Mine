@@ -1,10 +1,8 @@
 ﻿using System.Reflection;
 using ImGuiNET;
-using Mine.Studio;
-using RedHerring.Studio.UserInterface.Attributes;
 using Gui = ImGuiNET.ImGui;
 
-namespace RedHerring.Studio.UserInterface;
+namespace Mine.Studio;
 
 /*
 	Naming, just for clarity:

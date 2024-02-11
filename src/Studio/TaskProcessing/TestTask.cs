@@ -1,4 +1,4 @@
-namespace RedHerring.Studio.TaskProcessing;
+namespace Mine.Studio;
 
 public class TestTask : ATask
 {

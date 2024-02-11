@@ -1,7 +1,5 @@
 using System.Xml;
 using Mine.Framework;
-using RedHerring.Studio.Models.Project;
-using RedHerring.Studio.Models.ViewModels.Console;
 
 namespace Mine.Studio;
 

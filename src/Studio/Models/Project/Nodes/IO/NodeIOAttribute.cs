@@ -1,5 +1,3 @@
-using RedHerring.Studio.Models.Project.FileSystem;
-
 namespace Mine.Studio;
 
 [AttributeUsage(AttributeTargets.Class)]

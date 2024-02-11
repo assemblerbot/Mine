@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
-using RedHerring.Studio.UserInterface.Attributes;
+using Mine.Studio;
 
-namespace RedHerring.Studio.UserInterface;
+namespace Mine.Studio;
 
 public class InspectorControlMap
 {

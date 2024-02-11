@@ -1,7 +1,6 @@
 using System.Text;
-using RedHerring.Studio.Models;
 
-namespace RedHerring.Studio.UserInterface;
+namespace Mine.Studio;
 
 public sealed class StatusBarMessageHandler
 {

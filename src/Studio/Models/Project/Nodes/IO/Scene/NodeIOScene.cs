@@ -2,14 +2,12 @@ using Assimp;
 using Assimp.Configs;
 using Mine.Framework;
 using OdinSerializer;
-using RedHerring.Studio.Models.Project.FileSystem;
-using RedHerring.Studio.Models.Project.Imports;
-using RedHerring.Studio.Models.ViewModels.Console;
+using Scene = Assimp.Scene;
 
-namespace Mine.Studio.Scene;
+namespace Mine.Studio;
 
 [NodeIO(ProjectNodeType.AssetScene)]
-public sealed class NodeIOScene : NodeIO<Assimp.Scene>
+public sealed class NodeIOScene : NodeIO<Scene>
 {
 	public override string ReferenceType => nameof(SceneReference);
 	
@@ -21,7 +19,7 @@ public sealed class NodeIOScene : NodeIO<Assimp.Scene>
 	{
 	}
 
-	public override Assimp.Scene? Load()
+	public override Scene? Load()
 	{
 		NodeIOSceneSettings? settings = Owner.Meta?.NodeIOSettings as NodeIOSceneSettings;
 		if (settings == null)
@@ -31,7 +29,7 @@ public sealed class NodeIOScene : NodeIO<Assimp.Scene>
 
 		AssimpContext context = new AssimpContext();
 
-		Assimp.Scene? assimpScene = context.ImportFile(
+		Scene? assimpScene = context.ImportFile(
 			Owner.AbsolutePath,
 			PostProcessSteps.Triangulate
 		);
@@ -46,7 +44,7 @@ public sealed class NodeIOScene : NodeIO<Assimp.Scene>
 		for (int i = 0; i < assimpScene.Meshes.Count; ++i)
 		{
 			// update settings
-			Assimp.Mesh assimpMesh = assimpScene.Meshes[i];
+			Mesh assimpMesh = assimpScene.Meshes[i];
 			if (i == settings.Meshes.Count)
 			{
 				settings.Meshes.Add(new NodeIOSceneMeshSettings(assimpMesh.Name));
@@ -70,7 +68,7 @@ public sealed class NodeIOScene : NodeIO<Assimp.Scene>
 		return assimpScene;
 	}
 
-	public override void Save(Assimp.Scene data)
+	public override void Save(Scene data)
 	{
 		throw new InvalidOperationException();
 	}
@@ -91,7 +89,7 @@ public sealed class NodeIOScene : NodeIO<Assimp.Scene>
 		AssimpContext context = new AssimpContext();
 		context.SetConfig(new NormalSmoothingAngleConfig(settings.NormalSmoothingAngle));
 
-		Assimp.Scene? assimpScene = context.ImportFile(
+		Scene? assimpScene = context.ImportFile(
 			Owner.AbsolutePath,
 			PostProcessSteps.Triangulate // always - only triangles are supported
 		);
@@ -102,7 +100,7 @@ public sealed class NodeIOScene : NodeIO<Assimp.Scene>
 			return null;
 		}
 
-		Mine.Framework.Scene scene = new();
+		Framework.Scene scene = new();
 		
 		// meshes ---------------------------------------
 		if (assimpScene.HasMeshes)
@@ -216,7 +214,7 @@ public sealed class NodeIOScene : NodeIO<Assimp.Scene>
 		return relativePath;
 	}
 
-	private void ImportChildNodesRecursive(SceneNode targetNode, Assimp.Node source)
+	private void ImportChildNodesRecursive(SceneNode targetNode, Node source)
 	{
 		if (source.Children == null)
 		{
@@ -235,7 +233,7 @@ public sealed class NodeIOScene : NodeIO<Assimp.Scene>
 		}
 	}
 
-	private void ImportNode(SceneNode targetNode, Assimp.Node source)
+	private void ImportNode(SceneNode targetNode, Node source)
 	{
 		targetNode.Name = source.Name;
 
@@ -271,7 +269,7 @@ public sealed class NodeIOScene : NodeIO<Assimp.Scene>
 
 		AssimpContext context = new AssimpContext();
 
-		Assimp.Scene? scene = context.ImportFile(
+		Scene? scene = context.ImportFile(
 			Owner.AbsolutePath,
 			PostProcessSteps.None
 		);
@@ -288,7 +286,7 @@ public sealed class NodeIOScene : NodeIO<Assimp.Scene>
 		for (int i = 0; i < scene.Meshes.Count; ++i)
 		{
 			// update settings
-			Assimp.Mesh assimpMesh = scene.Meshes[i];
+			Mesh assimpMesh = scene.Meshes[i];
 			if (i == sceneSettings.Meshes.Count)
 			{
 				sceneSettings.Meshes.Add(new NodeIOSceneMeshSettings(assimpMesh.Name));

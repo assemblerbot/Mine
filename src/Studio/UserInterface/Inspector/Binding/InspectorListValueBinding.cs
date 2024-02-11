@@ -1,8 +1,8 @@
 ﻿using System.Collections;
 using System.Reflection;
-using RedHerring.Studio.UserInterface.Attributes;
+using Mine.Studio;
 
-namespace RedHerring.Studio.UserInterface;
+namespace Mine.Studio;
 
 // list item binding
 public class InspectorListValueBinding : InspectorValueBinding

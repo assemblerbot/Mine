@@ -1,8 +1,7 @@
 ﻿using System.Reflection;
 using Mine.Studio;
-using RedHerring.Studio.UserInterface.Attributes;
 
-namespace RedHerring.Studio.UserInterface;
+namespace Mine.Studio;
 
 public abstract class InspectorControl
 {

@@ -1,6 +1,6 @@
 using EventAggregatorPlugin;
 
-namespace RedHerring.Studio.Models;
+namespace Mine.Studio;
 
 public interface IStudioModelEventAggregatorReadOnly : IGenericEventAggregatorReadOnly<IStudioModelEvent>
 {

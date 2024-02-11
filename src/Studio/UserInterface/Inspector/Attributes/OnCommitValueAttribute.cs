@@ -1,4 +1,4 @@
-﻿namespace RedHerring.Studio.UserInterface.Attributes;
+﻿namespace Mine.Studio;
 
 [AttributeUsage(AttributeTargets.Field)]
 public sealed class OnCommitValueAttribute : Attribute

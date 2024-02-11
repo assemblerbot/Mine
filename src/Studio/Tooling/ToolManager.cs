@@ -1,7 +1,6 @@
 ﻿using Mine.Framework;
-using RedHerring.Studio.Models;
 
-namespace RedHerring.Studio.Tools;
+namespace Mine.Studio;
 
 public sealed class ToolManager
 {

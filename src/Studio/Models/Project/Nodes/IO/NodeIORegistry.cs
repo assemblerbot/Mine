@@ -1,5 +1,4 @@
 using Mine.Framework;
-using RedHerring.Studio.Models.Project.FileSystem;
 
 namespace Mine.Studio;
 

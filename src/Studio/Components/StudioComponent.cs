@@ -1,20 +1,17 @@
 using System.Numerics;
-using System.Text.Json;
 using Assimp;
 using ImGuiNET;
 using Migration;
 using Mine.Framework;
 using Mine.ImGuiPlugin;
 using NativeFileDialogSharp;
-using OdinSerializer;
-using RedHerring.Studio.Models;
-using RedHerring.Studio.Tools;
-using RedHerring.Studio.UserInterface;
 
 namespace Mine.Studio;
 
 public sealed class StudioComponent : Component, IUpdatable
 {
+	public const string Title = "MINE Studio";
+	
 	public int GetUpdateOrder() => 0;
 
 	private readonly StudioModel _studioModel = new();
@@ -36,6 +33,8 @@ public sealed class StudioComponent : Component, IUpdatable
 	public StudioComponent()
 	{
 		_statusBarMessageHandler = new StatusBarMessageHandler(_statusBar, _studioModel);
+		_studioModel.EventAggregator.Register<ProjectModel.OpenedEvent>(OnProjectOpened);
+		_studioModel.EventAggregator.Register<ProjectModel.ClosedEvent>(OnProjectClosed);
 	}
 
 	public override void AfterAddedToWorld()
@@ -106,6 +105,18 @@ public sealed class StudioComponent : Component, IUpdatable
 		Engine.World.Add(new Entity("ImGui").AddComponent<ImGuiComponent>().Entity);
 		ImGui.GetIO().ConfigFlags |= ImGuiConfigFlags.DockingEnable;
 	}
+	
+	#region Event handlers
+	private void OnProjectOpened(ProjectModel.OpenedEvent obj)
+	{
+		Engine.Window.Title = $"{Title} - {_studioModel.Project.ProjectSettings.ProjectFolderPath}";
+	}
+
+	private void OnProjectClosed(ProjectModel.ClosedEvent obj)
+	{
+		Engine.Window.Title = Title;
+	}
+	#endregion
 	
 	#region Menu
 	private void InitMenu()

@@ -1,6 +1,4 @@
 using Mine.Framework;
-using RedHerring.Studio.Models.Project.FileSystem;
-using RedHerring.Studio.Models.Project.Imports;
 
 namespace Mine.Studio;
 

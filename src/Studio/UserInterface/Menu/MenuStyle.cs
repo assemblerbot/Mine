@@ -1,4 +1,4 @@
-namespace RedHerring.Studio.UserInterface;
+namespace Mine.Studio;
 
 public enum MenuStyle
 {

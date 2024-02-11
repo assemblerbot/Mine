@@ -1,4 +1,4 @@
-namespace Mine.Studio.PngImage;
+namespace Mine.Studio;
 
 public class NodeIOPng
 {
@@ -10,7 +10,7 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.Processing.Processors.Quantization;
 
-namespace RedHerring.Studio.Models.Project.Importers;
+namespace Mine.Studio;
 
 [Importer(".png")]
 public sealed class PngImporter : AssetImporter<PngImporterSettings>

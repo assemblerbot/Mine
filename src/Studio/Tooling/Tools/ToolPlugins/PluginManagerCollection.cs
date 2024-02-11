@@ -1,5 +1,4 @@
 using System.Text.Json;
-using RedHerring.Studio.Models.ViewModels.Console;
 
 namespace Mine.Studio;
 

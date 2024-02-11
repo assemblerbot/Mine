@@ -1,12 +1,10 @@
 ﻿using ImGuiNET;
 using Migration;
 using Mine.Framework;
-using RedHerring.Studio.Tools;
-using RedHerring.Studio.UserInterface.Attributes;
 
-namespace RedHerring.Studio.Models;
+namespace Mine.Studio;
 
-[Serializable, SerializedClassId("studio-settings-class-id")]
+[Serializable, SerializedClassId("a5e939ef-fea4-4582-80dc-c0960e4b79db")]
 public sealed class StudioSettings
 {
 	public const string DefaultTheme = "Crimson Rivers";

@@ -1,4 +1,4 @@
-﻿namespace RedHerring.Studio.UserInterface.Attributes;
+﻿namespace Mine.Studio;
 
 [AttributeUsage(AttributeTargets.Method)]
 public sealed class ButtonAttribute : Attribute

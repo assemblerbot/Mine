@@ -1,8 +1,6 @@
 using System.Numerics;
 using ImGuiNET;
-using Mine.Framework;
 using Mine.ImGuiPlugin;
-using RedHerring.Studio.Models;
 
 namespace Mine.Studio;
 
@@ -39,7 +37,7 @@ public class PluginManagerFoldout
 	private readonly string? _textUpToDate;
 	
 	public PluginManagerFoldout(
-		StudioModel studioModel,
+		StudioModel                           studioModel,
 		PluginManagerSettings                 settings,
 		PluginManagerCollections              collections,
 		PluginManagerCollections.CPluginsPair pluginsPair,

@@ -1,5 +1,5 @@
 ﻿using Migration;
-using RedHerring.Studio.UserInterface.Attributes;
+using Mine.Studio;
 
 namespace Mine.Studio;
 

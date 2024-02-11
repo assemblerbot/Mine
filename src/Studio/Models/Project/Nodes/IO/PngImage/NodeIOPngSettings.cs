@@ -2,7 +2,7 @@
 using Migration;
 using SixLabors.ImageSharp.Formats.Png;
 
-namespace RedHerring.Studio.Models.Project.Imports;
+namespace Mine.Studio;
 
 [Serializable, SerializedClassId("79e3e75f-a6c2-465b-b815-fd68fb46972a")]
 public sealed class PngNodeIOSettings : NodeIOSettings

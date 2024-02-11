@@ -1,8 +1,7 @@
 using Migration;
-using RedHerring.Studio.Models.Project.Imports;
-using RedHerring.Studio.UserInterface.Attributes;
+using Mine.Studio;
 
-namespace RedHerring.Studio.Models.Project.FileSystem;
+namespace Mine.Studio;
 
 [Serializable, SerializedClassId("0714ba10-3363-4221-ae09-53ad37dc2628")]
 public class Metadata

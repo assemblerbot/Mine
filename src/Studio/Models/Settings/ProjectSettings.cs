@@ -1,10 +1,10 @@
 ﻿using Migration;
 using Mine.Framework;
-using RedHerring.Studio.UserInterface.Attributes;
+using Mine.Studio;
 
-namespace RedHerring.Studio.Models;
+namespace Mine.Studio;
 
-[Serializable, SerializedClassId("project-settings")]
+[Serializable, SerializedClassId("2e2d4aa7-814e-4e3c-a1b9-88dff7bb51d3")]
 public sealed class ProjectSettings
 {
 	public string AssetDatabaseSourcePath = "AssetDatabase.cs";

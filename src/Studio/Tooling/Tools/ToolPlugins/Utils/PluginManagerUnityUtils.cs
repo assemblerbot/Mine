@@ -1,5 +1,3 @@
-using RedHerring.Studio.Models.ViewModels.Console;
-
 namespace Mine.Studio;
 
 public static class PluginManagerUnityUtils

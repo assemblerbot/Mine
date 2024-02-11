@@ -1,10 +1,7 @@
-﻿using Mine.Framework;
-using Mine.ImGuiPlugin;
-using RedHerring.Studio.Models;
-using RedHerring.Studio.Models.ViewModels.Console;
+﻿using Mine.ImGuiPlugin;
 using Gui = ImGuiNET.ImGui;
 
-namespace RedHerring.Studio.Tools;
+namespace Mine.Studio;
 
 [Tool(ToolName)]
 public sealed class ToolConsole : Tool

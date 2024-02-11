@@ -1,9 +1,7 @@
 using Migration;
 using Mine.Studio;
-using RedHerring.Studio.Models.ViewModels;
-using RedHerring.Studio.UserInterface.Attributes;
 
-namespace RedHerring.Studio.Models.Project.FileSystem;
+namespace Mine.Studio;
 
 public abstract class ProjectNode : ISelectable
 {

@@ -1,4 +1,4 @@
-﻿namespace RedHerring.Studio.Tools;
+﻿namespace Mine.Studio;
 
 [AttributeUsage(AttributeTargets.Class)]
 public sealed class ToolAttribute : Attribute

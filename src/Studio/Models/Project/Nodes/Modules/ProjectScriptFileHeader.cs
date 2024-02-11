@@ -1,7 +1,7 @@
 using System.Text.Json;
 using Migration;
 
-namespace RedHerring.Studio.Models.Project.FileSystem;
+namespace Mine.Studio;
 
 [Serializable, SerializedClassId("c413809d-cfeb-4083-aefb-79c1850f20e0")]
 public sealed class ProjectScriptFileHeader

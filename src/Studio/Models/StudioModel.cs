@@ -1,14 +1,7 @@
-using System.Reflection;
-using EventAggregatorPlugin;
+using CommandProcessorPlugin;
 using Migration;
-using Mine.Studio;
-using RedHerring.Studio.Commands;
-using RedHerring.Studio.Models.Project;
-using RedHerring.Studio.Models.ViewModels;
-using RedHerring.Studio.Models.ViewModels.Console;
-using RedHerring.Studio.TaskProcessing;
 
-namespace RedHerring.Studio.Models;
+namespace Mine.Studio;
 
 // main studio model
 public class StudioModel

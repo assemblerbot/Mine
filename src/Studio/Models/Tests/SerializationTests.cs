@@ -1,6 +1,6 @@
 using OdinSerializer;
 
-namespace RedHerring.Studio.Models.Tests;
+namespace Mine.Studio;
 
 [Serializable]
 public class TestClassA

@@ -1,8 +1,8 @@
 ﻿using System.Collections;
 using System.Reflection;
-using RedHerring.Studio.UserInterface.Attributes;
+using Mine.Studio;
 
-namespace RedHerring.Studio.UserInterface;
+namespace Mine.Studio;
 
 // TODO: it's dangerous to use this control in two different classes! Some kind of check is needed.
 public abstract class InspectorValueDropdownControl<T> : InspectorSingleInputControl<T>

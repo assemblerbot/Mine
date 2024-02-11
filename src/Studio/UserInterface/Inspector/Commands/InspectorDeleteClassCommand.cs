@@ -1,6 +1,6 @@
-﻿using RedHerring.Studio.Commands;
+﻿using CommandProcessorPlugin;
 
-namespace RedHerring.Studio.UserInterface;
+namespace Mine.Studio;
 
 // TODO - refactor, copy pasted
 public class InspectorDeleteClassCommand : Command

@@ -9,7 +9,7 @@ internal static class Program
 	
 	private static void Main(string[] args)
 	{
-		_engine  = new Engine(args, "MINE Studio", OnLoad, OnExit);
+		_engine  = new Engine(args, StudioComponent.Title, OnLoad, OnExit);
 		_globals = new();
 
 		_engine.Run();

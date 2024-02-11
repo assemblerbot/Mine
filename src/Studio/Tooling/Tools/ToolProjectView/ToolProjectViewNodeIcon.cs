@@ -1,7 +1,6 @@
 using Mine.ImGuiPlugin;
-using RedHerring.Studio.Models.Project.FileSystem;
 
-namespace RedHerring.Studio.Tools;
+namespace Mine.Studio;
 
 public static class ToolProjectViewNodeIcon
 {

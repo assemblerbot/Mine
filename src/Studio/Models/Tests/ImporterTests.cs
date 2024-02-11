@@ -1,6 +1,6 @@
 using Assimp;
 
-namespace RedHerring.Studio.Models.Tests;
+namespace Mine.Studio;
 
 public class ImporterTests
 {

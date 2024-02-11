@@ -1,5 +1,3 @@
-using RedHerring.Studio.Models.ViewModels.Console;
-
 namespace Mine.Studio;
 
 public static class PluginManagerFileUtils
@@ -13,7 +11,7 @@ public static class PluginManagerFileUtils
     {
         if (!sourcePathToDescriptorFile.StartsWith(sourceRootDirectory))
         {
-            throw new System.Exception("Source path is not inside source root directory!");
+            throw new Exception("Source path is not inside source root directory!");
         }
 
         string sourcePluginDirectory = Path.GetDirectoryName(sourcePathToDescriptorFile);

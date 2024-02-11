@@ -1,6 +1,6 @@
-﻿using RedHerring.Studio.Commands;
+﻿using CommandProcessorPlugin;
 
-namespace RedHerring.Studio.UserInterface;
+namespace Mine.Studio;
 
 // TODO - refactor, too many similar parts
 public sealed class InspectorInstantiateClassCommand : Command

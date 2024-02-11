@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using Gui = ImGuiNET.ImGui;
 
-namespace RedHerring.Studio.UserInterface;
+namespace Mine.Studio;
 
 public class InspectorEnumControl : InspectorSingleInputControl<Enum>
 {

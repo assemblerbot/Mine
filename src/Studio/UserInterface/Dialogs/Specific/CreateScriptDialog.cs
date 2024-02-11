@@ -1,8 +1,5 @@
+using CommandProcessorPlugin;
 using ImGuiNET;
-using RedHerring.Studio.Commands;
-using RedHerring.Studio.Models.Project;
-using RedHerring.Studio.Models.ViewModels.Console;
-using RedHerring.Studio.UserInterface.Attributes;
 
 namespace Mine.Studio;
 

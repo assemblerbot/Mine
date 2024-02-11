@@ -1,4 +1,4 @@
-﻿namespace RedHerring.Studio.Models;
+﻿namespace Mine.Studio;
 
 // TODO - temporary, just for now
 public sealed class StudioTheme

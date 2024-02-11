@@ -1,4 +1,4 @@
-﻿namespace RedHerring.Studio.Models.ViewModels;
+﻿namespace Mine.Studio;
 
 public sealed class SelectionViewModel
 {

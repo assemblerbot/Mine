@@ -1,7 +1,6 @@
 ﻿using System.Numerics;
+using CommandProcessorPlugin;
 using ImGuiNET;
-using RedHerring.Studio.Commands;
-using RedHerring.Studio.UserInterface;
 using Gui = ImGuiNET.ImGui;
 
 namespace Mine.Studio;

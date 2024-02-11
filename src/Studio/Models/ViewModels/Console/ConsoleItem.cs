@@ -1,4 +1,4 @@
-﻿namespace RedHerring.Studio.Models.ViewModels.Console;
+﻿namespace Mine.Studio;
 
 public readonly struct ConsoleItem
 {

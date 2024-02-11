@@ -1,4 +1,4 @@
-﻿namespace RedHerring.Studio.Models.Project.FileSystem;
+﻿namespace Mine.Studio;
 
 [Flags]
 public enum TraverseFlags

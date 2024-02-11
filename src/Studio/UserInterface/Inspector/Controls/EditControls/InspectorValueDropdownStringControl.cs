@@ -1,6 +1,6 @@
 ﻿using Gui = ImGuiNET.ImGui;
 
-namespace RedHerring.Studio.UserInterface;
+namespace Mine.Studio;
 
 public class InspectorValueDropdownStringControl : InspectorValueDropdownControl<string>
 {

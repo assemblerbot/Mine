@@ -1,6 +1,5 @@
 using System.Reflection;
 using Migration;
-using RedHerring.Studio.Models;
 
 namespace Mine.Studio;
 

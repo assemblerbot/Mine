@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace RedHerring.Studio.UserInterface;
+namespace Mine.Studio;
 
 // root object binding
 public class InspectorBinding

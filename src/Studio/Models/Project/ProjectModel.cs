@@ -3,12 +3,8 @@ using System.Reflection;
 using System.Security.Cryptography;
 using Migration;
 using Mine.Framework;
-using Mine.Studio;
-using OdinSerializer;
-using RedHerring.Studio.Models.Project.FileSystem;
-using RedHerring.Studio.Models.ViewModels.Console;
 
-namespace RedHerring.Studio.Models.Project;
+namespace Mine.Studio;
 
 public sealed class ProjectModel
 {

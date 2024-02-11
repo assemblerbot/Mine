@@ -1,9 +1,6 @@
 using System.Numerics;
 using ImGuiNET;
 using Mine.ImGuiPlugin;
-using RedHerring.Studio.Models;
-using RedHerring.Studio.Models.Project;
-using RedHerring.Studio.Tools;
 
 namespace Mine.Studio;
 

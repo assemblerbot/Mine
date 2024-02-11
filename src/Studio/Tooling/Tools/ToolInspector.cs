@@ -1,12 +1,8 @@
-﻿using Mine.Framework;
-using Mine.ImGuiPlugin;
-using RedHerring.Studio.Models;
-using RedHerring.Studio.Models.ViewModels;
-using RedHerring.Studio.UserInterface;
-using RedHerring.Studio.UserInterface.Attributes;
+﻿using Mine.ImGuiPlugin;
+using Mine.Studio;
 using Gui = ImGuiNET.ImGui;
 
-namespace RedHerring.Studio.Tools;
+namespace Mine.Studio;
 
 [Tool(ToolName)]
 public sealed class ToolInspector : Tool

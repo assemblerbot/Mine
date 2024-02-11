@@ -1,4 +1,4 @@
-﻿namespace RedHerring.Studio.Models.Project.FileSystem;
+﻿namespace Mine.Studio;
 
 public sealed class ProjectRootNode : ProjectFolderNode
 {
