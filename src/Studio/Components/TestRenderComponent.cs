@@ -1,7 +1,6 @@
 using System.Numerics;
 using System.Text;
 using Mine.Framework;
-using ImGuiNET;
 using Veldrid;
 using Veldrid.SPIRV;
 
@@ -135,7 +134,7 @@ void main()
 			scissorTestEnabled: false);
 
 		pipelineDescription.PrimitiveTopology = PrimitiveTopology.TriangleStrip;
-		pipelineDescription.ResourceLayouts   = System.Array.Empty<ResourceLayout>();
+		pipelineDescription.ResourceLayouts   = Array.Empty<ResourceLayout>();
 
 		pipelineDescription.ShaderSet = new ShaderSetDescription(
 			vertexLayouts: new VertexLayoutDescription[] { vertexLayout },

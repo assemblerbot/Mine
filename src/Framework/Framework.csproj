@@ -20,11 +20,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Geometry\" />
-      <Folder Include="World\BuiltInComponents\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <None Remove="Resources\Roboto-Regular.ttf" />
     </ItemGroup>
 

@@ -2,6 +2,7 @@ using Assimp;
 using Assimp.Configs;
 using Mine.Framework;
 using OdinSerializer;
+using Veldrid;
 using Scene = Assimp.Scene;
 
 namespace Mine.Studio;
@@ -110,7 +111,20 @@ public sealed class NodeIOScene : NodeIO<Scene>
 			{
 				Mesh assimpMesh = assimpScene.Meshes[i];
 
+				// sanity checks
+				if (!assimpMesh.HasVertices)
+				{
+					continue; // vertices are mandatory
+				}
+
+				if (assimpMesh.PrimitiveType != PrimitiveType.Triangle)
+				{
+					continue; // ignore this mesh
+				}
+				
 				SceneMesh mesh = new();
+
+				// at least positions are there, so it should be safe to add the mesh
 				scene.Meshes.Add(mesh);
 
 				mesh.Name        = assimpMesh.Name;
@@ -118,17 +132,12 @@ public sealed class NodeIOScene : NodeIO<Scene>
 					new Point3Float(assimpMesh.BoundingBox.Min.X, assimpMesh.BoundingBox.Min.Y, assimpMesh.BoundingBox.Min.Z),
 					new Point3Float(assimpMesh.BoundingBox.Max.X, assimpMesh.BoundingBox.Max.Y, assimpMesh.BoundingBox.Max.Z)
 				);
-				
-				if (assimpMesh.PrimitiveType != PrimitiveType.Triangle)
-				{
-					continue; // ignore this mesh and keep empty in scene
-				}
+
+				// only the triangle list is supported now
+				mesh.Topology = PrimitiveTopology.TriangleList;
 				
 				// positions
-				if (assimpMesh.HasVertices)
-				{
-					mesh.Positions = assimpMesh.Vertices.Select(v => new Point3Float(v.X, v.Y, v.Z)).ToList();
-				}
+				mesh.Positions = assimpMesh.Vertices.Select(v => new Point3Float(v.X, v.Y, v.Z)).ToList();
 
 				// normals
 				if (assimpMesh.HasNormals)

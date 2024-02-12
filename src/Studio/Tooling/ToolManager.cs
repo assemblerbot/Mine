@@ -57,6 +57,12 @@ public sealed class ToolManager
 
 		foreach (ToolId id in toolIds)
 		{
+			if (id.Name is null)
+			{
+				// error in file
+				continue;
+			}
+
 			Activate(id.Name, id.UniqueId);
 		}
 	}
