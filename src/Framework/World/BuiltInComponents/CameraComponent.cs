@@ -2,10 +2,7 @@ namespace Mine.Framework;
 
 public class CameraComponent : Component, IRenderable
 {
-	public int  GetRenderOrder()
-	{
-		return 0;
-	}
+	public int RenderOrder => 0;
 
 	public void Render()
 	{

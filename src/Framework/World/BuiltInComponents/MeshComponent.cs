@@ -6,8 +6,12 @@ public class MeshComponent : Component
 {
 	private BoundingBoxFloat _boundingBox;
 
-	// geometry
-	private DeviceBuffer?           _vertexBuffer = null;
-	private DeviceBuffer?           _indexBuffer  = null;
-	private VertexLayoutDescription _vertextLayoutDescription;
+	private SharedMesh? _mesh;
+	private Material? _material = null;
+
+	public void Init(SharedMesh mesh, Material material)
+	{
+		_mesh     = mesh;
+		_material = material;
+	}
 }

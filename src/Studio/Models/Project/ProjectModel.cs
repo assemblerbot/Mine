@@ -871,7 +871,7 @@ public sealed class ProjectModel
 						string? resourcePath = io.Import(_projectSettings!.AbsoluteResourcesPath);
 						if (resourcePath is not null)
 						{
-							_assetDatabase![node.Meta.Guid!] = new StudioAssetDatabaseItem(node.Meta.Guid!, node.Meta.ReferenceField, node.RelativePath, io.ReferenceType);
+							_assetDatabase![node.Meta.Guid!] = new StudioAssetDatabaseItem(node.Meta.Guid!, node.Meta.ReferenceField, resourcePath, io.ReferenceType);
 						}
 					}
 					catch (Exception e)

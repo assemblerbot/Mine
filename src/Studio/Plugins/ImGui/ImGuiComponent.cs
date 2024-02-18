@@ -15,12 +15,14 @@ public sealed class ImGuiComponent : Component, IUpdatable, IRenderable
 	public const string FontFASolid     = AssetsFolder + "fa-solid-900.ttf";
 	public const int    Size            = 16;
 
-	public int UpdateOrder = Int32.MinValue;
-	public int GetUpdateOrder() => UpdateOrder;
-	
-	public int RenderOrder = Int32.MaxValue;
-	public int GetRenderOrder() => RenderOrder;
-	
+	public int UpdateOrderValue = Int32.MinValue;
+
+	public int UpdateOrder => UpdateOrderValue;
+
+	public int RenderOrderValue = Int32.MaxValue;
+
+	public int RenderOrder => RenderOrderValue;
+
 	private readonly ImGuiRenderer _renderer;
 	private readonly CommandList   _commandList;
 	

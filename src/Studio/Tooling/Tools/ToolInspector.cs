@@ -1,4 +1,5 @@
-﻿using Mine.ImGuiPlugin;
+﻿using ImGuiNET;
+using Mine.ImGuiPlugin;
 using Mine.Studio;
 using Gui = ImGuiNET.ImGui;
 
@@ -34,7 +35,7 @@ public sealed class ToolInspector : Tool
 	private bool UpdateUI()
 	{
 		bool isOpen = true;
-		if (Gui.Begin(NameId, ref isOpen))
+		if (Gui.Begin(NameId, ref isOpen, ImGuiWindowFlags.HorizontalScrollbar))
 		{
 			if (!_subscribedToChange)
 			{

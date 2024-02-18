@@ -49,7 +49,7 @@ public sealed class ToolProjectView : Tool
 	private bool UpdateUI()
 	{
 		bool isOpen = true;
-		if (Gui.Begin(NameId, ref isOpen))
+		if (Gui.Begin(NameId, ref isOpen, ImGuiWindowFlags.HorizontalScrollbar))
 		{
 			lock (StudioModel.Project.ProjectTreeLock)
 			{

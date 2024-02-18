@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace Mine.Framework;
@@ -32,5 +33,23 @@ public partial record struct Point3Float
 		z = Z;
 	}
 	
+	#region Operators
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Point3Float operator +(Point3Float a, Vector3Float b)
+	{
+		return new Point3Float(a.X + b.X, a.Y + b.Y, a.Z + b.Z);
+	}
 	
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Point3Float operator +(Vector3Float a, Point3Float b)
+	{
+		return new Point3Float(a.X + b.X, a.Y + b.Y, a.Z + b.Z);
+	}
+
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3Float operator -(Point3Float a, Point3Float b)
+	{
+		return new Vector3Float(a.X - b.X, a.Y - b.Y, a.Z - b.Z);
+	}
+	#endregion
 }

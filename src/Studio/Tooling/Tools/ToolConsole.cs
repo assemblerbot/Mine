@@ -1,4 +1,5 @@
-﻿using Mine.ImGuiPlugin;
+﻿using ImGuiNET;
+using Mine.ImGuiPlugin;
 using Gui = ImGuiNET.ImGui;
 
 namespace Mine.Studio;
@@ -21,7 +22,7 @@ public sealed class ToolConsole : Tool
 	private bool UpdateUI()
 	{
 		bool isOpen = true;
-		if (Gui.Begin(NameId, ref isOpen))
+		if (Gui.Begin(NameId, ref isOpen, ImGuiWindowFlags.HorizontalScrollbar))
 		{
 			for(int i=0; i<StudioModel.Console.Count; ++i)
 			{

@@ -15,8 +15,8 @@ public sealed class SceneMesh
 	public List<SceneMeshTextureCoordinateChannel>? TextureCoordinateChannels;
 	public List<SceneMeshVertexColorChannel>?       VertexColorChannels;
 	
-	public List<ushort>? UShortIndices;
-	public List<uint>?   UIntIndices;
+	public ushort[]? UShortIndices;
+	public uint[]?   UIntIndices;
 
 	public int VertexCount => Positions.Count;
 	

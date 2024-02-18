@@ -196,11 +196,11 @@ public sealed class NodeIOScene : NodeIO<Scene>
 				{
 					if (mesh.Positions is not null && mesh.Positions.Count <= 0xffff)
 					{
-						mesh.UShortIndices = assimpMesh.GetUnsignedIndices().Select(idx => (ushort)idx).ToList();
+						mesh.UShortIndices = assimpMesh.GetUnsignedIndices().Select(idx => (ushort)idx).ToArray();
 					}
 					else
 					{
-						mesh.UIntIndices = assimpMesh.GetUnsignedIndices().ToList();
+						mesh.UIntIndices = assimpMesh.GetUnsignedIndices().ToArray();
 					}
 				}
 			}

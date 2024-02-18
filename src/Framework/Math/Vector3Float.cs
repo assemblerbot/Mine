@@ -25,6 +25,14 @@ public partial record struct Vector3Float
 		Y = y;
 		Z = z;
 	}
+
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public void Deconstruct(out float x, out float y, out float z)
+	{
+		x = this.X;
+		y = this.Y;
+		z = this.Z;
+	}
 	
 	#region Operators
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -38,17 +46,15 @@ public partial record struct Vector3Float
 	{
 		return new Vector3Float(a.X - b.X, a.Y - b.Y, a.Z - b.Z);
 	}
+	
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3Float operator -(Vector3Float a)
+	{
+		return new Vector3Float(-a.X, -a.Y, -a.Z);
+	}
 	#endregion
 	
-	#region Methods
-	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public void Deconstruct(out float x, out float y, out float z)
-	{
-		x = this.X;
-		y = this.Y;
-		z = this.Z;
-	}
-
+	#region Magnitude and normalization
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public float SquareMagnitude()
 	{
@@ -76,5 +82,24 @@ public partial record struct Vector3Float
 		Y /= magnitude;
 		Z /= magnitude;
 	}
+	#endregion
+	
+	#region Dot and cross product
+
+	public static float Dot(Vector3Float v1, Vector3Float v2)
+	{
+		return v1.X * v2.X + v1.Y * v2.Y + v1.Z * v2.Z;
+	}
+	
+	public static Vector3Float Cross(Vector3Float v1, Vector3Float v2)
+	{
+		return new Vector3Float
+		       {
+			       X = v1.Y * v2.Z - v1.Z * v2.Y,
+			       Y = v1.Z * v2.X - v1.X * v2.Z,
+			       Z = v1.X * v2.Y - v1.Y * v2.X,
+		       };
+	}
+
 	#endregion
 }

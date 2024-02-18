@@ -69,7 +69,7 @@ public class ToolPlugins : Tool
 	private bool UpdateUI()
 	{
 		bool isOpen = true;
-		if (ImGui.Begin(NameId, ref isOpen))
+		if (ImGui.Begin(NameId, ref isOpen, ImGuiWindowFlags.HorizontalScrollbar))
 		{
 			if (!_eventsRegistered)
 			{

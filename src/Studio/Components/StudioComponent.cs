@@ -11,8 +11,8 @@ namespace Mine.Studio;
 public sealed class StudioComponent : Component, IUpdatable
 {
 	public const string Title = "MINE Studio";
-	
-	public int GetUpdateOrder() => 0;
+
+	public int UpdateOrder => 0;
 
 	private readonly StudioModel _studioModel = new();
 
@@ -52,18 +52,8 @@ public sealed class StudioComponent : Component, IUpdatable
 		_newProjectDialog = new NewProjectDialog(_studioModel);
 
 		LoadSettings();
-		
-		Engine.World.Add(new Entity("Test Object").AddComponent<TestRenderComponent>().Entity);
 
-		// List<int> test   = new() {2, 4, 6, 8, 10, 12, 13};
-		// int       index0 = test.FindInsertionIndexBinary(x => x.CompareTo(0));
-		// int       index1 = test.FindInsertionIndexBinary(x => x.CompareTo(15));
-		// int       index2 = test.FindInsertionIndexBinary(x => x.CompareTo(5));
-		// int       index3 = test.FindInsertionIndexBinary(x => x.CompareTo(4));
-		// int       index4 = test.FindInsertionIndexBinary(x => x.CompareTo(2));
-		// int       index5 = test.FindInsertionIndexBinary(x => x.CompareTo(12));
-		//
-		// int d=0;
+		CreateDebugEntities();
 	}
 
 	public override void BeforeRemovedFromWorld()
@@ -241,6 +231,11 @@ public sealed class StudioComponent : Component, IUpdatable
 		// }
 	}
 
+	private void CreateDebugEntities()
+	{
+		Engine.World.Add(new Entity("Test Object").AddComponent<TestRenderComponent>().Entity);
+	}
+	
 	private struct TestVertex
 	{
 		public const int     Size = 3 * 4 + 3 * 4;

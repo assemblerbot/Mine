@@ -46,8 +46,8 @@ public sealed class World : IDisposable
 
 	public void RegisterUpdatable(IUpdatable updatable)
 	{
-		int order = updatable.GetUpdateOrder();
-		int index = _updatables.FindInsertionIndexBinary(x => x.GetUpdateOrder().CompareTo(order));
+		int order = updatable.UpdateOrder;
+		int index = _updatables.FindInsertionIndexBinary(x => x.UpdateOrder.CompareTo(order));
 		_updatables.Insert(index, updatable);
 	}
 	
@@ -100,8 +100,8 @@ public sealed class World : IDisposable
 
 	public void RegisterRenderable(IRenderable renderable)
 	{
-		int order = renderable.GetRenderOrder();
-		int index = _renderables.FindInsertionIndexBinary(x => x.GetRenderOrder().CompareTo(order));
+		int order = renderable.RenderOrder;
+		int index = _renderables.FindInsertionIndexBinary(x => x.RenderOrder.CompareTo(order));
 		_renderables.Insert(index, renderable);
 	}
 
