@@ -5,7 +5,7 @@ namespace Mine.Framework;
 [Serializable, StructLayout(LayoutKind.Explicit)]
 public record struct Color4FloatRGBA
 {
-	public const int Size = 4 * sizeof(float);
+	public const int SizeInBytes = 4 * sizeof(float);
 	
 	[FieldOffset(sizeof(float) * 0)] public float R;
 	[FieldOffset(sizeof(float) * 1)] public float G;

@@ -5,7 +5,7 @@ namespace Mine.Framework;
 [Serializable, StructLayout(LayoutKind.Explicit)]
 public record struct Vector4Float
 {
-	public const int Size = 4 * sizeof(float);
+	public const int SizeInBytes = 4 * sizeof(float);
 
 	[FieldOffset(sizeof(float) * 0)] public float        X;
 	[FieldOffset(sizeof(float) * 1)] public float        Y;

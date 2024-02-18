@@ -131,22 +131,22 @@ public sealed class SceneMesh
 
 	private int CalculateVertexSize()
 	{
-		int size = Point3Float.Size
-		           + (Normals    is not null ? Vector3Float.Size : 0)
-		           + (Tangents   is not null ? Vector3Float.Size : 0)
-		           + (BiTangents is not null ? Vector3Float.Size : 0);
+		int size = Point3Float.SizeInBytes
+		           + (Normals    is not null ? Vector3Float.SizeInBytes : 0)
+		           + (Tangents   is not null ? Vector3Float.SizeInBytes : 0)
+		           + (BiTangents is not null ? Vector3Float.SizeInBytes : 0);
 
 		if (TextureCoordinateChannels is not null)
 		{
 			foreach (SceneMeshTextureCoordinateChannel channel in TextureCoordinateChannels)
 			{
-				size += channel.ItemSize;
+				size += channel.ItemSizeInBytes;
 			}
 		}
 
 		if (VertexColorChannels is not null)
 		{
-			size += VertexColorChannels.Count * SceneMeshVertexColorChannel.ItemSize;
+			size += VertexColorChannels.Count * SceneMeshVertexColorChannel.ItemSizeInBytes;
 		}
 
 		return size;

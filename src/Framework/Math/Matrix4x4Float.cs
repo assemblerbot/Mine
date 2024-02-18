@@ -5,7 +5,7 @@ namespace Mine.Framework;
 [Serializable, StructLayout(LayoutKind.Explicit)]
 public record struct Matrix4x4Float
 {
-	public const int Size = 16 * sizeof(float);
+	public const int SizeInBytes = 16 * sizeof(float);
 	
 	[FieldOffset(sizeof(float) * 00)] public float        M11;
 	[FieldOffset(sizeof(float) * 01)] public float        M12;

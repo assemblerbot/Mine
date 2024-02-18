@@ -5,7 +5,7 @@ namespace Mine.Framework;
 [Serializable, StructLayout(LayoutKind.Explicit)]
 public record struct TransformFloat
 {
-	public const int Size = Point3Float.Size + QuaternionFloat.Size + Vector3Float.Size;
+	public const int SizeInBytes = Point3Float.SizeInBytes + QuaternionFloat.SizeInBytes + Vector3Float.SizeInBytes;
 	
 	// local transformations
 	[FieldOffset(sizeof(float) * 0)] public Vector3Float    Translation;

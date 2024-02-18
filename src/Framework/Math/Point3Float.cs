@@ -6,7 +6,7 @@ namespace Mine.Framework;
 [Serializable, StructLayout(LayoutKind.Explicit)]
 public partial record struct Point3Float
 {
-	public const int Size = 3 * sizeof(float);
+	public const int SizeInBytes = 3 * sizeof(float);
 	
 	[FieldOffset(sizeof(float) * 0)] public float X;
 	[FieldOffset(sizeof(float) * 1)] public float Y;
