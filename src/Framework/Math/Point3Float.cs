@@ -12,6 +12,8 @@ public partial record struct Point3Float
 	[FieldOffset(sizeof(float) * 1)] public float Y;
 	[FieldOffset(sizeof(float) * 2)] public float Z;
 
+	public static Point3Float Zero = new (0, 0, 0);
+	
 	public Point3Float(float xyz)
 	{
 		X = xyz;
@@ -25,7 +27,7 @@ public partial record struct Point3Float
 		Y = y;
 		Z = z;
 	}
-	
+
 	public void Deconstruct(out float x, out float y, out float z)
 	{
 		x = X;

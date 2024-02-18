@@ -1,5 +1,3 @@
-using System.Numerics;
-
 namespace Mine.Framework;
 
 public sealed class Entity
@@ -8,18 +6,30 @@ public sealed class Entity
 	public  string Name => _name;
 
 	private bool _activeSelf        = true;
-	private bool _activeInHierarchy = true;
 	public  bool ActiveSelf        => _activeSelf;
-	public  bool ActiveInHierarchy => _activeInHierarchy;
-	
-	private Vector3    _position;
-	private Quaternion _rotation;
-	
+	public  bool ActiveInHierarchy => _activeSelf && _parent is not null && _parent.ActiveInHierarchy;
+
+	private EntityFlags     _flags;
+
+	// hierarchy
 	private Entity?      _parent   = null;
 	private List<Entity> _children = new();
 	
+	// components
 	private List<Component> _components = new();
 
+	// transform
+	public  Point3Float     LocalPosition      { get; set; }         = Point3Float.Zero;
+	public  QuaternionFloat LocalRotation      { get; set; }         = QuaternionFloat.Identity;
+	public  Vector3Float    LocalScale         { get; set; }         = Vector3Float.One;
+
+	// public Point3Float     WorldPosition => LocalToWorldMatrix.Transform(LocalPosition);
+	// public QuaternionFloat WorldRotation => LocalToWorldMatrix.TransForm(LocalRotation);
+	
+	public  Matrix4x4Float  LocalToWorldMatrix { get; private set; } = Matrix4x4Float.Identity;
+	public  Matrix4x4Float  WorldToLocalMatrix { get; private set; } = Matrix4x4Float.Identity;
+	private bool            _matricesDirty = true;
+	
 	public Entity()
 	{
 		_name = "(Entity)";
@@ -69,29 +79,7 @@ public sealed class Entity
 	#region Activity
 	public void SetActive(bool active)
 	{
-		if (_activeSelf == active)
-		{
-			return;
-		}
-
 		_activeSelf = active;
-
-		if (!_activeInHierarchy)
-		{
-			return;
-		}
-		
-		UpdateActiveInHierarchyRecursive(true);
-	}
-
-	private void UpdateActiveInHierarchyRecursive(bool parentIsActive)
-	{
-		_activeInHierarchy = parentIsActive && _activeSelf;
-		
-		for (int i = 0; i < _children.Count; ++i)
-		{
-			_children[i].UpdateActiveInHierarchyRecursive(_activeInHierarchy);
-		}
 	}
 	#endregion
 

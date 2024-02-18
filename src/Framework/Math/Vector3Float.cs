@@ -15,8 +15,14 @@ public partial record struct Vector3Float
 	[FieldOffset(sizeof(float) * 2)] public float Z;
 	
 	#region Constants
-	public static Vector3Float Zero => new (0, 0, 0);
-	public static Vector3Float One  => new (1, 1, 1);
+	public static Vector3Float Zero   => new (0, 0, 0);
+	public static Vector3Float One    => new (1, 1, 1);
+	public static Vector3Float PlusX  => new(1, 0, 0);
+	public static Vector3Float MinusX => new(-1, 0, 0);
+	public static Vector3Float PlusY  => new(0, 1, 0);
+	public static Vector3Float MinusY => new(0, -1, 0);
+	public static Vector3Float PlusZ  => new(0, 0, 1);
+	public static Vector3Float MinusZ => new(0, 0, -1);
 	#endregion
 	
 	public Vector3Float(float x, float y, float z)

@@ -12,6 +12,8 @@ public record struct QuaternionFloat
 	[FieldOffset(sizeof(float) * 2)] public float Z;
 	[FieldOffset(sizeof(float) * 3)] public float W;
 
+	public static QuaternionFloat Identity = new (0,0,0,1);
+	
 	public QuaternionFloat(float x, float y, float z, float w)
 	{
 		X = x;
