@@ -54,4 +54,15 @@ public partial record struct Point3Float
 		return new Vector3Float(a.X - b.X, a.Y - b.Y, a.Z - b.Z);
 	}
 	#endregion
+	
+	#region Transformations
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public Point3Float Transform(Matrix4x4Float matrix)
+	{
+		return new Point3Float(
+			X * matrix.M11 + Y * matrix.M21 + Z * matrix.M31 + matrix.M41,
+			X * matrix.M12 + Y * matrix.M22 + Z * matrix.M32 + matrix.M42,
+			X * matrix.M13 + Y * matrix.M23 + Z * matrix.M33 + matrix.M43);
+	}
+	#endregion
 }

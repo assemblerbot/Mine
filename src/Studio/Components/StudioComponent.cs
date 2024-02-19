@@ -234,6 +234,33 @@ public sealed class StudioComponent : Component, IUpdatable
 	private void CreateDebugEntities()
 	{
 		Engine.World.Add(new Entity("Test Object").AddComponent<TestRenderComponent>().Entity);
+
+
+		Entity e0 = new Entity();
+		Entity e1 = new Entity();
+		Entity e2 = new Entity();
+
+		e1.SetParent(e0);
+		e2.SetParent(e1);
+
+		e1.LocalPosition = new Point3Float(1, 2, 3);
+		
+		PrintMatrix("e0", e0.LocalToWorldMatrix);
+		PrintMatrix("e1", e1.LocalToWorldMatrix);
+		PrintMatrix("e2", e2.LocalToWorldMatrix);
+	}
+
+	private void PrintMatrix(string name, Matrix4x4Float matrix)
+	{
+		using FileStream   stream = File.Open("d:\\Tmp\\transform_mine.txt", FileMode.Append);
+		using StreamWriter writer = new StreamWriter(stream);
+
+		writer.WriteLine(name);
+		writer.WriteLine($"{matrix.M11,7:F3} | {matrix.M12,7:F3} | {matrix.M13,7:F3} | {matrix.M14,7:F3}");
+		writer.WriteLine($"{matrix.M21,7:F3} | {matrix.M22,7:F3} | {matrix.M23,7:F3} | {matrix.M24,7:F3}");
+		writer.WriteLine($"{matrix.M31,7:F3} | {matrix.M32,7:F3} | {matrix.M33,7:F3} | {matrix.M34,7:F3}");
+		writer.WriteLine($"{matrix.M41,7:F3} | {matrix.M42,7:F3} | {matrix.M43,7:F3} | {matrix.M44,7:F3}");
+		writer.WriteLine();
 	}
 	
 	private struct TestVertex

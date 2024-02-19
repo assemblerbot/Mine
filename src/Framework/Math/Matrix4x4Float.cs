@@ -158,6 +158,64 @@ public record struct Matrix4x4Float
 		return m;
 	}
 
+	public static Matrix4x4Float CreateRotationMatrix(QuaternionFloat rotation)
+	{
+		float xx = rotation.X * rotation.X;
+		float yy = rotation.Y * rotation.Y;
+		float zz = rotation.Z * rotation.Z;
+
+		float xy = rotation.X * rotation.Y;
+		float wz = rotation.Z * rotation.W;
+		float xz = rotation.Z * rotation.X;
+		float wy = rotation.Y * rotation.W;
+		float yz = rotation.Y * rotation.Z;
+		float wx = rotation.X * rotation.W;
+
+		Matrix4x4Float result = new
+		(
+			1.0f - 2.0f * (yy + zz),
+			2.0f * (xy + wz),
+			2.0f * (xz - wy),
+			0,
+
+			2.0f * (xy - wz),
+			1.0f - 2.0f * (zz + xx),
+			2.0f * (yz + wx),
+			0,
+
+			2.0f * (xz + wy),
+			2.0f * (yz - wx),
+			1.0f - 2.0f * (yy + xx),
+			0,
+
+			0, 0, 0, 1
+		);
+
+		return result;
+	}
+
+	public static Matrix4x4Float CreateScaleMatrix(Vector3Float scale)
+	{
+		return new Matrix4x4Float(
+			scale.X,
+			0.0f,
+			0.0f,
+			0.0f,
+			0.0f,
+			scale.Y,
+			0.0f,
+			0.0f,
+			0.0f,
+			0.0f,
+			scale.Z,
+			0.0f,
+			0.0f,
+			0.0f,
+			0.0f,
+			1.0f
+		);
+	}
+
 	public static Matrix4x4Float CreateViewLookAtLH(Point3Float eye, Point3Float at, Vector3Float up)
 	{
 		Vector3Float zAxis = at - eye; zAxis.Normalize();

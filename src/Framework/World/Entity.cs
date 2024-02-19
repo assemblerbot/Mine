@@ -1,35 +1,24 @@
 namespace Mine.Framework;
 
-public sealed class Entity
+public sealed partial class Entity
 {
 	private string _name;
 	public  string Name => _name;
 
 	private bool _activeSelf        = true;
 	public  bool ActiveSelf        => _activeSelf;
-	public  bool ActiveInHierarchy => _activeSelf && _parent is not null && _parent.ActiveInHierarchy;
-
-	private EntityFlags     _flags;
+	public  bool ActiveInHierarchy => _activeSelf && (_parent is null || _parent.ActiveInHierarchy);
 
 	// hierarchy
-	private Entity?      _parent   = null;
-	private List<Entity> _children = new();
+	private Entity?      _parent = null;
+	public  Entity?      Parent => _parent;
+	
+	private List<Entity>          _children = new();
+	public  IReadOnlyList<Entity> Children => _children;
 	
 	// components
 	private List<Component> _components = new();
 
-	// transform
-	public  Point3Float     LocalPosition      { get; set; }         = Point3Float.Zero;
-	public  QuaternionFloat LocalRotation      { get; set; }         = QuaternionFloat.Identity;
-	public  Vector3Float    LocalScale         { get; set; }         = Vector3Float.One;
-
-	// public Point3Float     WorldPosition => LocalToWorldMatrix.Transform(LocalPosition);
-	// public QuaternionFloat WorldRotation => LocalToWorldMatrix.TransForm(LocalRotation);
-	
-	public  Matrix4x4Float  LocalToWorldMatrix { get; private set; } = Matrix4x4Float.Identity;
-	public  Matrix4x4Float  WorldToLocalMatrix { get; private set; } = Matrix4x4Float.Identity;
-	private bool            _matricesDirty = true;
-	
 	public Entity()
 	{
 		_name = "(Entity)";
@@ -80,6 +69,25 @@ public sealed class Entity
 	public void SetActive(bool active)
 	{
 		_activeSelf = active;
+	}
+	#endregion
+	
+	#region Hierarchy
+	public void SetParent(Entity? parent)
+	{
+		if (_parent is not null)
+		{
+			_parent._children.Remove(this);
+			_parent = null;
+		}
+
+		_parent = parent;
+		if (_parent == null)
+		{
+			return;
+		}
+
+		_parent._children.Add(this);
 	}
 	#endregion
 
