@@ -71,6 +71,33 @@ public record struct QuaternionFloat
 
 		return q;
 	}
+
+	public static QuaternionFloat CreateFromYawPitchRoll(float yaw, float pitch, float roll)
+	{
+		//  Roll first, about axis the object is facing, then
+		//  pitch upward, then yaw to face into the new heading
+		float sr, cr, sp, cp, sy, cy;
+
+		float halfRoll = roll * 0.5f;
+		sr = (float)Math.Sin(halfRoll);
+		cr = (float)Math.Cos(halfRoll);
+
+		float halfPitch = pitch * 0.5f;
+		sp = (float)Math.Sin(halfPitch);
+		cp = (float)Math.Cos(halfPitch);
+
+		float halfYaw = yaw * 0.5f;
+		sy = (float)Math.Sin(halfYaw);
+		cy = (float)Math.Cos(halfYaw);
+
+		QuaternionFloat result = new (
+			cy * sp * cr + sy * cp * sr,
+			sy * cp * cr - cy * sp * sr,
+			cy * cp * sr - sy * sp * cr,
+			cy * cp * cr + sy * sp * sr
+		);
+		return result;
+	}	
 	#endregion
 
 	#region Operators

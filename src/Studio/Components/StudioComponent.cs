@@ -236,18 +236,28 @@ public sealed class StudioComponent : Component, IUpdatable
 		Engine.World.Add(new Entity("Test Object").AddComponent<TestRenderComponent>().Entity);
 
 
-		Entity e0 = new Entity();
 		Entity e1 = new Entity();
 		Entity e2 = new Entity();
+		Entity e3 = new Entity();
 
-		e1.SetParent(e0);
 		e2.SetParent(e1);
+		e3.SetParent(e2);
 
-		e1.LocalPosition = new Point3Float(1, 2, 3);
+		e2.LocalPosition = new Point3Float(1, 2, 3);
+		e2.LocalRotation = QuaternionFloat.CreateFromYawPitchRoll(2, 1, 3);
+		e2.LocalScale    = new Vector3Float(2, 3, 4);
+
+		e1.LocalPosition = new Point3Float(4, 5, 6);
+		e1.LocalRotation = QuaternionFloat.CreateFromYawPitchRoll(5, 4, 6);
+		e1.LocalScale    = new Vector3Float(7, 8, 9);
 		
-		PrintMatrix("e0", e0.LocalToWorldMatrix);
 		PrintMatrix("e1", e1.LocalToWorldMatrix);
 		PrintMatrix("e2", e2.LocalToWorldMatrix);
+		PrintMatrix("e3", e3.LocalToWorldMatrix);
+
+		PrintMatrix("e1i", e1.WorldToLocalMatrix);
+		PrintMatrix("e2i", e2.WorldToLocalMatrix);
+		PrintMatrix("e3i", e3.WorldToLocalMatrix);
 	}
 
 	private void PrintMatrix(string name, Matrix4x4Float matrix)

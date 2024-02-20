@@ -64,13 +64,14 @@ public sealed partial class Entity
 		{
 			if ((_transformFlags & TransformFlags.LocalToWorldMatrixDirty) != 0)
 			{
+				Console.WriteLine($"Updating matrix, parent is null: {Parent is null}");
 				Matrix4x4Float translate = Matrix4x4Float.CreateTranslationMatrix(LocalPosition.Vector3);
 				Matrix4x4Float rotate    = Matrix4x4Float.CreateRotationMatrix(LocalRotation);
 				Matrix4x4Float scale     = Matrix4x4Float.CreateScaleMatrix(LocalScale);
 
 				Matrix4x4Float local = Matrix4x4Float.Mul(Matrix4x4Float.Mul(scale, rotate), translate);
-				_localToWorldMatrix =  Parent is null ? local : Matrix4x4Float.Mul(Parent.LocalToWorldMatrix, local);
-				_transformFlags    &= ~TransformFlags.LocalToWorldMatrixDirty;
+				_localToWorldMatrix =  Parent is null ? local : Matrix4x4Float.Mul(local, Parent.LocalToWorldMatrix);
+				_transformFlags     &= ~TransformFlags.LocalToWorldMatrixDirty;
 			}
 			return _localToWorldMatrix;
 		}
