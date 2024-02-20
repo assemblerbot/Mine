@@ -235,7 +235,7 @@ public sealed class StudioComponent : Component, IUpdatable
 	{
 		Engine.World.Add(new Entity("Test Object").AddComponent<TestRenderComponent>().Entity);
 
-
+/*
 		Entity e1 = new Entity();
 		Entity e2 = new Entity();
 		Entity e3 = new Entity();
@@ -258,6 +258,7 @@ public sealed class StudioComponent : Component, IUpdatable
 		PrintMatrix("e1i", e1.WorldToLocalMatrix);
 		PrintMatrix("e2i", e2.WorldToLocalMatrix);
 		PrintMatrix("e3i", e3.WorldToLocalMatrix);
+		*/
 	}
 
 	private void PrintMatrix(string name, Matrix4x4Float matrix)
