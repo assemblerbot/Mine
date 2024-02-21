@@ -18,6 +18,9 @@ public sealed partial class Entity
 	
 	// components
 	private List<Component> _components = new();
+	
+	// layers
+	public ulong RenderingLayers = 0;
 
 	public Entity()
 	{

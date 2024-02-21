@@ -5,6 +5,7 @@ using Migration;
 using Mine.Framework;
 using Mine.ImGuiPlugin;
 using NativeFileDialogSharp;
+using Scene = Mine.Framework.Scene;
 
 namespace Mine.Studio;
 
@@ -231,9 +232,33 @@ public sealed class StudioComponent : Component, IUpdatable
 		// }
 	}
 
+	public static SceneReference Suzanne = new(@"Debug/suzanne.fbx.scene"); // that will be generated
 	private void CreateDebugEntities()
 	{
-		Engine.World.Add(new Entity("Test Object").AddComponent<TestRenderComponent>().Entity);
+		//Engine.World.Add(new Entity("Test Object").AddComponent<TestRenderComponent>().Entity);
+
+		// mesh
+		{
+			Entity entity = new Entity("Suzanne");
+			MeshComponent meshComponent = entity.AddComponent<MeshComponent>();
+
+			Scene? scene = Suzanne.Value;
+			SharedMesh sharedMesh = Engine.Shared.GetOrCreateMesh(Suzanne.Path, scene.Meshes[0]);
+			meshComponent.SetMesh(sharedMesh);
+
+			// TODO shared material
+			
+			Engine.World.Add(entity);
+		}
+		
+		// camera
+		{
+			Entity          entity          = new Entity("Camera");
+			CameraComponent cameraComponent = entity.AddComponent<CameraComponent>();
+			Engine.World.Add(entity);
+
+			entity.LocalPosition = new Point3Float(0, -10, 0);
+		}
 
 /*
 		Entity e1 = new Entity();
@@ -250,7 +275,7 @@ public sealed class StudioComponent : Component, IUpdatable
 		e1.LocalPosition = new Point3Float(4, 5, 6);
 		e1.LocalRotation = QuaternionFloat.CreateFromYawPitchRoll(5, 4, 6);
 		e1.LocalScale    = new Vector3Float(7, 8, 9);
-		
+
 		PrintMatrix("e1", e1.LocalToWorldMatrix);
 		PrintMatrix("e2", e2.LocalToWorldMatrix);
 		PrintMatrix("e3", e3.LocalToWorldMatrix);

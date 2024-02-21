@@ -65,4 +65,9 @@ public partial record struct Point3Float
 			X * matrix.M13 + Y * matrix.M23 + Z * matrix.M33 + matrix.M43);
 	}
 	#endregion
+
+	public override string ToString()
+	{
+		return $"{X},{Y},{Z}";
+	}
 }

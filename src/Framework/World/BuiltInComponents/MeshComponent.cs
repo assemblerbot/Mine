@@ -14,4 +14,14 @@ public class MeshComponent : Component
 		_mesh     = mesh;
 		_material = material;
 	}
+
+	public void SetMesh(SharedMesh? mesh)
+	{
+		_mesh = mesh;
+	}
+
+	public void SetMaterial(Material? material)
+	{
+		_material = material;
+	}
 }
