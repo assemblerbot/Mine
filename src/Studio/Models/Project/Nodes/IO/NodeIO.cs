@@ -13,7 +13,7 @@ public abstract class NodeIO
 	public abstract void UpdateCache();
 	public abstract void ClearCache();
 
-	public abstract string? Import(string resourcesRootPath); // import file to Resources, returns relative path to resource or null
+	public abstract void Import(string resourcesRootPath, out string? relativeResourcePath);
 
 	public abstract NodeIOSettings CreateImportSettings();
 	public abstract bool           UpdateImportSettings(NodeIOSettings settings); // returns true if settings were changed

@@ -2,37 +2,33 @@ namespace Mine.Studio;
 
 public enum ProjectNodeType
 {
-	Uninitialized,
+	Uninitialized = 0,
 	
-	AssetFolder,
-	AssetImage,
-	AssetScene,
-	AssetBinary,
-	AssetMaterial,
+	AssetFlag     = 0x01,
+	AssetFolder   = 1 << 8 | AssetFlag,
+	AssetImage    = 2 << 8 | AssetFlag,
+	AssetScene    = 3 << 8 | AssetFlag,
+	AssetBinary   = 4 << 8 | AssetFlag,
+	AssetMaterial = 5 << 8 | AssetFlag,
+	AssetShader   = 6 << 8 | AssetFlag,
 	
-	ScriptFolder,
-	ScriptFile,
+	ScriptFlag   = 0x02,
+	ScriptFolder = 1 << 8 | ScriptFlag,
+	ScriptFile   = 2 << 8 | ScriptFlag,
+	
+	FlagMask = 0xff
 }
 
 public static class ProjectNodeTypeExtensions
 {
 	public static bool IsAssetsRelated(this ProjectNodeType type)
 	{
-		return
-			type == ProjectNodeType.AssetFolder     ||
-			type == ProjectNodeType.AssetImage      ||
-			type == ProjectNodeType.AssetScene      ||
-			type == ProjectNodeType.AssetBinary     ||
-			type == ProjectNodeType.AssetMaterial
-			;
+		return ((uint) type & (uint) ProjectNodeType.FlagMask) == (uint) ProjectNodeType.AssetFlag;
 	}
 
 	public static bool IsScriptsRelated(this ProjectNodeType type)
 	{
-		return
-			type == ProjectNodeType.ScriptFolder ||
-			type == ProjectNodeType.ScriptFile
-			;
+		return ((uint) type & (uint) ProjectNodeType.FlagMask) == (uint) ProjectNodeType.ScriptFlag;
 	}
 
 	public static ProjectNodeType FromAssetExtension(string extension)
@@ -43,6 +39,8 @@ public static class ProjectNodeTypeExtensions
 			".jpg" => ProjectNodeType.AssetImage,
 			".fbx" => ProjectNodeType.AssetScene,
 			".obj" => ProjectNodeType.AssetScene,
+			".hlsl" => ProjectNodeType.AssetShader,
+			".glsl" => ProjectNodeType.AssetShader,
 			".material" => ProjectNodeType.AssetMaterial,
 			_ => ProjectNodeType.AssetBinary
 		};

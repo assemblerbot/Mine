@@ -18,7 +18,7 @@ public sealed class Engine
 	private          Input             _input     = null!;
 	private          World             _world     = new();
 	private readonly Resources         _resources = new();
-	private          SharedDataManager _shared    = new();
+	private          Shared _shared    = new();
 
 	public static Types             Types     => _instance._types;
 	public static Config            Config    => _instance._config;
@@ -27,7 +27,7 @@ public sealed class Engine
 	public static Input             Input     => _instance._input;
 	public static World             World     => _instance._world;
 	public static Resources         Resources => _instance._resources;
-	public static SharedDataManager Shared    => _instance._shared;
+	public static Shared Shared    => _instance._shared;
 
 	#region Paths
 	public static readonly string? HomeDirectory = 

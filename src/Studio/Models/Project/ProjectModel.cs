@@ -868,7 +868,7 @@ public sealed class ProjectModel
 					try
 					{
 						NodeIO  io           = node.GetNodeIO<NodeIO>()!;
-						string? resourcePath = io.Import(_projectSettings!.AbsoluteResourcesPath);
+						io.Import(_projectSettings!.AbsoluteResourcesPath, out string? resourcePath);
 						if (resourcePath is not null)
 						{
 							_assetDatabase![node.Meta.Guid!] = new StudioAssetDatabaseItem(node.Meta.Guid!, node.Meta.ReferenceField, resourcePath, io.ReferenceType);

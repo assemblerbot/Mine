@@ -38,14 +38,15 @@ public sealed class NodeIOCopy : NodeIO<byte[]>
 	{
 	}
 
-	public override string? Import(string resourcesRootPath)
+	public override void Import(string resourcesRootPath, out string? relativeResourcePath)
 	{
 		byte[]? data = Load();
 		
 		if (data == null)
 		{
 			ConsoleViewModel.LogError($"Cannot import file {Owner.RelativePath}, file was not loaded!");
-			return null;
+			relativeResourcePath = null;
+			return;
 		}
 
 		string path = Path.Join(resourcesRootPath, Owner.RelativePath);
@@ -60,7 +61,7 @@ public sealed class NodeIOCopy : NodeIO<byte[]>
 			ConsoleViewModel.LogException(e.ToString());
 		}
 
-		return Owner.RelativePath;
+		relativeResourcePath = Owner.RelativePath;
 	}
 
 	public override NodeIOSettings CreateImportSettings()

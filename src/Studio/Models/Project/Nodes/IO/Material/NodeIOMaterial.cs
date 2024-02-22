@@ -19,9 +19,9 @@ public sealed class NodeIOMaterial : NodeIO<Material>
 	{
 	}
 
-	public override string? Import(string resourcesRootPath)
+	public override void Import(string resourcesRootPath, out string? relativeResourcePath)
 	{
-		return null;
+		relativeResourcePath = null;
 	}
 
 	public override NodeIOSettings CreateImportSettings()

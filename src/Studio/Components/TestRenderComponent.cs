@@ -28,7 +28,7 @@ public class TestRenderComponent : Component, IUpdatable, IRenderable
 
 	private DeviceBuffer _vertexBuffer;
 	private DeviceBuffer _indexBuffer;
-	private Shader[]     _shaders;
+	private Veldrid.Shader[]     _shaders;
 	private Pipeline     _pipeline;
 	private CommandList  _commandList = null!;
 	
@@ -192,7 +192,7 @@ void main()
 		_vertexBuffer.Dispose();
 		_indexBuffer.Dispose();
 		
-		foreach(Shader shader in _shaders)
+		foreach(Veldrid.Shader shader in _shaders)
 		{
 			shader.Dispose();
 		}
