@@ -83,7 +83,7 @@ public sealed class NodeIOScene : NodeIO<Scene>
 		NodeIOSceneSettings? settings = Owner.Meta?.NodeIOSettings as NodeIOSceneSettings;
 		if (settings == null)
 		{
-			ConsoleViewModel.LogError($"Cannot import '{Owner.RelativePath}'. There are now settings!");
+			ConsoleViewModel.LogError($"Cannot import '{Owner.RelativePath}'. Settings are missing or invalid!");
 			relativeResourcePath = null;
 			return;
 		}

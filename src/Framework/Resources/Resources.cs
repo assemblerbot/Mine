@@ -6,7 +6,7 @@ public sealed class Resources
 {
 	private const string DefaultResourcePackageExtension = ".zip";
 	private const string ResourcesDirectory              = "Resources";
-	public static string RootPath                        = ResourcesDirectory;
+	public static string RootRelativePath                = ResourcesDirectory;
 	
 	private readonly List<string>                           _resourcePackages   = new();
 	private readonly Dictionary<string, ResourceDescriptor> _resourceDictionary = new();
@@ -68,13 +68,13 @@ public sealed class Resources
 	#region Scanning
 	private void ScanResourcePackages()
 	{
-		if (!Directory.Exists(RootPath))
+		if (!Directory.Exists(RootRelativePath))
 		{
 			Console.WriteLine("Resources folder not found!");
 			return;
 		}
 
-		foreach (string fileName in Directory.EnumerateFiles(RootPath))
+		foreach (string fileName in Directory.EnumerateFiles(RootRelativePath))
 		{
 			if (!fileName.EndsWith(DefaultResourcePackageExtension))
 			{
@@ -106,7 +106,7 @@ public sealed class Resources
 	
 	private void BuildDictionaryFromFiles()
 	{
-		if (!Directory.Exists(RootPath))
+		if (!Directory.Exists(RootRelativePath))
 		{
 			return;
 		}
@@ -116,9 +116,9 @@ public sealed class Resources
 
 	private void BuildDictionaryFromFilesInDirectoryRecursive(string relativePath)
 	{
-		int resourceDirectoryLength = RootPath.Length + 1;
+		int resourceDirectoryLength = RootRelativePath.Length + 1;
 		
-		string absolutePath = Path.Combine(RootPath, relativePath);
+		string absolutePath = Path.Combine(RootRelativePath, relativePath);
 		foreach (string absoluteFilePath in Directory.EnumerateFiles(absolutePath))
 		{
 			if (absoluteFilePath.EndsWith(DefaultResourcePackageExtension))

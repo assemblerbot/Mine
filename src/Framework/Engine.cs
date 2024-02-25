@@ -10,34 +10,26 @@ public sealed class Engine
 	private static Engine _instance = null!;
 	public static  Engine Instance => _instance;
 	
-	private readonly GraphicsBackend   _graphicsBackend;
-	private readonly Types             _types  = new();
-	private readonly Config            _config = new();
-	private readonly EngineWindow      _window;
-	private          Renderer          _renderer  = null!;
-	private          Input             _input     = null!;
-	private          World             _world     = new();
-	private readonly Resources         _resources = new();
-	private          Shared _shared    = new();
+	private readonly GraphicsBackend _graphicsBackend;
+	private readonly Types           _types  = new();
+	private readonly Config          _config = new();
+	private readonly EngineWindow    _window;
+	private          Renderer        _renderer  = null!;
+	private          Input           _input     = null!;
+	private          World           _world     = new();
+	private readonly Resources       _resources = new();
+	private          Shared          _shared    = new();
+	private readonly Paths           _paths;
 
-	public static Types             Types     => _instance._types;
-	public static Config            Config    => _instance._config;
-	public static IWindow           Window    => _instance._window.NativeWindow;
-	public static Renderer          Renderer  => _instance._renderer;
-	public static Input             Input     => _instance._input;
-	public static World             World     => _instance._world;
-	public static Resources         Resources => _instance._resources;
-	public static Shared Shared    => _instance._shared;
-
-	#region Paths
-	public static readonly string? HomeDirectory = 
-		(Environment.OSVersion.Platform == PlatformID.Unix || Environment.OSVersion.Platform == PlatformID.MacOSX)
-			? (Environment.GetEnvironmentVariable("XDG_CONFIG_HOME") ?? "~/Library/Application Support")
-			: Environment.ExpandEnvironmentVariables("%APPDATA%");
-
-	private readonly string? _dataPath;
-	public static    string  ApplicationDataPath => _instance._dataPath ?? "";
-	#endregion
+	public static Types     Types     => _instance._types;
+	public static Config    Config    => _instance._config;
+	public static IWindow   Window    => _instance._window.NativeWindow;
+	public static Renderer  Renderer  => _instance._renderer;
+	public static Input     Input     => _instance._input;
+	public static World     World     => _instance._world;
+	public static Resources Resources => _instance._resources;
+	public static Shared    Shared    => _instance._shared;
+	public static Paths     Paths     => _instance._paths;
 	
 	private Action?       _onLoad;
 	private Action?       _onExit;
@@ -52,8 +44,7 @@ public sealed class Engine
 	{
 		_instance = this;
 		
-		_dataPath = Path.Join(HomeDirectory, applicationName);
-		Console.WriteLine(ApplicationDataPath);
+		_paths    = new Paths(applicationName);
 
 		ParseArguments(applicationArguments);
 		
@@ -148,7 +139,7 @@ public sealed class Engine
 		{
 			if (arguments[i] == "--resources")
 			{
-				Resources.RootPath = arguments[++i];
+				Resources.RootRelativePath = arguments[++i];
 				continue;
 			}
 			

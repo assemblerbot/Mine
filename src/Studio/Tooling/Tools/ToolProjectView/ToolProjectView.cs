@@ -1,6 +1,5 @@
 ﻿using ImGuiNET;
 using Mine.ImGuiPlugin;
-using Mine.Studio;
 using Gui = ImGuiNET.ImGui;
 
 namespace Mine.Studio;
@@ -169,6 +168,9 @@ public sealed class ToolProjectView : Tool
 	{
 		// _contextMenu.AddItem("Create/DefinitionTemplate", OnCreateDefinitionTemplate, CanCreateScript);
 		// _contextMenu.AddItem("Create/DefinitionAsset",    OnCreateDefinitionAsset,    CanCreateAsset);
+
+		_contextMenu.AddItem("Refresh", OnContextMenuRefresh, IsAnythingSelected);
+		_contextMenu.AddSeparator("");
 		
 		_contextMenu.AddItem("Edit/Rename", OnContextMenuEditRename, IsChangeOfContextItemPossible);
 		_contextMenu.AddItem("Edit/Copy",   OnContextMenuEditCopy,   IsChangeOfContextItemPossible);
@@ -232,6 +234,11 @@ public sealed class ToolProjectView : Tool
 	#endregion
 
 	#region Edit
+	private void OnContextMenuRefresh()
+	{
+		_contextMenuActivatedAt!.RefreshMetaFile();
+	}
+
 	private void OnContextMenuEditRename()
 	{
 		// TODO
@@ -280,6 +287,12 @@ public sealed class ToolProjectView : Tool
 	{
 		return _contextMenuActivatedAt != null && _contextMenuActivatedAt.Type.IsAssetsRelated();
 	}
+
+	private bool IsAnythingSelected()
+	{
+		return _contextMenuActivatedAt != null;
+	}
+
 	#endregion
 	
 	#endregion

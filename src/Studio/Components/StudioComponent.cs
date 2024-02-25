@@ -232,7 +232,7 @@ public sealed class StudioComponent : Component, IUpdatable
 		// }
 	}
 
-	public static SceneReference Suzanne = new(@"Debug/suzanne.fbx.scene"); // that will be generated
+	public static SceneReference Suzanne = new(@"Test/suzanne.fbx.scene"); // that will be generated
 	private void CreateDebugEntities()
 	{
 		Engine.World.Add(new Entity("Test Object").AddComponent<TestRenderComponent>().Entity);

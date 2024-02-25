@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Migration;
 using Mine.Studio;
 
@@ -21,7 +22,7 @@ public abstract class ProjectNode : ISelectable
 	public    Metadata? Meta;
 	protected NodeIO?   IO;
 
-	public          string Extension => Path.GetExtension(AbsolutePath).ToLower(); // cache if needed
+	public          string Extension => Regex.Match(Path.GetFileName(AbsolutePath), @"\..*").Value.ToLower(); //Path.GetExtension(AbsolutePath).ToLower(); // cache if needed
 	public abstract bool   Exists    { get; }
 
 	protected ProjectNode(ProjectModel project, string name, string absolutePath, string relativePath, bool hasMetaFile)
@@ -42,6 +43,22 @@ public abstract class ProjectNode : ISelectable
 
 	public void ApplyChanges()
 	{
+		UpdateMetaFile();
+	}
+
+	public void RefreshMetaFile()
+	{
+		if (Meta is null)
+		{
+			CreateMetaFile();
+		}
+
+		NodeIOSettings importSettings = IO!.CreateImportSettings();
+		if (Meta!.NodeIOSettings is null || importSettings.GetType() != Meta.NodeIOSettings.GetType())
+		{
+			Meta.NodeIOSettings = importSettings;
+		}
+
 		UpdateMetaFile();
 	}
 

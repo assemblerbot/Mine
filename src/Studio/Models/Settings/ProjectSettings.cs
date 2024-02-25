@@ -14,7 +14,7 @@ public sealed class ProjectSettings
 	[ReadOnlyInInspector, NonSerialized] public string ProjectFolderPath = "";
 
 	[ReadOnlyInInspector, ShowInInspector, NonSerialized] private string? _relativeResourcesPath;
-	public                  string  RelativeResourcesPath => _relativeResourcesPath ??= Resources.RootPath;
+	public                  string  RelativeResourcesPath => _relativeResourcesPath ??= Resources.RootRelativePath;
 
 	[ReadOnlyInInspector, ShowInInspector, NonSerialized] private string? _absoluteResourcesPath;
 	public                  string  AbsoluteResourcesPath => _absoluteResourcesPath ??= Path.Combine(ProjectFolderPath, RelativeResourcesPath);

@@ -2,10 +2,10 @@ using Mine.Framework;
 
 namespace Mine.Studio;
 
-[NodeIO(ProjectNodeType.AssetShader)]
-public sealed class NodeIOShader : NodeIO
+public abstract class NodeIOShader : NodeIO
 {
-	public override string ReferenceType => nameof(AssetReference); // TODO - remove ?
+	private static readonly string _compilerAbsolutePath = Path.Join(Engine.Paths.ApplicationAbsolutePath, "Tools\\win-x64\\glslc.exe"); // TODO - platform
+	public override         string ReferenceType => nameof(AssetReference);                                                             // TODO - remove ?
 
 	public NodeIOShader(ProjectNode owner) : base(owner)
 	{
@@ -21,12 +21,22 @@ public sealed class NodeIOShader : NodeIO
 
 	public override void Import(string resourcesRootPath, out string? relativeResourcePath)
 	{
-		throw new NotImplementedException(); // todo - execute process and capture output
-	}
+		string targetPath           = Path.Join(resourcesRootPath, Owner.RelativePath.Replace(".hlsl", ".spirv").Replace(".glsl", ".spirv"));
 
-	public override NodeIOSettings CreateImportSettings()
-	{
-		return new NodeIOShaderSettings();
+		NodeIOShaderSettings? settings = Owner.Meta?.NodeIOSettings as NodeIOShaderSettings;
+		if (settings is null)
+		{
+			ConsoleViewModel.LogError($"Cannot import '{Owner.RelativePath}' - settings are missing or invalid!");
+			relativeResourcePath = null;
+			return;
+		}
+
+		string arguments = $"-fentry-point={settings.EntryPoint} -fshader-stage={settings.ShaderStage} -o \"{targetPath}\" \"{Owner.AbsolutePath}\"";
+		ConsoleViewModel.LogInfo($"Executing: {_compilerAbsolutePath} {arguments}");
+		string outputLog = RunUtility.RunExternalExe(_compilerAbsolutePath, arguments);
+		ConsoleViewModel.LogInfo(outputLog);
+
+		relativeResourcePath = targetPath;
 	}
 
 	public override bool UpdateImportSettings(NodeIOSettings settings)
@@ -34,71 +44,3 @@ public sealed class NodeIOShader : NodeIO
 		return false;
 	}
 }
-
-/*
-// usage
-const string ToolFileName = "example.exe";
-string output = RunExternalExe(ToolFileName);
-
-public string RunExternalExe(string filename, string arguments = null)
-{
-    var process = new Process();
-
-    process.StartInfo.FileName = filename;
-    if (!string.IsNullOrEmpty(arguments))
-    {
-        process.StartInfo.Arguments = arguments;
-    }
-
-    process.StartInfo.CreateNoWindow = true;
-    process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-    process.StartInfo.UseShellExecute = false;
-
-    process.StartInfo.RedirectStandardError = true;
-    process.StartInfo.RedirectStandardOutput = true;
-    var stdOutput = new StringBuilder();
-    process.OutputDataReceived += (sender, args) => stdOutput.AppendLine(args.Data); // Use AppendLine rather than Append since args.Data is one line of output, not including the newline character.
-
-    string stdError = null;
-    try
-    {
-        process.Start();
-        process.BeginOutputReadLine();
-        stdError = process.StandardError.ReadToEnd();
-        process.WaitForExit();
-    }
-    catch (Exception e)
-    {
-        throw new Exception("OS error while executing " + Format(filename, arguments)+ ": " + e.Message, e);
-    }
-
-    if (process.ExitCode == 0)
-    {
-        return stdOutput.ToString();
-    }
-    else
-    {
-        var message = new StringBuilder();
-
-        if (!string.IsNullOrEmpty(stdError))
-        {
-            message.AppendLine(stdError);
-        }
-
-        if (stdOutput.Length != 0)
-        {
-            message.AppendLine("Std output:");
-            message.AppendLine(stdOutput.ToString());
-        }
-
-        throw new Exception(Format(filename, arguments) + " finished with exit code = " + process.ExitCode + ": " + message);
-    }
-}
-
-private string Format(string filename, string arguments)
-{
-    return "'" + filename + 
-        ((string.IsNullOrEmpty(arguments)) ? string.Empty : " " + arguments) +
-        "'";
-}
- */

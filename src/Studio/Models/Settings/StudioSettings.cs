@@ -9,7 +9,7 @@ public sealed class StudioSettings
 {
 	public const string DefaultTheme = "Crimson Rivers";
 	
-	public string SettingsPath => Path.Join(Engine.ApplicationDataPath, "studio_settings.json");
+	public string SettingsPath => Path.Join(Engine.Paths.ApplicationDataAbsolutePath, "studio_settings.json");
 	
 	public int WorkerThreadsCount = 4;
 
