@@ -11,6 +11,8 @@ public sealed class NodeIOSceneSettings : NodeIOSettings
 	[ReadOnlyInInspector] public List<NodeIOSceneMeshSettings> Meshes = new();
 
 	[ReadOnlyInInspector] public List<NodeIOSceneMaterialSettings> Materials = new();
+
+	[ReadOnlyInInspector] public NodeIOSceneHierarchyNodeSettings Root = new("Root");
 }
 
 #region Migration
@@ -25,5 +27,7 @@ public class NodeIOSceneSettings_000 : NodeIOSettings_000, INodeIOSceneSettingsM
 	[MigrateField] public List<INodeIOSceneMeshSettingsMigratable> Meshes;
 
 	[MigrateField] public List<INodeIOSceneMaterialSettingsMigratable> Materials;
+
+	public INodeIOSceneHierarchyNodeSettingsMigratable Root;
 }
 #endregion

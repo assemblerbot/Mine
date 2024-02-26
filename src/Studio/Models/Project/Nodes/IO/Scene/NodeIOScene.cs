@@ -3,6 +3,7 @@ using Assimp.Configs;
 using Mine.Framework;
 using OdinSerializer;
 using Veldrid;
+using Material = Assimp.Material;
 using Scene = Assimp.Scene;
 
 namespace Mine.Studio;
@@ -289,8 +290,7 @@ public sealed class NodeIOScene : NodeIO<Scene>
 		// 	return;
 		// }
 
-		Node? root = scene.RootNode;
-		
+		//----- meshes
 		bool settingsChanged = false;
 		for (int i = 0; i < scene.Meshes.Count; ++i)
 		{
@@ -314,8 +314,66 @@ public sealed class NodeIOScene : NodeIO<Scene>
 			sceneSettings.Meshes.RemoveRange(scene.Meshes.Count, sceneSettings.Meshes.Count - scene.Meshes.Count);
 			settingsChanged = true;
 		}
+
+		//----- materials
+		sceneSettings.Materials ??= new List<NodeIOSceneMaterialSettings>();
+		for (int i = 0; i < scene.MaterialCount; ++i)
+		{
+			Material assimpMaterial = scene.Materials[i] ?? new Material();
+			if (i == sceneSettings.Materials.Count)
+			{
+				sceneSettings.Materials.Add(new NodeIOSceneMaterialSettings(assimpMaterial.Name));
+				settingsChanged = true;
+			}
+			else if (sceneSettings.Materials[i].Name != assimpMaterial.Name)
+			{
+				sceneSettings.Materials[i] = new NodeIOSceneMaterialSettings(assimpMaterial.Name);
+				settingsChanged            = true;
+			}
+		}
 		
+		// cut the rest
+		if (sceneSettings.Materials.Count > scene.Materials.Count)
+		{
+			sceneSettings.Materials.RemoveRange(scene.Materials.Count, sceneSettings.Materials.Count - scene.Materials.Count);
+			settingsChanged = true;
+		}
 		
+		//----- hierarchy
+		Node root = scene.RootNode ?? new Node();
+		sceneSettings.Root ??= new NodeIOSceneHierarchyNodeSettings(root.Name);
+		settingsChanged    |=  UpdateImportSettingsHierarchyNode(root, sceneSettings.Root);
+
+		return settingsChanged;
+	}
+
+	private bool UpdateImportSettingsHierarchyNode(Node node, NodeIOSceneHierarchyNodeSettings sceneSettingsNode)
+	{
+		bool settingsChanged = false;
+		for (int i = 0; i < node.ChildCount; ++i)
+		{
+			Node child = node.Children[i] ?? new Node();
+
+			sceneSettingsNode.Children ??= new List<NodeIOSceneHierarchyNodeSettings>();
+			if (i == sceneSettingsNode.Children.Count)
+			{
+				sceneSettingsNode.Children.Add(new NodeIOSceneHierarchyNodeSettings(child.Name));
+				settingsChanged = true;
+			}
+			else if(sceneSettingsNode.Children[i].Name != child.Name)
+			{
+				sceneSettingsNode.Children[i] = new NodeIOSceneHierarchyNodeSettings(child.Name);
+				settingsChanged = true;
+			}
+
+			settingsChanged |= UpdateImportSettingsHierarchyNode(child, sceneSettingsNode.Children[i]);
+		}
+
+		if (sceneSettingsNode.Children is not null && sceneSettingsNode.Children.Count > node.ChildCount)
+		{
+			sceneSettingsNode.Children.RemoveRange(node.ChildCount, sceneSettingsNode.Children.Count - node.ChildCount);
+			settingsChanged = true;
+		}
 
 		return settingsChanged;
 	}

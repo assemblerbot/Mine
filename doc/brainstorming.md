@@ -136,6 +136,7 @@ Let's consider following scenarios:
 - no additional tool needed
 - editing in text editing tool
 - XML or some custom data format
+  - Universal declarative language will be more readable and makes more sense
 - prefab created at build time in Studio!
 - instantiation:
   - entities with proper transforms should work - that's the point

@@ -168,6 +168,7 @@ public sealed class ToolProjectView : Tool
 	{
 		// _contextMenu.AddItem("Create/DefinitionTemplate", OnCreateDefinitionTemplate, CanCreateScript);
 		// _contextMenu.AddItem("Create/DefinitionAsset",    OnCreateDefinitionAsset,    CanCreateAsset);
+		_contextMenu.AddItem("Create/Prefab", OnCreatePrefab, CanCreatePrefab);
 
 		_contextMenu.AddItem("Refresh", OnContextMenuRefresh, IsAnythingSelected);
 		_contextMenu.AddSeparator("");
@@ -231,6 +232,11 @@ public sealed class ToolProjectView : Tool
 	// 	StudioModel.Project.ResumeWatchers();
 	// }
 
+	private void OnCreatePrefab()
+	{
+		// TODO
+		
+	}
 	#endregion
 
 	#region Edit
@@ -270,27 +276,32 @@ public sealed class ToolProjectView : Tool
 	#region Checks
 	private bool IsChangeOfContextItemPossible()
 	{
-		return _contextMenuActivatedAt != null && _contextMenuActivatedAt is not ProjectRootNode;
+		return _contextMenuActivatedAt is not null && _contextMenuActivatedAt is not ProjectRootNode;
 	}
 
 	private bool IsCreationUnderContextItemPossible()
 	{
-		return _contextMenuActivatedAt != null;
+		return _contextMenuActivatedAt is not null;
 	}
 
 	private bool CanCreateScript()
 	{
-		return _contextMenuActivatedAt != null && _contextMenuActivatedAt.Type.IsScriptsRelated();
+		return _contextMenuActivatedAt is not null && _contextMenuActivatedAt.Type.IsScriptsRelated();
 	}
 	
 	private bool CanCreateAsset()
 	{
-		return _contextMenuActivatedAt != null && _contextMenuActivatedAt.Type.IsAssetsRelated();
+		return _contextMenuActivatedAt is not null && _contextMenuActivatedAt.Type.IsAssetsRelated();
+	}
+
+	private bool CanCreatePrefab()
+	{
+		return _contextMenuActivatedAt is not null && _contextMenuActivatedAt.Type == ProjectNodeType.AssetScene;
 	}
 
 	private bool IsAnythingSelected()
 	{
-		return _contextMenuActivatedAt != null;
+		return _contextMenuActivatedAt is not null;
 	}
 
 	#endregion
