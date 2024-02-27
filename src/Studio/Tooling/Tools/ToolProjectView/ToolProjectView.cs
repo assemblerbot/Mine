@@ -1,5 +1,6 @@
 ﻿using ImGuiNET;
 using Mine.ImGuiPlugin;
+using NativeFileDialogSharp;
 using Gui = ImGuiNET.ImGui;
 
 namespace Mine.Studio;
@@ -234,8 +235,22 @@ public sealed class ToolProjectView : Tool
 
 	private void OnCreatePrefab()
 	{
-		// TODO
-		
+		DialogResult result = Dialog.FileSave("cs", StudioModel.Project.ScriptsFolder!.AbsolutePath);
+		if(!result.IsOk)
+		{
+			return;
+		}
+
+		string path = result.Path;
+		if (Path.GetExtension(path) != ".cs")
+		{
+			path += ".cs";
+		}
+
+		ConsoleViewModel.LogInfo(path);
+		StudioModel.Project.PauseWatchers();
+		NodeIOScenePrefab.CreatePrefab(path, _contextMenuActivatedAt!);
+		StudioModel.Project.ResumeWatchers();
 	}
 	#endregion
 

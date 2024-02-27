@@ -235,6 +235,14 @@ public sealed class StudioComponent : Component, IUpdatable
 	public static SceneReference Suzanne = new(@"Test/suzanne.fbx.scene"); // that will be generated
 	private void CreateDebugEntities()
 	{
+		// instantiate prefab
+		
+		
+		
+		
+		
+		
+		
 		Engine.World.Add(new Entity("Test Object").AddComponent<TestRenderComponent>().Entity);
 
 		// mesh

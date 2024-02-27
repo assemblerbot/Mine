@@ -21,7 +21,8 @@ public abstract class NodeIOShader : NodeIO
 
 	public override void Import(string resourcesRootPath, out string? relativeResourcePath)
 	{
-		string targetPath           = Path.Join(resourcesRootPath, Owner.RelativePath.Replace(".hlsl", ".spirv").Replace(".glsl", ".spirv"));
+		relativeResourcePath = Owner.RelativePath.Replace(".hlsl", ".spirv").Replace(".glsl", ".spirv");
+		string targetPath         = Path.Join(resourcesRootPath, relativeResourcePath);
 
 		NodeIOShaderSettings? settings = Owner.Meta?.NodeIOSettings as NodeIOShaderSettings;
 		if (settings is null)
@@ -35,8 +36,6 @@ public abstract class NodeIOShader : NodeIO
 		ConsoleViewModel.LogInfo($"Executing: {_compilerAbsolutePath} {arguments}");
 		string outputLog = RunUtility.RunExternalExe(_compilerAbsolutePath, arguments);
 		ConsoleViewModel.LogInfo(outputLog);
-
-		relativeResourcePath = targetPath;
 	}
 
 	public override bool UpdateImportSettings(NodeIOSettings settings)
