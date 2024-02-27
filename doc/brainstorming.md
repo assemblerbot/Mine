@@ -135,10 +135,11 @@ Let's consider following scenarios:
   - string custom name of reference (can be updated by Studio)
 - no additional tool needed
 - editing in text editing tool
-- XML or some custom data format
-  - Universal declarative language will be more readable and makes more sense
+- XML or some custom data format ❌
+  - Universal declarative language will be more readable and makes more sense ✅
 - prefab created at build time in Studio!
 - instantiation:
   - entities with proper transforms should work - that's the point
   - components instantiated through reflection and filled with values also through reflection
     - slow, but can be improved later (prototype pattern or some kind of pooling)
+  - kind of bytecode to avoid parsing?
