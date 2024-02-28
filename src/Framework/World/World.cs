@@ -29,15 +29,85 @@ public sealed class World : IDisposable
 		_entities.Remove(entity);
 	}
 
-	public Entity? Instantiate(SceneReference? scene)
+	public Entity? Instantiate(SceneReference? sceneReference, Entity? parent = null)
 	{
-		if (scene is null)
+		if (sceneReference is null)
 		{
 			return null;
 		}
-		
-		// TODO
-		return null;
+
+		Scene? scene = sceneReference.Value;
+		if (scene is null || scene.Root is null)
+		{
+			return null;
+		}
+
+		return InstantiateRecursiveRoot(scene.Root, scene.Root.Translation.Point3, scene.Root.Rotation, scene.Root.Scale, parent);
+	}
+
+	public Entity? Instantiate(SceneReference? sceneReference, Point3Float localPosition, QuaternionFloat localRotation, Vector3Float localScale, Entity? parent = null)
+	{
+		if (sceneReference is null)
+		{
+			return null;
+		}
+
+		Scene? scene = sceneReference.Value;
+		if (scene is null || scene.Root is null)
+		{
+			return null;
+		}
+
+		return InstantiateRecursiveRoot(scene.Root, localPosition, localRotation, localScale, parent);
+	}
+	
+	private Entity InstantiateRecursiveRoot(SceneNode sceneNode, Point3Float localPosition, QuaternionFloat localRotation, Vector3Float localScale, Entity? parent)
+	{
+		Entity entity = new (sceneNode.Name);
+		if (parent is null)
+		{
+			Add(entity);
+		}
+		else
+		{
+			entity.SetParent(parent);
+		}
+
+		entity.LocalPosition = localPosition;
+		entity.LocalRotation = localRotation;
+		entity.LocalScale    = localScale;
+
+		if (sceneNode.Children is null)
+		{
+			return entity;
+		}
+
+		foreach (SceneNode child in sceneNode.Children)
+		{
+			InstantiateRecursive(child, entity);
+		}
+
+		return entity;
+	}
+
+	private void InstantiateRecursive(SceneNode sceneNode, Entity parent)
+	{
+		Entity entity = new (sceneNode.Name);
+		entity.SetParent(parent);
+
+		entity.LocalPosition = sceneNode.Translation.Point3;
+		entity.LocalRotation = sceneNode.Rotation;
+		entity.LocalScale    = sceneNode.Scale;
+
+		if (sceneNode.Children is null)
+		{
+			return;
+		}
+
+		foreach (SceneNode child in sceneNode.Children)
+		{
+			InstantiateRecursive(child, entity);
+		}
 	}
 	#endregion
 	
