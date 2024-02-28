@@ -19,6 +19,7 @@ public static class NodeIOScenePrefab
 			using StreamWriter writer     = new(stream);
 
 			writer.WriteLine("// PREFAB");
+			writer.WriteLine($"using {StudioModel.Instance.Project.ProjectSettings.AssetDatabaseNamespace};"); 
 			writer.WriteLine("using Mine.Framework;");
 			writer.WriteLine();
 			//writer.WriteLine($"namespace {StudioModel.Instance.Project.}");
@@ -27,7 +28,11 @@ public static class NodeIOScenePrefab
 			writer.WriteLine("	public static Entity Instantiate(Entity parent)");
 			writer.WriteLine("	{");
 
-			writer.WriteLine($"		Entity instance = Engine.World.Instantiate(AssetDatabase.Assets[\"{node.Meta!.Guid}\"] as SceneReference, parent);");
+			writer.WriteLine($"		Entity? instance = Engine.World.Instantiate(AssetDatabase.Assets[\"{node.Meta!.Guid}\"] as SceneReference, parent);");
+			writer.WriteLine("		if (instance is null)");
+			writer.WriteLine("		{");
+			writer.WriteLine($"			throw new NullReferenceException(\"Asset with id '{node.Meta!.Guid}' is missing!\");");
+			writer.WriteLine("		}");
 			WriteNodeRecursive(writer, settings.Root, "");
 			writer.WriteLine("		return instance;");
 			

@@ -247,7 +247,7 @@ public sealed class ToolProjectView : Tool
 			path += ".cs";
 		}
 
-		ConsoleViewModel.LogInfo(path);
+		ConsoleViewModel.LogInfo($"Writing prefab to file: '{path}'");
 		StudioModel.Project.PauseWatchers();
 		NodeIOScenePrefab.CreatePrefab(path, _contextMenuActivatedAt!);
 		StudioModel.Project.ResumeWatchers();
