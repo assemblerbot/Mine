@@ -28,6 +28,17 @@ public sealed class World : IDisposable
 		entity.BeforeRemovedFromWorld();
 		_entities.Remove(entity);
 	}
+
+	public Entity? Instantiate(SceneReference? scene)
+	{
+		if (scene is null)
+		{
+			return null;
+		}
+		
+		// TODO
+		return null;
+	}
 	#endregion
 	
 	#region Updating

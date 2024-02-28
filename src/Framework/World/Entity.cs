@@ -97,15 +97,18 @@ public sealed partial class Entity
 	#region Component management
 	public T AddComponent<T>() where T : Component, new()
 	{
-		Component component = new T();
-		
+		return AddComponent(new T());
+	}
+
+	public T AddComponent<T>(T component) where T : Component
+	{
 		component.SetEntity(this);
 		_components.Add(component);
 
 		component.OnInstantiate();
-		return (component as T)!;
+		return component;
 	}
-	
+
 	public void RemoveComponent(Component component)
 	{
 		int index = _components.IndexOf(component);

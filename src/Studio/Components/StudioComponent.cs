@@ -236,7 +236,7 @@ public sealed class StudioComponent : Component, IUpdatable
 	private void CreateDebugEntities()
 	{
 		// instantiate prefab
-		
+		Entity suzanne = Engine.World.Instantiate(Suzanne);
 		
 		
 		

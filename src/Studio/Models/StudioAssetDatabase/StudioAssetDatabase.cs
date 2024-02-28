@@ -29,8 +29,9 @@ public sealed class StudioAssetDatabase
 	{
 		string path = Path.Join(projectSettings.AbsoluteScriptsPath, projectSettings.AssetDatabaseSourcePath);
 
+		try
 		{
-			using FileStream   stream = File.Open(path, FileMode.Create);
+			using FileStream   stream = new(path, FileMode.Create);
 			using StreamWriter writer = new(stream);
 
 			writer.WriteLine("// this file is generated in Mine Studio");
@@ -38,7 +39,7 @@ public sealed class StudioAssetDatabase
 			writer.WriteLine($"namespace {projectSettings.AssetDatabaseNamespace};");
 			writer.WriteLine($"public static class {projectSettings.AssetDatabaseClass}");
 			writer.WriteLine("{");
-			
+
 			foreach (StudioAssetDatabaseItem item in _items.Values)
 			{
 				if (item.Field == null)
@@ -56,14 +57,19 @@ public sealed class StudioAssetDatabase
 			{
 				writer.WriteLine($"		{{\"{item.Guid}\",new {item.ReferenceType}(@\"{item.Path}\")}},");
 			}
+
 			writer.WriteLine("	};");
-			
+
 			writer.WriteLine("}");
 
 			writer.Flush();
 			stream.Flush();
 		}
-		
+		catch (Exception e)
+		{
+			ConsoleViewModel.LogException("Exception occured while writing AssetDatabase: " + e);
+		}
+
 		_dirty = false;
 	}
 	#endregion

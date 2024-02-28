@@ -27,7 +27,7 @@ public static class NodeIOScenePrefab
 			writer.WriteLine("	public static Entity Instantiate(Entity parent)");
 			writer.WriteLine("	{");
 
-			writer.WriteLine($"		Entity instance = Engine.World.Instantiate(\"{node.Meta!.Guid}\", parent);");
+			writer.WriteLine($"		Entity instance = Engine.World.Instantiate(AssetDatabase.Assets[\"{node.Meta!.Guid}\"] as SceneReference, parent);");
 			WriteNodeRecursive(writer, settings.Root, "");
 			writer.WriteLine("		return instance;");
 			
