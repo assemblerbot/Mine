@@ -4,24 +4,29 @@ namespace Mine.Framework;
 
 public class MeshComponent : Component
 {
-	private BoundingBoxFloat _boundingBox;
+	public BoundingBoxFloat BoundingBox;
 
-	private SharedMesh? _mesh;
-	private Material? _material = null;
+	public SharedMesh? Mesh;
+	public Material? Material;
 
-	public void Init(SharedMesh mesh, Material material)
+	public MeshComponent(SharedMesh? mesh, Material? material)
 	{
-		_mesh     = mesh;
-		_material = material;
+		Mesh     = mesh;
+		Material = material;
 	}
 
-	public void SetMesh(SharedMesh? mesh)
+	public MeshComponent(SceneReference? sceneReference, int meshIndex, Material? material)
 	{
-		_mesh = mesh;
-	}
+		if (sceneReference is null)
+		{
+			Mesh = null;
+		}
+		else
+		{
+			Scene? scene = sceneReference.Value;
+			Mesh = scene?.Meshes is null ? null : Engine.Shared.GetOrCreateMesh(sceneReference.Path, meshIndex, scene.Meshes[meshIndex]);
+		}
 
-	public void SetMaterial(Material? material)
-	{
-		_material = material;
+		Material = material;
 	}
 }

@@ -236,25 +236,16 @@ public sealed class StudioComponent : Component, IUpdatable
 	private void CreateDebugEntities()
 	{
 		// instantiate prefab
-		Entity suzanne = Engine.World.Instantiate(Suzanne);
-		
-		
-		
-		
-		
+		//Entity suzanne = Engine.World.Instantiate(Suzanne);
 		
 		Engine.World.Add(new Entity("Test Object").AddComponent<TestRenderComponent>().Entity);
 
 		// mesh
 		{
 			Entity entity = new Entity("Suzanne");
-			MeshComponent meshComponent = entity.AddComponent<MeshComponent>();
+			entity.AddComponent(new MeshComponent(Suzanne, 0, null));
 
-			Scene? scene = Suzanne.Value;
-			SharedMesh sharedMesh = Engine.Shared.GetOrCreateMesh(Suzanne.Path, scene.Meshes[0]);
-			meshComponent.SetMesh(sharedMesh);
-
-			// TODO shared material
+			// TODO material
 			
 			Engine.World.Add(entity);
 		}

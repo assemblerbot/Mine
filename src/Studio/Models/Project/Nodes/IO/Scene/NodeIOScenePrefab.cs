@@ -28,12 +28,13 @@ public static class NodeIOScenePrefab
 			writer.WriteLine("	public static Entity Instantiate(Entity parent)");
 			writer.WriteLine("	{");
 
-			writer.WriteLine($"		Entity? instance = Engine.World.Instantiate(AssetDatabase.Assets[\"{node.Meta!.Guid}\"] as SceneReference, parent);");
+			writer.WriteLine($"		SceneReference? asset = AssetDatabase.Assets[\"{node.Meta!.Guid}\"] as SceneReference;");
+			writer.WriteLine("		Entity? instance = Engine.World.Instantiate(asset, parent);");
 			writer.WriteLine("		if (instance is null)");
 			writer.WriteLine("		{");
 			writer.WriteLine($"			throw new NullReferenceException(\"Asset with id '{node.Meta!.Guid}' is missing!\");");
 			writer.WriteLine("		}");
-			WriteNodeRecursive(writer, settings.Root, "");
+			WriteNodeRecursive(writer, settings, settings.Root, "");
 			writer.WriteLine("		return instance;");
 			
 			writer.WriteLine("	}");
@@ -48,11 +49,25 @@ public static class NodeIOScenePrefab
 		}
 	}
 
-	private static void WriteNodeRecursive(StreamWriter writer, NodeIOSceneHierarchyNodeSettings node, string thisPath)
+	private static void WriteNodeRecursive(StreamWriter writer, NodeIOSceneSettings settings, NodeIOSceneHierarchyNodeSettings node, string thisPath)
 	{
 		if (!string.IsNullOrEmpty(thisPath))
 		{
-			writer.WriteLine($"		// instance.Child(\"{thisPath}\")");
+			if (node.Meshes.Count == 0)
+			{
+				writer.WriteLine($"		// instance.GetChild(\"{thisPath}\")!");
+			}
+			else
+			{
+				writer.WriteLine($"		instance.GetChild(\"{thisPath}\")!");
+				for (int i = 0; i < node.Meshes.Count; ++i)
+				{
+					writer.Write(i > 0 ? "			.Entity" : "			");
+					writer.WriteLine($".AddComponent(new MeshComponent(asset, {node.Meshes[i]}, null)) // {settings.Meshes[node.Meshes[i]].Name}");
+				}
+
+				writer.WriteLine("			;");
+			}
 		}
 
 		if (node.Children is null)
@@ -62,7 +77,7 @@ public static class NodeIOScenePrefab
 
 		foreach (NodeIOSceneHierarchyNodeSettings child in node.Children)
 		{
-			WriteNodeRecursive(writer, child, $"{thisPath}/{child.Name}");
+			WriteNodeRecursive(writer, settings, child, $"{thisPath}/{child.Name}");
 		}
 	}
 }

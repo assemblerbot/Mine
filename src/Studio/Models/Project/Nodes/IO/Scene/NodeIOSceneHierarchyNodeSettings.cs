@@ -6,8 +6,8 @@ namespace Mine.Studio;
 public sealed class NodeIOSceneHierarchyNodeSettings
 {
 	[ReadOnlyInInspector] public string Name;
-	
 	[ReadOnlyInInspector] public List<NodeIOSceneHierarchyNodeSettings>? Children = null;
+	[ReadOnlyInInspector] public List<int>                               Meshes   = new();
 
 	public NodeIOSceneHierarchyNodeSettings(string name)
 	{
@@ -26,5 +26,6 @@ public class NodeIOSceneHierarchyNodeSettings_000 : INodeIOSceneHierarchyNodeSet
 	public string Name;
 	
 	[MigrateField] public List<INodeIOSceneHierarchyNodeSettingsMigratable>? Children;
+	public                List<int>                                          Meshes;
 }
 #endregion

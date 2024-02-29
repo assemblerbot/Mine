@@ -92,6 +92,28 @@ public sealed partial class Entity
 
 		_parent._children.Add(this);
 	}
+
+	public Entity? GetChild(string path)
+	{
+		string[] pathChunks = path.Split('/');
+
+		Entity? current = this;
+		foreach (string chunk in pathChunks)
+		{
+			if (string.IsNullOrEmpty(chunk))
+			{
+				continue;
+			}
+
+			current = current._children.FirstOrDefault(child => child.Name == chunk);
+			if (current is null)
+			{
+				return null;
+			}
+		}
+
+		return current;
+	}
 	#endregion
 
 	#region Component management
@@ -120,6 +142,7 @@ public sealed partial class Entity
 
 		_components.RemoveAt(index); // TODO - not sure if this should be called here or posponed until end of Update
 	}
+	
 	#endregion
 
 	#region Scene Add/Remove

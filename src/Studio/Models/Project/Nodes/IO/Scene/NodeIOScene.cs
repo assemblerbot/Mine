@@ -375,6 +375,35 @@ public sealed class NodeIOScene : NodeIO<Scene>
 			settingsChanged = true;
 		}
 
+		sceneSettingsNode.Meshes ??= new List<int>();
+		if (node.HasMeshes)
+		{
+			for (int i = 0; i < node.MeshCount; ++i)
+			{
+				if (i == sceneSettingsNode.Meshes.Count)
+				{
+					sceneSettingsNode.Meshes.Add(node.MeshIndices[i]);
+					settingsChanged = true;
+				}
+				else if(sceneSettingsNode.Meshes[i] != node.MeshIndices[i])
+				{
+					sceneSettingsNode.Meshes[i] = node.MeshIndices[i];
+					settingsChanged             = true;
+				}
+			}
+
+			if (sceneSettingsNode.Meshes.Count > node.MeshIndices.Count)
+			{
+				sceneSettingsNode.Meshes.RemoveRange(node.MeshCount, sceneSettingsNode.Meshes.Count - node.MeshIndices.Count);
+				settingsChanged = true;
+			}
+		}
+		else if(sceneSettingsNode.Meshes.Count > 0)
+		{
+			sceneSettingsNode.Meshes.Clear();
+			settingsChanged = true;
+		}
+
 		return settingsChanged;
 	}
 }

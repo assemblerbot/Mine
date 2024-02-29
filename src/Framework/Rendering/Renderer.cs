@@ -27,6 +27,7 @@ public class Renderer : IDisposable
 				// TODO - customization from game
 				PreferDepthRangeZeroToOne         = true,
 				PreferStandardClipSpaceYDirection = true,
+				SwapchainDepthFormat = PixelFormat.D24_UNorm_S8_UInt
 			},
 			graphicsBackend
 		);
