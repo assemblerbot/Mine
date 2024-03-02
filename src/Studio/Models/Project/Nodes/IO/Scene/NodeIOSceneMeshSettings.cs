@@ -7,11 +7,13 @@ namespace Mine.Studio;
 public sealed class NodeIOSceneMeshSettings
 {
 	[ReadOnlyInInspector] public string Name;
-	public bool Import = true;
+	[ReadOnlyInInspector] public int    MaterialIndex;
+	public                       bool   Import = true;
 
-	public NodeIOSceneMeshSettings(string name)
+	public NodeIOSceneMeshSettings(string name, int materialIndex)
 	{
-		Name = name;
+		Name          = name;
+		MaterialIndex = materialIndex;
 	}
 }
 
@@ -24,6 +26,7 @@ public interface INodeIOSceneMeshSettingsMigratable;
 public class NodeIoSceneMeshSettings_000 : INodeIOSceneMeshSettingsMigratable
 {
 	public string Name;
-	public bool Import = true;
+	public int    MaterialIndex;
+	public bool   Import = true;
 }
 #endregion

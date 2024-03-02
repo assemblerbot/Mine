@@ -3,13 +3,11 @@ using Assimp.Configs;
 using Mine.Framework;
 using OdinSerializer;
 using Veldrid;
-using Material = Assimp.Material;
-using Scene = Assimp.Scene;
 
 namespace Mine.Studio;
 
 [NodeIO(ProjectNodeType.AssetScene)]
-public sealed class NodeIOScene : NodeIO<Scene>
+public sealed class NodeIOScene : NodeIO<Assimp.Scene>
 {
 	public override string ReferenceType => nameof(SceneReference);
 	
@@ -25,56 +23,58 @@ public sealed class NodeIOScene : NodeIO<Scene>
 	{
 	}
 	
-	public override Scene? Load()
+	public override Assimp.Scene? Load()
 	{
-		NodeIOSceneSettings? settings = Owner.Meta?.NodeIOSettings as NodeIOSceneSettings;
-		if (settings == null)
-		{
-			return null;
-		}
-
-		AssimpContext context = new AssimpContext();
-
-		Scene? assimpScene = context.ImportFile(
-			Owner.AbsolutePath,
-			PostProcessSteps.Triangulate
-		);
+		throw new NotImplementedException();
 		
-		if(!assimpScene.HasMeshes)
-		{
-			settings.Meshes.Clear();
-			return assimpScene;
-		}
-		
-		bool settingsChanged = false;
-		for (int i = 0; i < assimpScene.Meshes.Count; ++i)
-		{
-			// update settings
-			Mesh assimpMesh = assimpScene.Meshes[i];
-			if (i == settings.Meshes.Count)
-			{
-				settings.Meshes.Add(new NodeIOSceneMeshSettings(assimpMesh.Name));
-				settingsChanged = true;
-			}
-			else if(settings.Meshes[i].Name != assimpMesh.Name)
-			{
-				settings.Meshes[i] = new NodeIOSceneMeshSettings(assimpMesh.Name);
-				settingsChanged    = true;
-			}
-		}
-
-		// cut the rest
-		if (settings.Meshes.Count > assimpScene.Meshes.Count)
-		{
-			settings.Meshes.RemoveRange(assimpScene.Meshes.Count, settings.Meshes.Count - assimpScene.Meshes.Count);
-			settingsChanged = true;
-		}
-
-		//return settingsChanged ? ImporterResult.FinishedSettingsChanged : ImporterResult.Finished;
-		return assimpScene;
+		// NodeIOSceneSettings? settings = Owner.Meta?.NodeIOSettings as NodeIOSceneSettings;
+		// if (settings == null)
+		// {
+		// 	return null;
+		// }
+		//
+		// AssimpContext context = new AssimpContext();
+		//
+		// Scene? assimpScene = context.ImportFile(
+		// 	Owner.AbsolutePath,
+		// 	PostProcessSteps.Triangulate
+		// );
+		//
+		// if(!assimpScene.HasMeshes)
+		// {
+		// 	settings.Meshes.Clear();
+		// 	return assimpScene;
+		// }
+		//
+		// bool settingsChanged = false;
+		// for (int i = 0; i < assimpScene.Meshes.Count; ++i)
+		// {
+		// 	// update settings
+		// 	Mesh assimpMesh = assimpScene.Meshes[i];
+		// 	if (i == settings.Meshes.Count)
+		// 	{
+		// 		settings.Meshes.Add(new NodeIOSceneMeshSettings(assimpMesh.Name));
+		// 		settingsChanged = true;
+		// 	}
+		// 	else if(settings.Meshes[i].Name != assimpMesh.Name)
+		// 	{
+		// 		settings.Meshes[i] = new NodeIOSceneMeshSettings(assimpMesh.Name);
+		// 		settingsChanged    = true;
+		// 	}
+		// }
+		//
+		// // cut the rest
+		// if (settings.Meshes.Count > assimpScene.Meshes.Count)
+		// {
+		// 	settings.Meshes.RemoveRange(assimpScene.Meshes.Count, settings.Meshes.Count - assimpScene.Meshes.Count);
+		// 	settingsChanged = true;
+		// }
+		//
+		// //return settingsChanged ? ImporterResult.FinishedSettingsChanged : ImporterResult.Finished;
+		// return assimpScene;
 	}
 
-	public override void Save(Scene data)
+	public override void Save(Assimp.Scene data)
 	{
 		throw new InvalidOperationException();
 	}
@@ -92,7 +92,7 @@ public sealed class NodeIOScene : NodeIO<Scene>
 		AssimpContext context = new AssimpContext();
 		context.SetConfig(new NormalSmoothingAngleConfig(settings.NormalSmoothingAngle));
 
-		Scene? assimpScene = context.ImportFile(
+		Assimp.Scene? assimpScene = context.ImportFile(
 			Owner.AbsolutePath,
 			PostProcessSteps.Triangulate // always - only triangles are supported
 		);
@@ -279,7 +279,7 @@ public sealed class NodeIOScene : NodeIO<Scene>
 
 		AssimpContext context = new AssimpContext();
 
-		Scene? scene = context.ImportFile(
+		Assimp.Scene? scene = context.ImportFile(
 			Owner.AbsolutePath,
 			PostProcessSteps.None
 		);
@@ -290,54 +290,23 @@ public sealed class NodeIOScene : NodeIO<Scene>
 		// 	return;
 		// }
 
-		//----- meshes
 		bool settingsChanged = false;
-		for (int i = 0; i < scene.Meshes.Count; ++i)
-		{
-			// update settings
-			Mesh assimpMesh = scene.Meshes[i];
-			if (i == sceneSettings.Meshes.Count)
-			{
-				sceneSettings.Meshes.Add(new NodeIOSceneMeshSettings(assimpMesh.Name));
-				settingsChanged = true;
-			}
-			else if(sceneSettings.Meshes[i].Name != assimpMesh.Name)
-			{
-				sceneSettings.Meshes[i] = new NodeIOSceneMeshSettings(assimpMesh.Name);
-				settingsChanged    = true;
-			}
-		}
 
-		// cut the rest
-		if (sceneSettings.Meshes.Count > scene.Meshes.Count)
-		{
-			sceneSettings.Meshes.RemoveRange(scene.Meshes.Count, sceneSettings.Meshes.Count - scene.Meshes.Count);
-			settingsChanged = true;
-		}
+		//----- meshes
+		settingsChanged |= ResizeAndUpdateList(
+			ref sceneSettings.Meshes,
+			scene.Meshes.Count,
+			(settingsMesh, index) => settingsMesh.Name != scene.Meshes[index].Name || settingsMesh.MaterialIndex != scene.Meshes[index].MaterialIndex,
+			index => sceneSettings.Meshes[index] = new NodeIOSceneMeshSettings(scene.Meshes[index].Name, scene.Meshes[index].MaterialIndex)
+		);
 
 		//----- materials
-		sceneSettings.Materials ??= new List<NodeIOSceneMaterialSettings>();
-		for (int i = 0; i < scene.MaterialCount; ++i)
-		{
-			Material assimpMaterial = scene.Materials[i] ?? new Material();
-			if (i == sceneSettings.Materials.Count)
-			{
-				sceneSettings.Materials.Add(new NodeIOSceneMaterialSettings(assimpMaterial.Name));
-				settingsChanged = true;
-			}
-			else if (sceneSettings.Materials[i].Name != assimpMaterial.Name)
-			{
-				sceneSettings.Materials[i] = new NodeIOSceneMaterialSettings(assimpMaterial.Name);
-				settingsChanged            = true;
-			}
-		}
-		
-		// cut the rest
-		if (sceneSettings.Materials.Count > scene.Materials.Count)
-		{
-			sceneSettings.Materials.RemoveRange(scene.Materials.Count, sceneSettings.Materials.Count - scene.Materials.Count);
-			settingsChanged = true;
-		}
+		settingsChanged |= ResizeAndUpdateList(
+			ref sceneSettings.Materials,
+			scene.MaterialCount,
+			(settingsMaterial, index) => settingsMaterial.Name != scene.Materials[index].Name,
+			index => sceneSettings.Materials[index] = new NodeIOSceneMaterialSettings(scene.Materials[index].Name)
+		);
 		
 		//----- hierarchy
 		Node root = scene.RootNode ?? new Node();
@@ -350,60 +319,52 @@ public sealed class NodeIOScene : NodeIO<Scene>
 	private bool UpdateImportSettingsHierarchyNode(Node node, NodeIOSceneHierarchyNodeSettings sceneSettingsNode)
 	{
 		bool settingsChanged = false;
-		for (int i = 0; i < node.ChildCount; ++i)
-		{
-			Node child = node.Children[i] ?? new Node();
 
-			sceneSettingsNode.Children ??= new List<NodeIOSceneHierarchyNodeSettings>();
-			if (i == sceneSettingsNode.Children.Count)
-			{
-				sceneSettingsNode.Children.Add(new NodeIOSceneHierarchyNodeSettings(child.Name));
-				settingsChanged = true;
-			}
-			else if(sceneSettingsNode.Children[i].Name != child.Name)
-			{
-				sceneSettingsNode.Children[i] = new NodeIOSceneHierarchyNodeSettings(child.Name);
-				settingsChanged = true;
-			}
+		// children
+		settingsChanged |= ResizeAndUpdateList(
+			ref sceneSettingsNode.Children,
+			node.ChildCount,
+			(child, index) => child.Name != node.Children[index].Name,
+			index => sceneSettingsNode.Children![index] = new NodeIOSceneHierarchyNodeSettings(node.Children[index].Name)
+		);
 
-			settingsChanged |= UpdateImportSettingsHierarchyNode(child, sceneSettingsNode.Children[i]);
-		}
-
-		if (sceneSettingsNode.Children is not null && sceneSettingsNode.Children.Count > node.ChildCount)
-		{
-			sceneSettingsNode.Children.RemoveRange(node.ChildCount, sceneSettingsNode.Children.Count - node.ChildCount);
-			settingsChanged = true;
-		}
-
-		sceneSettingsNode.Meshes ??= new List<int>();
-		if (node.HasMeshes)
-		{
-			for (int i = 0; i < node.MeshCount; ++i)
-			{
-				if (i == sceneSettingsNode.Meshes.Count)
-				{
-					sceneSettingsNode.Meshes.Add(node.MeshIndices[i]);
-					settingsChanged = true;
-				}
-				else if(sceneSettingsNode.Meshes[i] != node.MeshIndices[i])
-				{
-					sceneSettingsNode.Meshes[i] = node.MeshIndices[i];
-					settingsChanged             = true;
-				}
-			}
-
-			if (sceneSettingsNode.Meshes.Count > node.MeshIndices.Count)
-			{
-				sceneSettingsNode.Meshes.RemoveRange(node.MeshCount, sceneSettingsNode.Meshes.Count - node.MeshIndices.Count);
-				settingsChanged = true;
-			}
-		}
-		else if(sceneSettingsNode.Meshes.Count > 0)
-		{
-			sceneSettingsNode.Meshes.Clear();
-			settingsChanged = true;
-		}
+		// meshes
+		settingsChanged |= ResizeAndUpdateList(
+			ref sceneSettingsNode.Meshes,
+			node.HasMeshes ? node.MeshCount : 0,
+			(meshIndex, index) => meshIndex != node.MeshIndices[index],
+			index => sceneSettingsNode.Meshes[index] = node.MeshIndices[index]
+		);
 
 		return settingsChanged;
+	}
+
+	private static bool ResizeAndUpdateList<T>(ref List<T>? list, int desiredCount, Func<T, int, bool> needsUpdate, Action<int> update)
+	{
+		bool changed = false;
+		
+		list ??= new List<T>();
+		for (int i = 0; i < desiredCount; ++i)
+		{
+			if (i == list.Count)
+			{
+				list.Add(default);
+				update(i);
+				changed = true;
+			}
+			else if (needsUpdate(list[i], i))
+			{
+				update(i);
+				changed = true;
+			}
+		}
+
+		if (list.Count > desiredCount)
+		{
+			list.RemoveRange(desiredCount, list.Count - desiredCount);
+			changed = true;
+		}
+
+		return changed;
 	}
 }

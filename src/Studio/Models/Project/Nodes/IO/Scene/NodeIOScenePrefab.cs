@@ -62,8 +62,11 @@ public static class NodeIOScenePrefab
 				writer.WriteLine($"		instance.GetChild(\"{thisPath}\")!");
 				for (int i = 0; i < node.Meshes.Count; ++i)
 				{
+					string meshName     = settings.Meshes[node.Meshes[i]].Name;
+					string materialName = settings.Materials[settings.Meshes[node.Meshes[i]].MaterialIndex].Name;
+					
 					writer.Write(i > 0 ? "			.Entity" : "			");
-					writer.WriteLine($".AddComponent(new MeshComponent(asset, {node.Meshes[i]}, null)) // {settings.Meshes[node.Meshes[i]].Name}");
+					writer.WriteLine($".AddComponent(new MeshComponent(asset, {node.Meshes[i]}, null)) // mesh:{meshName} material:{materialName}");
 				}
 
 				writer.WriteLine("			;");
