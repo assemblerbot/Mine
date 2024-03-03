@@ -18,6 +18,7 @@ public enum ProjectNodeType
 	AssetTessEvalShader    = 9  << 8 | AssetFlag,
 	AssetGeometryShader    = 10 << 8 | AssetFlag,
 	AssetComputeShader     = 11 << 8 | AssetFlag,
+	//AssetShading           = 12 << 8 | AssetFlag,
 	
 	ScriptFlag   = 0x02,
 	ScriptFolder = 1 << 8 | ScriptFlag,
@@ -59,6 +60,7 @@ public static class ProjectNodeTypeExtensions
 			".comp.hlsl" => ProjectNodeType.AssetComputeShader,
 			".comp.glsl" => ProjectNodeType.AssetComputeShader,
 			".material" => ProjectNodeType.AssetMaterial,
+			//".shading" => ProjectNodeType.AssetShading,
 			_ => ProjectNodeType.AssetBinary
 		};
 	}
@@ -88,6 +90,8 @@ public static class ProjectNodeTypeExtensions
 			ProjectNodeType.AssetTessEvalShader => FontAwesome6.Shapes,
 			ProjectNodeType.AssetGeometryShader => FontAwesome6.Shapes,
 			ProjectNodeType.AssetComputeShader => FontAwesome6.SquareRootVariable,
+			ProjectNodeType.AssetMaterial => FontAwesome6.Palette,
+			//ProjectNodeType.AssetShading => FontAwesome6.PaintRoller,
 			//ProjectNodeType.AssetDefinition => FontAwesome6.Table,
 			
 			ProjectNodeType.ScriptFile => FontAwesome6.FileCode,
