@@ -3,6 +3,8 @@ using System.Text;
 using Mine.Framework;
 using Veldrid;
 using Veldrid.SPIRV;
+using Shader = Mine.Framework.Shader;
+using ShaderConstantType = Mine.Framework.ShaderConstantType;
 
 namespace Mine.Studio;
 
@@ -58,9 +60,87 @@ void main()
 }";
 
 	private string _text = "";
-	
+
+	// just for testing
+	public static AssetReference VertexShaderAsset = new(@"diffuse.vsh.spirv");
+	public static AssetReference PixelShaderAsset  = new(@"diffuse.psh.spirv");
+	public static AssetReference TextureAsset  = new(@"diffuse.png");
+
+	private class MyMaterial : Material
+	{
+		public Vector4Float LightColor     { set => SetShaderConstant("LightColor",     value); }
+		public Vector4Float LightDirection { set => SetShaderConstant("LightDirection", value); }
+
+		public MyMaterial(
+			AssetReference mainTexture
+		)
+			: base(
+				new Pass(
+					"Main",
+					BlendStateDescription.SingleOverrideBlend,
+					new DepthStencilStateDescription(
+						true,
+						true,
+						ComparisonKind.LessEqual
+					),
+					new RasterizerStateDescription(
+						FaceCullMode.Back,
+						PolygonFillMode.Solid,
+						FrontFace.Clockwise,
+						true,
+						false
+					),
+					VertexShaderAsset,
+					PixelShaderAsset,
+					new []
+					{
+						new ShaderResourceSet(
+							new ShaderResourceUniformBuffer(
+								"Constants", ShaderStages.Vertex,
+								new ShaderConstant("WorldMatrix", ShaderConstantSemantic.WorldMatrix, ShaderConstantType.Float4x4),
+								new ShaderConstant("WVPMatrix",   ShaderConstantSemantic.WVPMatrix,   ShaderConstantType.Float4x4),
+								new ShaderConstant("Animation",   ShaderConstantSemantic.Custom,      ShaderConstantType.Float4)
+							)
+						),
+						new ShaderResourceSet(
+							new ShaderResourceUniformBuffer(
+								"Constants", ShaderStages.Fragment,
+								new ShaderConstant("LightColor",     ShaderConstantSemantic.Custom, ShaderConstantType.Float4),
+								new ShaderConstant("LightDirection", ShaderConstantSemantic.Custom, ShaderConstantType.Float4)
+							),
+							new ShaderResourceTextureReadOnly(
+								"MainTexture", ShaderStages.Fragment,
+								mainTexture
+							),
+							new ShaderResourceSampler(
+								"MainTextureSampler", ShaderStages.Fragment,
+								new SamplerDescription(
+									SamplerAddressMode.Wrap, SamplerAddressMode.Wrap, SamplerAddressMode.Wrap,
+									SamplerFilter.MinLinear_MagLinear_MipLinear,
+									ComparisonKind.Always,
+									0,1,1,0,SamplerBorderColor.OpaqueWhite
+								)
+							)
+						),
+					}
+				)
+				//new Pass("Shadow", null, null)
+			)
+		{
+		}
+	}
+
+
 	public override void AfterAddedToWorld()
 	{
+		{
+			// DEBUG
+			MyMaterial material = new (
+				null
+			);
+		}
+
+
 		Vector3Float test = new(1.111f, 2.222f, 3.333f);
 		Vector3      v3   = test.NumericsVector3;
 		
