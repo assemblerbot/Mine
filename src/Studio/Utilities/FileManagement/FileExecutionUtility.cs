@@ -3,10 +3,10 @@ using System.Text;
 
 namespace Mine.Studio;
 
-public static class RunUtility
+public static class FileExecutionUtility
 {
 	// based on StackOverflow
-	public static string RunExternalExe(string filename, string? arguments = null)
+	public static string ExecuteFile(string filename, string? arguments = null)
 	{
 		string Format(string? formatFilename, string? formatArguments)
 		{

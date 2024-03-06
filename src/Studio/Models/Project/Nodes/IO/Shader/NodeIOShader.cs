@@ -34,7 +34,7 @@ public abstract class NodeIOShader : NodeIO
 
 		string arguments = $"-fentry-point={settings.EntryPoint} -fshader-stage={settings.ShaderStage} -o \"{targetPath}\" \"{Owner.AbsolutePath}\"";
 		ConsoleViewModel.LogInfo($"Executing: {_compilerAbsolutePath} {arguments}");
-		string outputLog = RunUtility.RunExternalExe(_compilerAbsolutePath, arguments);
+		string outputLog = FileExecutionUtility.ExecuteFile(_compilerAbsolutePath, arguments);
 		ConsoleViewModel.LogInfo(outputLog);
 	}
 

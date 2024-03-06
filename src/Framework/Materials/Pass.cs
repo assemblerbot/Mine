@@ -5,6 +5,7 @@ namespace Mine.Framework;
 public sealed class Pass
 {
 	public readonly string                       Name;
+	public readonly int                          Order;
 	public readonly BlendStateDescription        BlendStateDescription;
 	public readonly DepthStencilStateDescription DepthStencilStateDescription;
 	public readonly RasterizerStateDescription   RasterizerStateDescription;
@@ -14,6 +15,7 @@ public sealed class Pass
 
 	public Pass(
 		string                       name,
+		int                          order,
 		BlendStateDescription        blendStateDescription,
 		DepthStencilStateDescription depthStencilStateDescription,
 		RasterizerStateDescription   rasterizerStateDescription,
@@ -23,6 +25,7 @@ public sealed class Pass
 	)
 	{
 		Name                         = name;
+		Order                        = order;
 		BlendStateDescription        = blendStateDescription;
 		DepthStencilStateDescription = depthStencilStateDescription;
 		RasterizerStateDescription   = rasterizerStateDescription;

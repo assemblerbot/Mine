@@ -3,7 +3,6 @@ using System.Text;
 using Mine.Framework;
 using Veldrid;
 using Veldrid.SPIRV;
-using Shader = Mine.Framework.Shader;
 using ShaderConstantType = Mine.Framework.ShaderConstantType;
 
 namespace Mine.Studio;
@@ -77,6 +76,7 @@ void main()
 			: base(
 				new Pass(
 					"Main",
+					order:100,
 					BlendStateDescription.SingleOverrideBlend,
 					new DepthStencilStateDescription(
 						true,
