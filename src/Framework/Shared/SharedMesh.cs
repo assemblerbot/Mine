@@ -23,9 +23,9 @@ public sealed class SharedMesh : IDisposable
 			(uint)(sceneMesh.VertexCount * sceneMesh.VertexSize),
 			BufferUsage.VertexBuffer
 		);
-		_vertexBuffer = Engine.Renderer.Factory.CreateBuffer(vertexBufferDescription);
+		_vertexBuffer = Engine.Graphics.Factory.CreateBuffer(vertexBufferDescription);
 
-		Engine.Renderer.Device.UpdateBuffer(_vertexBuffer, 0, vertexData);
+		Engine.Graphics.Device.UpdateBuffer(_vertexBuffer, 0, vertexData);
 		
 		// index buffer
 		if (sceneMesh.UShortIndices != null && sceneMesh.UShortIndices.Length > 0)
@@ -36,9 +36,9 @@ public sealed class SharedMesh : IDisposable
 				BufferUsage.IndexBuffer
 			);
 
-			_indexBuffer = Engine.Renderer.Factory.CreateBuffer(indexBufferDescription);
+			_indexBuffer = Engine.Graphics.Factory.CreateBuffer(indexBufferDescription);
 
-			Engine.Renderer.Device.UpdateBuffer(_indexBuffer, 0, sceneMesh.UShortIndices);
+			Engine.Graphics.Device.UpdateBuffer(_indexBuffer, 0, sceneMesh.UShortIndices);
 		}
 		else if (sceneMesh.UIntIndices != null && sceneMesh.UIntIndices.Length > 0)
 		{
@@ -48,9 +48,9 @@ public sealed class SharedMesh : IDisposable
 				BufferUsage.IndexBuffer
 			);
 
-			_indexBuffer = Engine.Renderer.Factory.CreateBuffer(indexBufferDescription);
+			_indexBuffer = Engine.Graphics.Factory.CreateBuffer(indexBufferDescription);
 
-			Engine.Renderer.Device.UpdateBuffer(_indexBuffer, 0, sceneMesh.UIntIndices);
+			Engine.Graphics.Device.UpdateBuffer(_indexBuffer, 0, sceneMesh.UIntIndices);
 		}
 	}
 	

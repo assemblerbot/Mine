@@ -13,4 +13,10 @@ public abstract class Material
 	{
 		// TODO
 	}
+
+	public Pass? FindPassByName(string name)
+	{
+		int index = Array.FindIndex(Passes, x => x.Name == name);
+		return index == -1 ? null : Passes[index];
+	}
 }

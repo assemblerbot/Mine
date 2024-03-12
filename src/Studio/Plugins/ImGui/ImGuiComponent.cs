@@ -7,7 +7,7 @@ using Veldrid;
 namespace Mine.ImGuiPlugin;
 
 // built-in game object component
-public sealed class ImGuiComponent : Component, IUpdatable, IRenderable
+public sealed class ImGuiComponent : Component, IUpdatable, IRenderer
 {
 	public const string AssetsFolder    = "Plugins/ImGuiAssets/";
 	public const string DefaultFontFile = AssetsFolder + "Roboto-Regular.ttf";
@@ -16,12 +16,12 @@ public sealed class ImGuiComponent : Component, IUpdatable, IRenderable
 	public const int    Size            = 16;
 
 	public int UpdateOrderValue = Int32.MinValue;
-
 	public int UpdateOrder => UpdateOrderValue;
 
 	public int RenderOrderValue = Int32.MaxValue;
-
 	public int RenderOrder => RenderOrderValue;
+
+	public ulong RenderMask => 0;
 
 	private readonly ImGuiRenderer _renderer;
 	private readonly CommandList   _commandList;
@@ -31,27 +31,27 @@ public sealed class ImGuiComponent : Component, IUpdatable, IRenderable
 		Vector2D<int> windowSize = Engine.Window.Size;
 		
 		_renderer = new ImGuiRenderer(
-			Engine.Renderer.Device,
-			Engine.Renderer.Device.MainSwapchain.Framebuffer.OutputDescription,
+			Engine.Graphics.Device,
+			Engine.Graphics.Device.MainSwapchain.Framebuffer.OutputDescription,
 			windowSize.X,
 			windowSize.Y
 		);
 		
-		_commandList = Engine.Renderer.Factory.CreateCommandList();
+		_commandList = Engine.Graphics.Factory.CreateCommandList();
 
 		LoadFonts();
 	}
 
 	public override void AfterAddedToWorld()
 	{
-		World.RegisterUpdatable(this);
-		World.RegisterRenderable(this);
+		Engine.World.RegisterUpdatable(this);
+		Engine.World.RegisterRenderer(this);
 	}
 
 	public override void BeforeRemovedFromWorld()
 	{
-		World.UnregisterUpdatable(this);
-		World.UnregisterRenderable(this);
+		Engine.World.UnregisterUpdatable(this);
+		Engine.World.UnregisterRenderer(this);
 	}
 
 	private void LoadFonts()
@@ -142,10 +142,10 @@ public sealed class ImGuiComponent : Component, IUpdatable, IRenderable
 	public void Render()
 	{
 		_commandList.Begin();
-		_commandList.SetFramebuffer(Engine.Renderer.Device.SwapchainFramebuffer);
-		_renderer.Render(Engine.Renderer.Device, _commandList);
+		_commandList.SetFramebuffer(Engine.Graphics.Device.SwapchainFramebuffer);
+		_renderer.Render(Engine.Graphics.Device, _commandList);
 		_commandList.End();
-		Engine.Renderer.Device.SubmitCommands(_commandList);
+		Engine.Graphics.Device.SubmitCommands(_commandList);
 	}
 	
 	public void WindowResized(Vector2Int size)

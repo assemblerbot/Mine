@@ -253,7 +253,7 @@ public sealed class StudioComponent : Component, IUpdatable
 		// camera
 		{
 			Entity          entity          = new Entity("Camera");
-			CameraComponent cameraComponent = entity.AddComponent<CameraComponent>();
+			RendererComponent rendererComponent = entity.AddComponent(new RendererComponent(0, ulong.MaxValue, new MaskClipper()));
 			Engine.World.Add(entity);
 
 			entity.LocalPosition = new Point3Float(0, -10, 0);

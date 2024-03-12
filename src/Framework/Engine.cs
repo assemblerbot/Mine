@@ -14,7 +14,7 @@ public sealed class Engine
 	private readonly Types           _types  = new();
 	private readonly Config          _config = new();
 	private readonly EngineWindow    _window;
-	private          Renderer        _renderer  = null!;
+	private          Graphics        _graphics  = null!;
 	private          Input           _input     = null!;
 	private          World           _world     = new();
 	private readonly Resources       _resources = new();
@@ -24,7 +24,7 @@ public sealed class Engine
 	public static Types     Types     => _instance._types;
 	public static Config    Config    => _instance._config;
 	public static IWindow   Window    => _instance._window.NativeWindow;
-	public static Renderer  Renderer  => _instance._renderer;
+	public static Graphics  Graphics  => _instance._graphics;
 	public static Input     Input     => _instance._input;
 	public static World     World     => _instance._world;
 	public static Resources Resources => _instance._resources;
@@ -78,13 +78,13 @@ public sealed class Engine
 	private void OnResize(Vector2D<int> size)
 	{
 		Vector2Int newSize = new(size.X, size.Y);
-		_renderer.Resize(newSize);
+		_graphics.Resize(newSize);
 		_world.WindowSizeChanged(newSize);
 	}
 	
 	private void OnLoad()
 	{
-		_renderer = new Renderer(_window.View, _graphicsBackend);
+		_graphics = new Graphics(_window.View, _graphicsBackend);
 		_input    = new Input(_window.View);
 		_resources.Init();
 		_onLoad?.Invoke();
@@ -103,8 +103,9 @@ public sealed class Engine
 
 	private void OnRender(double timeDelta)
 	{
+		_graphics.BeginOfFrame();
 		_world.Render();
-		_renderer.EndOfFrame();
+		_graphics.EndOfFrame();
 	}
 
 	private void OnExit()
@@ -123,8 +124,8 @@ public sealed class Engine
 		_shared?.Dispose();
 		_shared = null!;
 		
-		_renderer?.Dispose();
-		_renderer = null!;
+		_graphics?.Dispose();
+		_graphics = null!;
 	}
 
 	private void OnFocusChangedHandler(bool hasFocus)

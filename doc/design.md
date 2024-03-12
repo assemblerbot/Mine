@@ -10,8 +10,7 @@
 
 ## Game built on top of the MINE engine
 
-- game must be a library too
-- game library is connected to studio so it can read components from it
+- game must be a library too in order to be properly managed by Studio
 - so game solution needs always two projects:
   - game library
   - game executable
@@ -25,22 +24,23 @@
 
 ## Scripts
 
-- game scripts are in **Scripts** directory - not in Assets
+- game scripts are in `GameLibrary` directory - not in Assets
 - scripts are ignored by Studio
-- engine connects to scripts via built game dll
+- ~~engine connects to scripts via built game dll~~
+- studio may generate scripts
 
 ## Scene organization
 
-- there is only one scene
+- there is only one scene named `World`
   - scene cannot be loaded or unloaded - only game objects it contains can be
   - scene is a tree of game objects
     - each game object has a transformation and a list of components
 
 ## Components
 
-- each component is derived from **Component** class
-- there are Updatable and #Renderable components
-- registration to update and render calls is not automatic
+- each component is derived from `Component` class
+- there are `Updatable`, `Renderable`, `Renderer` and `Light` components managed by engine
+- all managed components needs to be registered to lists manually
 
 ## Engine features
 
@@ -57,14 +57,16 @@
 
 ## Resource management
 
-- studio resources are in **Assets** directory
+- studio resources are in `Assets` directory
 	- all files has .meta file which contains:
 		- GUID
 		- hash
 		- importers
-	- prefabs reference files via GUID
+    - in export phase `AssetDatabase` script is generated
+	- prefabs can be created in studio
+    - prefabs reference files via GUID or direct reference to `AssetDatabase`
 
-- engine resources are in **Resources_[platform]** directory
+- engine resources are in `Resources` directory
 	- archives are zip files directly under Resources directory
 		- ordered by name
 		- later archive overrides structurally previous archives
@@ -72,9 +74,9 @@
 	- files are in subfolders
 		- files overrides content of archives
 		- relative path from Resources directory
-	- prefabs reference files via relative resource path (needs to be changed from GUID in build phase)
+	- ~~prefabs reference files via relative resource path (needs to be changed from GUID in build phase)~~
 
-## Prefabs
+## Prefabs OBSOLETE
 
 - prefabs are:
   - edited in studio
@@ -85,7 +87,21 @@
 - prefab can be loaded and instantiated without adding to scene
   - this is something like scriptable object in Unity 
 
-## Meshes
+## Prefabs
+
+- prefabs are:
+  - created from scenes in studio
+  - script classes in a scripts directory
+  - updated by studio if mesh changes ?
+  - instantiated by standard calls from c#
+
+## Scenes
+
+- scene is hierarchy of meshes loaded from any format supported by Assimp
+- stored as hierarchy in `Resources`
+- contains meshes, transform data and additional info (materials, etc) 
+
+## Meshes OBSOLETE
 
 - loaded from any mesh file that is supported by Assimp
 - stored in engine resources as binary json files with **.mesh** extension
@@ -103,10 +119,10 @@
 ## Shaders
 
 - created externally
-- compiled by third-party tool
+- compiled by third-party tool from studio in import phase
 - bytecode stored in Resources
 
-## Materials
+## Materials OBSOLETE
 
 - materials are created in studio
 - material is:
@@ -114,10 +130,19 @@
   - list of textures
   - list of shader parameters
 
-## Renderables
+## Material definitions
 
-- basic renderable function is following:
-  - is selects objects to render
+- C# classes created manually
+- can reference anything from `AssetDatabase` or any other part of code
+
+## Materials
+
+- instances of material definitions in C#
+
+## Camera
+
+- basic camera function is following:
+  - is selects renderable objects to render
     - by frustum culling
     - by layers / tags ?
     - by distance
@@ -154,7 +179,7 @@
 
 - plugin is combination of scripts and resources
 - plugin manager have to copy:
-  - scripts to **Scripts/Plugins** folder
-  - resources to **Assets/Plugins** folder
+  - scripts to `GameLibrary/Plugins` folder
+  - resources to `Assets/Plugins` folder
 - reverse process - updating of the plugin - needs to combine those two folders into one plugin folder
 - plugin json and possible descriptors/meta files/etc sould be together with scripts

@@ -7,7 +7,7 @@ using ShaderConstantType = Mine.Framework.ShaderConstantType;
 
 namespace Mine.Studio;
 
-public class TestRenderComponent : Component, IUpdatable, IRenderable
+public class TestRenderComponent : Component, IUpdatable, IRenderer
 {
 	struct VertexPositionColor
 	{
@@ -25,7 +25,8 @@ public class TestRenderComponent : Component, IUpdatable, IRenderable
 
 	public int UpdateOrder => 0;
 
-	public int RenderOrder => 0;
+	public int   RenderOrder => 0;
+	public ulong RenderMask  => long.MaxValue;
 
 	private DeviceBuffer _vertexBuffer;
 	private DeviceBuffer _indexBuffer;
@@ -79,16 +80,16 @@ void main()
 					order:100,
 					BlendStateDescription.SingleOverrideBlend,
 					new DepthStencilStateDescription(
-						true,
-						true,
+						depthTestEnabled:true,
+						depthWriteEnabled:true,
 						ComparisonKind.LessEqual
 					),
 					new RasterizerStateDescription(
 						FaceCullMode.Back,
 						PolygonFillMode.Solid,
 						FrontFace.Clockwise,
-						true,
-						false
+						depthClipEnabled:true,
+						scissorTestEnabled:false
 					),
 					VertexShaderAsset,
 					PixelShaderAsset,
@@ -130,7 +131,6 @@ void main()
 		}
 	}
 
-
 	public override void AfterAddedToWorld()
 	{
 		{
@@ -140,14 +140,13 @@ void main()
 			);
 		}
 
-
 		Vector3Float test = new(1.111f, 2.222f, 3.333f);
 		Vector3      v3   = test.NumericsVector3;
 		
 		Engine.World.RegisterUpdatable(this);
-		Engine.World.RegisterRenderable(this);
+		Engine.World.RegisterRenderer(this);
 
-		ResourceFactory factory = Engine.Renderer.Factory;
+		ResourceFactory factory = Engine.Graphics.Factory;
 		
 		VertexPositionColor[] quadVertices =
 		{
@@ -180,8 +179,8 @@ void main()
 		}
 
 		//Engine.Renderer.Device.UpdateBuffer(_vertexBuffer, 0, quadVertices);
-		Engine.Renderer.Device.UpdateBuffer(_vertexBuffer, 0, bytesQuadVertices);
-		Engine.Renderer.Device.UpdateBuffer(_indexBuffer,  0, quadIndices);
+		Engine.Graphics.Device.UpdateBuffer(_vertexBuffer, 0, bytesQuadVertices);
+		Engine.Graphics.Device.UpdateBuffer(_indexBuffer,  0, quadIndices);
 
 		VertexLayoutDescription vertexLayout = new VertexLayoutDescription(
 			new VertexElementDescription("Position", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2),
@@ -221,7 +220,7 @@ void main()
 			vertexLayouts: new VertexLayoutDescription[] { vertexLayout },
 			shaders: _shaders);
 
-		pipelineDescription.Outputs = Engine.Renderer.Device.SwapchainFramebuffer.OutputDescription;
+		pipelineDescription.Outputs = Engine.Graphics.Device.SwapchainFramebuffer.OutputDescription;
 		_pipeline                   = factory.CreateGraphicsPipeline(pipelineDescription);
 
 		_commandList = factory.CreateCommandList();
@@ -230,7 +229,7 @@ void main()
 	public void Render()
 	{
 		_commandList.Begin();
-		_commandList.SetFramebuffer(Engine.Renderer.Device.SwapchainFramebuffer);
+		_commandList.SetFramebuffer(Engine.Graphics.Device.SwapchainFramebuffer);
 		_commandList.ClearColorTarget(0, RgbaFloat.Black);
 		
 
@@ -245,7 +244,7 @@ void main()
 			instanceStart: 0);
 
 		_commandList.End();
-		Engine.Renderer.Device.SubmitCommands(_commandList);
+		Engine.Graphics.Device.SubmitCommands(_commandList);
 	}
 
 	public void WindowResized(Vector2Int size)

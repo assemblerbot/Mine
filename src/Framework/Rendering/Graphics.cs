@@ -1,4 +1,3 @@
-using Silk.NET.Maths;
 using Silk.NET.Windowing;
 using Silk.NET.Windowing.Extensions.Veldrid;
 using Veldrid;
@@ -11,7 +10,7 @@ using Veldrid;
 
 namespace Mine.Framework;
 
-public class Renderer : IDisposable
+public class Graphics : IDisposable
 {
 	private GraphicsDevice  _device;
 	private ResourceFactory _factory;
@@ -19,7 +18,7 @@ public class Renderer : IDisposable
 	public GraphicsDevice  Device  => _device;
 	public ResourceFactory Factory => _factory;
 	
-	public Renderer(IView view, GraphicsBackend graphicsBackend)
+	public Graphics(IView view, GraphicsBackend graphicsBackend)
 	{
 		_device = view.CreateGraphicsDevice(
 			new GraphicsDeviceOptions
@@ -44,7 +43,11 @@ public class Renderer : IDisposable
 	{
 		_device.Dispose();
 	}
-	
+
+	public void BeginOfFrame()
+	{
+	}
+
 	public void EndOfFrame()
 	{
 		_device.WaitForIdle();

@@ -4,11 +4,13 @@ public sealed class World : IDisposable
 {
 	private List<Entity> _entities = new();
 
-	private readonly List<IUpdatable>  _updatables  = new();	// sorted by update order
-	private readonly List<IRenderable> _renderables = new();	// sorted by render order
+	private readonly ManagedList<IUpdatable> _updatables  = new(); // sorted by update order
+	private readonly ManagedList<IRenderer>  _renderers   = new(); // sorted by render order
+	private readonly List<IMesh>       _meshes = new();
+	private readonly List<ILight>            _lights      = new();
 
-	private readonly List<IUpdatable>  _updatablesToRemove  = new();
-	private readonly List<IRenderable> _renderablesToRemove = new();
+	public IReadOnlyList<IMesh> Meshes => _meshes;
+	public IReadOnlyList<ILight>      Lights      => _lights;
 	
 	#region Add/Remove
 	public void Add(Entity entity)
@@ -114,102 +116,61 @@ public sealed class World : IDisposable
 	#region Updating
 	public void Update(double timeDelta)
 	{
-		for(int i=0;i<_updatables.Count;++i)
-		{
-			if (_updatables[i].Entity.ActiveInHierarchy)
-			{
-				_updatables[i].Update(timeDelta);
-			}
-		}
-
-		CleanupUpdatables();
+		_updatables.ForEach(x => x.Update(timeDelta));
 	}
 
 	public void RegisterUpdatable(IUpdatable updatable)
 	{
-		int order = updatable.UpdateOrder;
-		int index = _updatables.FindInsertionIndexBinary(x => x.UpdateOrder.CompareTo(order));
-		_updatables.Insert(index, updatable);
+		_updatables.Insert(updatable, x => x.UpdateOrder);
 	}
 	
 	public void UnregisterUpdatable(IUpdatable updatable)
 	{
-		_updatablesToRemove.Add(updatable);
-	}
-
-	private void CleanupUpdatables()
-	{
-		if (_updatablesToRemove.Count == 0)
-		{
-			return;
-		}
-
-		for(int i=0;i<_updatablesToRemove.Count; ++i)
-		{
-			int index = _updatables.IndexOf(_updatablesToRemove[i]);
-			if (index == -1)
-			{
-				continue;
-			}
-
-			_updatables.RemoveAt(index);
-		}
-
-		_updatablesToRemove.Clear();
+		_updatables.Remove(updatable);
 	}
 	#endregion
 
 	#region Rendering
 	public void Render()
 	{
-		for(int i=0;i<_renderables.Count; ++i)
-		{
-			if(_renderables[i].Entity.ActiveInHierarchy)
-			{
-				_renderables[i].Render();
-			}
-		}
+		_renderers.ForEach(x => x.Render());
 	}
 
 	public void WindowSizeChanged(Vector2Int size)
 	{
-		for(int i=0;i<_renderables.Count; ++i)
-		{
-			_renderables[i].WindowResized(size);
-		}
+		_renderers.ForEach(x => x.WindowResized(size));
 	}
 
-	public void RegisterRenderable(IRenderable renderable)
+	public void RegisterRenderer(IRenderer renderer)
 	{
-		int order = renderable.RenderOrder;
-		int index = _renderables.FindInsertionIndexBinary(x => x.RenderOrder.CompareTo(order));
-		_renderables.Insert(index, renderable);
+		_renderers.Insert(renderer, x => x.RenderOrder);
 	}
 
-	public void UnregisterRenderable(IRenderable renderable)
+	public void UnregisterRenderer(IRenderer renderer)
 	{
-		_renderablesToRemove.Add(renderable);
+		_renderers.Remove(renderer);
 	}
 
-	private void CleanupRenderables()
+	//---
+	public void RegisterMesh(IMesh mesh)
 	{
-		if (_renderablesToRemove.Count == 0)
-		{
-			return;
-		}
+		_meshes.Add(mesh);
+	}
 
-		for(int i=0;i<_renderablesToRemove.Count;++i)
-		{
-			int index = _renderables.IndexOf(_renderablesToRemove[i]);
-			if (index == -1)
-			{
-				continue;
-			}
+	public void UnregisterMesh(IMesh mesh)
+	{
+		_meshes.Remove(mesh);
+	}
+	
+	//---
+	public void RegisterLight(ILight light)
+	{
+		_lights.Add(light);
+	}
 
-			_renderables.RemoveAt(index);
-		}
-
-		_renderablesToRemove.Clear();
+	public void UnregisterLight(ILight light)
+	{
+		_lights.Remove(light);
 	}
 	#endregion
 	
