@@ -97,15 +97,21 @@ void main()
 					{
 						new ShaderResourceSet(
 							new ShaderResourceUniformBuffer(
-								"Constants", ShaderStages.Vertex,
-								new ShaderConstant("WorldMatrix", ShaderConstantSemantic.WorldMatrix, ShaderConstantType.Float4x4),
-								new ShaderConstant("WVPMatrix",   ShaderConstantSemantic.WVPMatrix,   ShaderConstantType.Float4x4),
-								new ShaderConstant("Animation",   ShaderConstantSemantic.Custom,      ShaderConstantType.Float4)
+								"Transform", ShaderStages.Vertex, ShaderResourceStorage.Mesh,
+								new ShaderConstant("WorldMatrix", ShaderConstantSemantic.WorldMatrix, ShaderConstantType.Float4x4)
+							),
+							new ShaderResourceUniformBuffer(
+								"Projection", ShaderStages.Vertex, ShaderResourceStorage.Renderer,
+								new ShaderConstant("ViewProjectionMatrix",   ShaderConstantSemantic.ViewProjectionMatrix,   ShaderConstantType.Float4x4)
+							),
+							new ShaderResourceUniformBuffer(
+								"Projection", ShaderStages.Vertex, ShaderResourceStorage.Entity,
+								new ShaderConstant("Animation", ShaderConstantSemantic.Custom,    ShaderConstantType.Float4)
 							)
 						),
 						new ShaderResourceSet(
 							new ShaderResourceUniformBuffer(
-								"Constants", ShaderStages.Fragment,
+								"Light0", ShaderStages.Fragment, ShaderResourceStorage.Light,
 								new ShaderConstant("LightColor",     ShaderConstantSemantic.Custom, ShaderConstantType.Float4),
 								new ShaderConstant("LightDirection", ShaderConstantSemantic.Custom, ShaderConstantType.Float4)
 							),

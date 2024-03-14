@@ -7,6 +7,6 @@ public enum ShaderConstantSemantic
 	WorldMatrix,
 	ViewMatrix,
 	ProjectionMatrix,
-	WVPMatrix,
-	VPMatrix,
+	WorldViewProjectionMatrix,
+	ViewProjectionMatrix,
 }

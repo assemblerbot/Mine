@@ -33,4 +33,8 @@ public sealed class Pass
 		PixelShader                  = pixelShader;
 		ShaderResourceSets           = shaderResourceSets;
 	}
+
+	public void SetRenderObjects(CommandList commandList)
+	{
+	}
 }

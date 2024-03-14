@@ -6,7 +6,7 @@ public sealed class ShaderResourceSampler : ShaderResource
 {
 	public readonly SamplerDescription SamplerDescription;
 	
-	public ShaderResourceSampler(string name, ShaderStages stages, SamplerDescription samplerDescription) : base(name, ResourceKind.Sampler, stages)
+	public ShaderResourceSampler(string name, ShaderStages stages, SamplerDescription samplerDescription) : base(name, ResourceKind.Sampler, stages, ShaderResourceStorage.Material)
 	{
 		SamplerDescription = samplerDescription;
 	}

@@ -8,7 +8,7 @@ public abstract class ShaderResource
 	public readonly ResourceKind Kind;
 	public readonly ShaderStages Stages;
 
-	protected ShaderResource(string name, ResourceKind kind, ShaderStages stages)
+	protected ShaderResource(string name, ResourceKind kind, ShaderStages stages, ShaderResourceStorage storage)
 	{
 		Name   = name;
 		Kind   = kind;

@@ -17,7 +17,7 @@ public class Graphics : IDisposable
 
 	public GraphicsDevice  Device  => _device;
 	public ResourceFactory Factory => _factory;
-	
+
 	public Graphics(IView view, GraphicsBackend graphicsBackend)
 	{
 		_device = view.CreateGraphicsDevice(
