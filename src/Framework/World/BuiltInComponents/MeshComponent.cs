@@ -29,4 +29,13 @@ public class MeshComponent : Component
 
 		Material = material;
 	}
+	public override void AfterAddedToWorld()
+	{
+		//Engine.World.RegisterMesh(TODO);
+	}
+
+	public override void BeforeRemovedFromWorld()
+	{
+		//Engine.World.UnregisterMesh(TODO);
+	}
 }

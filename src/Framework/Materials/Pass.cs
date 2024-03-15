@@ -1,4 +1,3 @@
-using System.Text;
 using Veldrid;
 using Veldrid.SPIRV;
 
@@ -15,7 +14,7 @@ public sealed class Pass : IDisposable
 	public readonly MaterialShader               PixelShader;
 	public readonly ShaderResourceSet[]          ShaderResourceSets;
 
-	private Veldrid.Shader[]? Shaders;
+	private Shader[]? Shaders;
 	
 	public Pass(
 		string                       name,

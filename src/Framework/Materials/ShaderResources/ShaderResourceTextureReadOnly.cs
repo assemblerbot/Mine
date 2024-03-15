@@ -5,6 +5,9 @@ namespace Mine.Framework;
 public sealed class ShaderResourceTextureReadOnly : ShaderResource
 {
 	public readonly AssetReference Reference;
+
+	private Texture?     _texture;
+	private TextureView? _textureView;
 	
 	public ShaderResourceTextureReadOnly(string name, ShaderStages stages, AssetReference reference) : base(name, ResourceKind.TextureReadOnly, stages, ShaderResourceStorage.Material)
 	{
@@ -18,6 +21,10 @@ public sealed class ShaderResourceTextureReadOnly : ShaderResource
 
 	public override void             Dispose()
 	{
-		throw new NotImplementedException();
+		_textureView?.Dispose();
+		_textureView = null;
+		
+		_texture?.Dispose();
+		_texture = null;
 	}
 }

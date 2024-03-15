@@ -5,17 +5,21 @@ namespace Mine.Framework;
 public sealed class SharedMesh : IDisposable
 {
 	// geometry
-	private DeviceBuffer?           _vertexBuffer = null;
-	private DeviceBuffer?           _indexBuffer  = null;
-	private VertexLayoutDescription _vertextLayoutDescription;
+	private DeviceBuffer?      _vertexBuffer = null;
+	private DeviceBuffer?      _indexBuffer  = null;
+	private SharedVertexLayout _sharedVertexLayout; // TODO - this needs to be shared, in reality almost every mesh in the game will have the same layout
 
-	public DeviceBuffer?           VertexBuffer            => _vertexBuffer;
-	public DeviceBuffer?           IndexBuffer             => _indexBuffer;
-	public VertexLayoutDescription VertexLayoutDescription => _vertextLayoutDescription;
+	public DeviceBuffer?      VertexBuffer       => _vertexBuffer;
+	public DeviceBuffer?      IndexBuffer        => _indexBuffer;
+	public SharedVertexLayout SharedVertexLayout => _sharedVertexLayout;
+
+	public PrimitiveTopology Topology => PrimitiveTopology.TriangleList; // hardcoded for now
     
 	public void Init(SceneMesh sceneMesh)
 	{
-		byte[] vertexData = sceneMesh.BuildVertexBufferData(out _vertextLayoutDescription);
+		// create shared vertex layout
+		byte[] vertexData = sceneMesh.BuildVertexBufferData(out VertexLayoutDescription vertexLayoutDescription);
+		_sharedVertexLayout = Engine.Shared.GetOrCreateVertexLayout(vertexLayoutDescription);
 		
 		// vertex buffer
 		BufferDescription vertexBufferDescription = new

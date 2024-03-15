@@ -31,20 +31,23 @@ public sealed class Engine
 	public static Shared    Shared    => _instance._shared;
 	public static Paths     Paths     => _instance._paths;
 	
-	private Action?       _onLoad;
-	private Action?       _onExit;
+	private Action? _onLoad;
+	private Action? _onExit;
 
 	private bool _exitRequested = false;
 
-	public         Action<bool>?  OnFocusChanged;
+	public         Action<bool>? OnFocusChanged;
 	private        bool          _hasFocus = true;
 	public  static bool          HasFocus => _instance._hasFocus;
+
+	private static ulong _uniqueId = 0;
+	public static  ulong NextUniqueId => _uniqueId++; // engine-wide unique id that can be used for anything in runtime, not in save/load state!
 	
 	public Engine(string[] applicationArguments, string applicationName, Action? onLoad = null, Action? onExit = null)
 	{
 		_instance = this;
 		
-		_paths    = new Paths(applicationName);
+		_paths = new Paths(applicationName);
 
 		ParseArguments(applicationArguments);
 		

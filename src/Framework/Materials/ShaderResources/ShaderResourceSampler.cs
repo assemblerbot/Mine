@@ -5,6 +5,8 @@ namespace Mine.Framework;
 public sealed class ShaderResourceSampler : ShaderResource
 {
 	public readonly SamplerDescription SamplerDescription;
+
+	private Sampler? _sampler;
 	
 	public ShaderResourceSampler(string name, ShaderStages stages, SamplerDescription samplerDescription) : base(name, ResourceKind.Sampler, stages, ShaderResourceStorage.Material)
 	{
@@ -13,11 +15,18 @@ public sealed class ShaderResourceSampler : ShaderResource
 
 	public override BindableResource GetOrCreateBindableResource()
 	{
-		throw new NotImplementedException();
+		if (_sampler is not null)
+		{
+			return _sampler;
+		}
+
+		_sampler = Engine.Graphics.Factory.CreateSampler(SamplerDescription);
+		return _sampler;
 	}
 
 	public override void             Dispose()
 	{
-		throw new NotImplementedException();
+		_sampler?.Dispose();
+		_sampler = null;
 	}
 }

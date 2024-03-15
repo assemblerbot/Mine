@@ -71,6 +71,9 @@ void main()
 		public Vector4Float LightColor     { set => SetShaderConstant("LightColor",     value); }
 		public Vector4Float LightDirection { set => SetShaderConstant("LightDirection", value); }
 
+		private static  ulong _id = Engine.NextUniqueId;
+		public override ulong Id => _id;
+		
 		public MyMaterial(
 			AssetReference mainTexture
 		)
@@ -223,7 +226,7 @@ void main()
 		pipelineDescription.ResourceLayouts   = Array.Empty<ResourceLayout>(); // material
 
 		pipelineDescription.ShaderSet = new ShaderSetDescription(
-			vertexLayouts: new VertexLayoutDescription[] { vertexLayout }, // mesh
+			vertexLayouts: new VertexLayoutDescription[] { vertexLayout }, // mesh - must be same as mesh, but shader input vertex layout may be different
 			shaders: _shaders);                                            // material
 
 		pipelineDescription.Outputs = Engine.Graphics.Device.SwapchainFramebuffer.OutputDescription; // renderer

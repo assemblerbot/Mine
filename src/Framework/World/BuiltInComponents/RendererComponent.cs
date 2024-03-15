@@ -9,7 +9,17 @@ public class RendererComponent : Component, IRenderer
 	public Clipper      Clipper;
 	public List<string> Passes = new();
 
-	private CommandList _commandList = null!;
+	public bool            ClearColorTarget      = true;
+	public Color4FloatRGBA ClearColor = Color4FloatRGBA.Black;
+
+	public bool  ClearDepthTarget = true;
+	public float ClearDepth       = 1f;
+
+	public bool  ClearStencilTarget = false;
+	public byte  ClearStencil     = 0;
+
+	private CommandList? _commandList;
+	private Framebuffer? _framebuffer;
 
 	public RendererComponent(int renderOrder, ulong renderMask, Clipper clipper)
 	{
@@ -29,20 +39,56 @@ public class RendererComponent : Component, IRenderer
 	{
 		Engine.World.UnregisterRenderer(this);
 
-		_commandList.Dispose();
+		_commandList?.Dispose();
 		_commandList = null!;
+
+		_framebuffer?.Dispose();
+		_framebuffer = null;
 	}
 
 	public virtual void Render()
 	{
-		// set and clear target
-		// TODO
-		
-		if (Passes.Count == 0)
+		if (_commandList is null)
 		{
-			return;
+			throw new NullReferenceException("Command buffer cannot be null!");
 		}
 
+		_commandList.Begin();
+
+		// set frame buffer
+		_commandList.SetFramebuffer(Engine.Graphics.Device.SwapchainFramebuffer); // TODO - texture
+
+		// clear color target
+		if (ClearColorTarget)
+		{
+			_commandList.ClearColorTarget(0, ClearColor.VeldridRgbaFloat); // TODO - target index is always 0
+		}
+
+		// clear depth-stencil target
+		if (ClearDepthTarget)
+		{
+			if (ClearStencilTarget)
+			{
+				_commandList.ClearDepthStencil(ClearDepth, ClearStencil);
+			}
+			else
+			{
+				_commandList.ClearDepthStencil(ClearDepth);
+			}
+		}
+
+		// render
+		RenderMeshes();
+		_commandList.End();
+		Engine.Graphics.Device.SubmitCommands(_commandList);
+	}
+	
+	public virtual void WindowResized(Vector2Int size)
+	{
+	}
+
+	private void RenderMeshes()
+	{
 		List<IMesh> meshes = Clipper.CollectMeshes(this);
 		if (meshes.Count == 0)
 		{
@@ -50,19 +96,10 @@ public class RendererComponent : Component, IRenderer
 		}
 
 		List<ILight>? lights = null;
-
-		_commandList.Begin();
 		foreach (string pass in Passes)
 		{
 			RenderPass(pass, meshes, ref lights);
 		}
-		_commandList.End();
-		Engine.Graphics.Device.SubmitCommands(_commandList);
-	}
-	
-	public virtual void WindowResized(Vector2Int size)
-	{
-		
 	}
 
 	private void RenderPass(string passName, List<IMesh> meshes, ref List<ILight>? lights)
@@ -83,6 +120,8 @@ public class RendererComponent : Component, IRenderer
 		// draw
 		foreach ((IMesh mesh, Pass pass) renderObject in sortedRenderObjects.Values)
 		{
+			
+			
 			renderObject.pass.SetupDrawing(_commandList); // TODO - cache
 			renderObject.mesh.Draw(_commandList);
 		}
