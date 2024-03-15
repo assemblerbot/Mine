@@ -10,4 +10,14 @@ public sealed class ShaderResourceSampler : ShaderResource
 	{
 		SamplerDescription = samplerDescription;
 	}
+
+	public override BindableResource GetOrCreateBindableResource()
+	{
+		throw new NotImplementedException();
+	}
+
+	public override void             Dispose()
+	{
+		throw new NotImplementedException();
+	}
 }

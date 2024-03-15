@@ -10,4 +10,14 @@ public sealed class ShaderResourceTextureReadOnly : ShaderResource
 	{
 		Reference = reference;
 	}
+
+	public override BindableResource GetOrCreateBindableResource()
+	{
+		throw new NotImplementedException();
+	}
+
+	public override void             Dispose()
+	{
+		throw new NotImplementedException();
+	}
 }

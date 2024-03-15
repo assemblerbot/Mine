@@ -14,4 +14,12 @@ public abstract class ShaderResource
 		Kind   = kind;
 		Stages = stages;
 	}
+
+	public ResourceLayoutElementDescription CreateResourceLayoutElementDescription()
+	{
+		return new ResourceLayoutElementDescription(Name, Kind, Stages);
+	}
+
+	public abstract BindableResource GetOrCreateBindableResource();
+	public abstract void             Dispose();
 }

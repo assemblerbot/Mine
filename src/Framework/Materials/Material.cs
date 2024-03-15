@@ -1,6 +1,6 @@
 namespace Mine.Framework;
 
-public abstract class Material
+public abstract class Material : IDisposable
 {
 	public readonly Pass[] Passes;
 
@@ -18,5 +18,13 @@ public abstract class Material
 	{
 		int index = Array.FindIndex(Passes, x => x.Name == name);
 		return index == -1 ? null : Passes[index];
+	}
+
+	public void Dispose()
+	{
+		foreach (Pass pass in Passes)
+		{
+			pass.Dispose();
+		}
 	}
 }

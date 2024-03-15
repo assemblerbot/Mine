@@ -43,7 +43,7 @@ public class RendererComponent : Component, IRenderer
 			return;
 		}
 
-		List<IMesh>   meshes = Clipper.CollectMeshes(this);
+		List<IMesh> meshes = Clipper.CollectMeshes(this);
 		if (meshes.Count == 0)
 		{
 			return;
@@ -68,7 +68,7 @@ public class RendererComponent : Component, IRenderer
 	private void RenderPass(string passName, List<IMesh> meshes, ref List<ILight>? lights)
 	{
 		// collect and sort meshes by order of their render passes
-		SortedList<int, (IMesh mesh, Pass pass)> sortedMeshes = new(meshes.Count);
+		SortedList<int, (IMesh mesh, Pass pass)> sortedRenderObjects = new(meshes.Count);
 		foreach (IMesh mesh in meshes)
 		{
 			Pass? pass = mesh.Material.FindPassByName(passName);
@@ -77,14 +77,14 @@ public class RendererComponent : Component, IRenderer
 				continue;
 			}
 
-			sortedMeshes.Add(pass.Order, (mesh, pass)); // TODO - combine by material to minimize pipeline changes
+			sortedRenderObjects.Add(pass.Order, (mesh, pass)); // TODO - combine by material to minimize pipeline changes
 		}
 		
 		// draw
-		foreach ((IMesh mesh, Pass pass) item in sortedMeshes.Values)
+		foreach ((IMesh mesh, Pass pass) renderObject in sortedRenderObjects.Values)
 		{
-			item.pass.SetRenderObjects(_commandList); // TODO - cache
-			item.mesh.Draw(_commandList);
+			renderObject.pass.SetupDrawing(_commandList); // TODO - cache
+			renderObject.mesh.Draw(_commandList);
 		}
 
 		//lights = Clipper.CollectLights(this);

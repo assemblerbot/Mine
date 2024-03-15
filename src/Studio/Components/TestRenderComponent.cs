@@ -28,11 +28,11 @@ public class TestRenderComponent : Component, IUpdatable, IRenderer
 	public int   RenderOrder => 0;
 	public ulong RenderMask  => long.MaxValue;
 
-	private DeviceBuffer _vertexBuffer;
-	private DeviceBuffer _indexBuffer;
-	private Veldrid.Shader[]     _shaders;
-	private Pipeline     _pipeline;
-	private CommandList  _commandList = null!;
+	private DeviceBuffer     _vertexBuffer;
+	private DeviceBuffer     _indexBuffer;
+	private Veldrid.Shader[] _shaders;
+	private Pipeline         _pipeline;
+	private CommandList      _commandList = null!;
 	
 	private const string VertexCode = @"
 #version 450
@@ -64,7 +64,7 @@ void main()
 	// just for testing
 	public static AssetReference VertexShaderAsset = new(@"diffuse.vsh.spirv");
 	public static AssetReference PixelShaderAsset  = new(@"diffuse.psh.spirv");
-	public static AssetReference TextureAsset  = new(@"diffuse.png");
+	public static AssetReference TextureAsset      = new(@"diffuse.png");
 
 	private class MyMaterial : Material
 	{
@@ -91,45 +91,45 @@ void main()
 						depthClipEnabled:true,
 						scissorTestEnabled:false
 					),
-					VertexShaderAsset,
-					PixelShaderAsset,
-					new []
-					{
-						new ShaderResourceSet(
-							new ShaderResourceUniformBuffer(
-								"Transform", ShaderStages.Vertex, ShaderResourceStorage.Mesh,
-								new ShaderConstant("WorldMatrix", ShaderConstantSemantic.WorldMatrix, ShaderConstantType.Float4x4)
-							),
-							new ShaderResourceUniformBuffer(
-								"Projection", ShaderStages.Vertex, ShaderResourceStorage.Renderer,
-								new ShaderConstant("ViewProjectionMatrix",   ShaderConstantSemantic.ViewProjectionMatrix,   ShaderConstantType.Float4x4)
-							),
-							new ShaderResourceUniformBuffer(
-								"Projection", ShaderStages.Vertex, ShaderResourceStorage.Entity,
-								new ShaderConstant("Animation", ShaderConstantSemantic.Custom,    ShaderConstantType.Float4)
-							)
-						),
-						new ShaderResourceSet(
-							new ShaderResourceUniformBuffer(
-								"Light0", ShaderStages.Fragment, ShaderResourceStorage.Light,
-								new ShaderConstant("LightColor",     ShaderConstantSemantic.Custom, ShaderConstantType.Float4),
-								new ShaderConstant("LightDirection", ShaderConstantSemantic.Custom, ShaderConstantType.Float4)
-							),
-							new ShaderResourceTextureReadOnly(
-								"MainTexture", ShaderStages.Fragment,
-								mainTexture
-							),
-							new ShaderResourceSampler(
-								"MainTextureSampler", ShaderStages.Fragment,
-								new SamplerDescription(
-									SamplerAddressMode.Wrap, SamplerAddressMode.Wrap, SamplerAddressMode.Wrap,
-									SamplerFilter.MinLinear_MagLinear_MipLinear,
-									ComparisonKind.Always,
-									0,1,1,0,SamplerBorderColor.OpaqueWhite
-								)
-							)
-						),
-					}
+					new MaterialShader(VertexShaderAsset, ShaderStages.Vertex,   "Main"),
+					new MaterialShader(PixelShaderAsset,  ShaderStages.Fragment, "Main"),
+					
+					new[] {
+						      new ShaderResourceSet(
+							      new ShaderResourceUniformBuffer(
+								      "Transform", ShaderStages.Vertex, ShaderResourceStorage.Mesh,
+								      new ShaderConstant("WorldMatrix", ShaderConstantSemantic.WorldMatrix, ShaderConstantType.Float4x4)
+							      ),
+							      new ShaderResourceUniformBuffer(
+								      "Projection", ShaderStages.Vertex, ShaderResourceStorage.Renderer,
+								      new ShaderConstant("ViewProjectionMatrix", ShaderConstantSemantic.ViewProjectionMatrix, ShaderConstantType.Float4x4)
+							      ),
+							      new ShaderResourceUniformBuffer(
+								      "Projection", ShaderStages.Vertex, ShaderResourceStorage.Entity,
+								      new ShaderConstant("Animation", ShaderConstantSemantic.Custom, ShaderConstantType.Float4)
+							      )
+						      ),
+						      new ShaderResourceSet(
+							      new ShaderResourceUniformBuffer(
+								      "Light0", ShaderStages.Fragment, ShaderResourceStorage.Light,
+								      new ShaderConstant("LightColor",     ShaderConstantSemantic.Custom, ShaderConstantType.Float4),
+								      new ShaderConstant("LightDirection", ShaderConstantSemantic.Custom, ShaderConstantType.Float4)
+							      ),
+							      new ShaderResourceTextureReadOnly(
+								      "MainTexture", ShaderStages.Fragment,
+								      mainTexture
+							      ),
+							      new ShaderResourceSampler(
+								      "MainTextureSampler", ShaderStages.Fragment,
+								      new SamplerDescription(
+									      SamplerAddressMode.Wrap, SamplerAddressMode.Wrap, SamplerAddressMode.Wrap,
+									      SamplerFilter.MinLinear_MagLinear_MipLinear,
+									      ComparisonKind.Always,
+									      0,1,1,0,SamplerBorderColor.OpaqueWhite
+								      )
+							      )
+						      ),
+					      }
 				)
 				//new Pass("Shadow", null, null)
 			)
@@ -205,28 +205,28 @@ void main()
 		_shaders = factory.CreateFromSpirv(vertexShaderDesc, fragmentShaderDesc);
 
 		GraphicsPipelineDescription pipelineDescription = new GraphicsPipelineDescription();
-		pipelineDescription.BlendState = BlendStateDescription.SingleOverrideBlend;
+		pipelineDescription.BlendState = BlendStateDescription.SingleOverrideBlend; // material
 
-		pipelineDescription.DepthStencilState = new DepthStencilStateDescription(
+		pipelineDescription.DepthStencilState = new DepthStencilStateDescription( // material
 			depthTestEnabled: true,
 			depthWriteEnabled: true,
 			comparisonKind: ComparisonKind.LessEqual);
 
-		pipelineDescription.RasterizerState = new RasterizerStateDescription(
+		pipelineDescription.RasterizerState = new RasterizerStateDescription( // material
 			cullMode: FaceCullMode.Back,
 			fillMode: PolygonFillMode.Solid,
 			frontFace: FrontFace.Clockwise,
 			depthClipEnabled: true,
 			scissorTestEnabled: false);
 
-		pipelineDescription.PrimitiveTopology = PrimitiveTopology.TriangleStrip;
-		pipelineDescription.ResourceLayouts   = Array.Empty<ResourceLayout>();
+		pipelineDescription.PrimitiveTopology = PrimitiveTopology.TriangleStrip; // mesh
+		pipelineDescription.ResourceLayouts   = Array.Empty<ResourceLayout>(); // material
 
 		pipelineDescription.ShaderSet = new ShaderSetDescription(
-			vertexLayouts: new VertexLayoutDescription[] { vertexLayout },
-			shaders: _shaders);
+			vertexLayouts: new VertexLayoutDescription[] { vertexLayout }, // mesh
+			shaders: _shaders);                                            // material
 
-		pipelineDescription.Outputs = Engine.Graphics.Device.SwapchainFramebuffer.OutputDescription;
+		pipelineDescription.Outputs = Engine.Graphics.Device.SwapchainFramebuffer.OutputDescription; // renderer
 		_pipeline                   = factory.CreateGraphicsPipeline(pipelineDescription);
 
 		_commandList = factory.CreateCommandList();
