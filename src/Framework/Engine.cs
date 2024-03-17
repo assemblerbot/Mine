@@ -41,7 +41,7 @@ public sealed class Engine
 	public  static bool          HasFocus => _instance._hasFocus;
 
 	private static ulong _uniqueId = 0;
-	public static  ulong NextUniqueId => _uniqueId++; // engine-wide unique id that can be used for anything in runtime, not in save/load state!
+	public static  ulong NextUniqueId => ++_uniqueId; // engine-wide unique id that can be used for anything in runtime, not in save/load state! Never returns 0.
 	
 	public Engine(string[] applicationArguments, string applicationName, Action? onLoad = null, Action? onExit = null)
 	{

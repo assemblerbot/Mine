@@ -27,4 +27,8 @@ public sealed class ShaderResourceTextureReadOnly : ShaderResource
 		_texture?.Dispose();
 		_texture = null;
 	}
+
+	public override void Update()
+	{
+	}
 }

@@ -9,12 +9,15 @@ public sealed class ShaderResourceSet : IDisposable
 	private ResourceLayout? _resourceLayout;
 	private ResourceSet?    _resourceSet;
 
+	public ResourceLayout ResourceLayout => GetOrCreateResourceLayout();
+	public ResourceSet    ResourceSet    => GetOrCreateResourceSet();
+
 	public ShaderResourceSet(params ShaderResource[] resources)
 	{
 		Resources = resources;
 	}
 
-	public ResourceLayout GetOrCreateResourceLayout()
+	private ResourceLayout GetOrCreateResourceLayout()
 	{
 		if (_resourceLayout is not null)
 		{
@@ -32,7 +35,7 @@ public sealed class ShaderResourceSet : IDisposable
 		return _resourceLayout;
 	}
 
-	public ResourceSet GetOrCreateResourceSet()
+	private ResourceSet GetOrCreateResourceSet()
 	{
 		if (_resourceSet is not null)
 		{

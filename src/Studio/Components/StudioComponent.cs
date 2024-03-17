@@ -243,7 +243,7 @@ public sealed class StudioComponent : Component, IUpdatable
 		// mesh
 		{
 			Entity entity = new Entity("Suzanne");
-			entity.AddComponent(new MeshComponent(Suzanne, 0, null));
+			entity.AddComponent(new MeshComponent(Suzanne, 0, null, ulong.MaxValue));
 
 			// TODO material
 			
@@ -253,7 +253,7 @@ public sealed class StudioComponent : Component, IUpdatable
 		// camera
 		{
 			Entity          entity          = new Entity("Camera");
-			RendererComponent rendererComponent = entity.AddComponent(new RendererComponent(0, ulong.MaxValue, new MaskClipper()));
+			//RendererComponent rendererComponent = entity.AddComponent(new RendererComponent(0, ulong.MaxValue, new MaskClipper()));
 			Engine.World.Add(entity);
 
 			entity.LocalPosition = new Point3Float(0, -10, 0);

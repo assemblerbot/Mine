@@ -71,14 +71,14 @@ void main()
 		public Vector4Float LightColor     { set => SetShaderConstant("LightColor",     value); }
 		public Vector4Float LightDirection { set => SetShaderConstant("LightDirection", value); }
 
-		private static  ulong _id = Engine.NextUniqueId;
-		public override ulong Id => _id;
+		private static ulong _mainPassId = Engine.NextUniqueId;
 		
 		public MyMaterial(
 			AssetReference mainTexture
 		)
 			: base(
 				new Pass(
+					_mainPassId,
 					"Main",
 					order:100,
 					BlendStateDescription.SingleOverrideBlend,
@@ -99,7 +99,7 @@ void main()
 					
 					new[] {
 						      new ShaderResourceSet(
-							      new ShaderResourceUniformBuffer(
+							      new ShaderResourceUniformBuffer( // TODO - semantic per buffer not per constant
 								      "Transform", ShaderStages.Vertex, ShaderResourceStorage.Mesh,
 								      new ShaderConstant("WorldMatrix", ShaderConstantSemantic.WorldMatrix, ShaderConstantType.Float4x4)
 							      ),
@@ -108,7 +108,7 @@ void main()
 								      new ShaderConstant("ViewProjectionMatrix", ShaderConstantSemantic.ViewProjectionMatrix, ShaderConstantType.Float4x4)
 							      ),
 							      new ShaderResourceUniformBuffer(
-								      "Projection", ShaderStages.Vertex, ShaderResourceStorage.Entity,
+								      "Animation", ShaderStages.Vertex, ShaderResourceStorage.Entity,
 								      new ShaderConstant("Animation", ShaderConstantSemantic.Custom, ShaderConstantType.Float4)
 							      )
 						      ),

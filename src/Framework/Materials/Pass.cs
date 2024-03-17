@@ -5,6 +5,7 @@ namespace Mine.Framework;
 
 public sealed class Pass : IDisposable
 {
+	public readonly ulong                        Id;
 	public readonly string                       Name;
 	public readonly int                          Order;
 	public readonly BlendStateDescription        BlendStateDescription;
@@ -13,10 +14,13 @@ public sealed class Pass : IDisposable
 	public readonly MaterialShader               VertexShader;
 	public readonly MaterialShader               PixelShader;
 	public readonly ShaderResourceSet[]          ShaderResourceSets;
+	
+	public readonly ResourceLayout[]             ResourceLayouts;
 
-	private Shader[]? Shaders;
+	public Shader[]? Shaders;
 	
 	public Pass(
+		ulong                        id,
 		string                       name,
 		int                          order,
 		BlendStateDescription        blendStateDescription,
@@ -27,6 +31,7 @@ public sealed class Pass : IDisposable
 		ShaderResourceSet[]          shaderResourceSets
 	)
 	{
+		Id                           = id;
 		Name                         = name;
 		Order                        = order;
 		BlendStateDescription        = blendStateDescription;
@@ -35,11 +40,20 @@ public sealed class Pass : IDisposable
 		VertexShader                 = vertexShader;
 		PixelShader                  = pixelShader;
 		ShaderResourceSets           = shaderResourceSets;
+
+		ResourceLayouts = new ResourceLayout[shaderResourceSets.Length];
+		for (int i = 0; i < shaderResourceSets.Length; ++i)
+		{
+			ResourceLayouts[i] = shaderResourceSets[i].ResourceLayout!;
+		}
 	}
 
 	public void SetupDrawing(CommandList commandList)
 	{
-		
+		for (int i = 0; i < ShaderResourceSets.Length; ++i)
+		{
+			commandList.SetGraphicsResourceSet((uint)i, ShaderResourceSets[i].ResourceSet!);
+		}
 	}
 
 	private void CreateShaders()

@@ -4,7 +4,7 @@ namespace Mine.Framework;
 
 public interface IMesh : IRenderable
 {
-	ulong Id { get; }
+	SharedMesh SharedMesh { get; }
 	Material Material { get; }
 	void     Draw(CommandList commandList);
 }

@@ -2,7 +2,7 @@ using Veldrid;
 
 namespace Mine.Framework;
 
-public class RendererComponent : Component, IRenderer
+public abstract class RendererComponent : Component, IRenderer
 {
 	public int          RenderOrder { get; private set; }
 	public ulong        RenderMask  { get; private set; }
@@ -20,6 +20,8 @@ public class RendererComponent : Component, IRenderer
 
 	private CommandList? _commandList;
 	private Framebuffer? _framebuffer;
+
+	private ulong OutputId = 0; // TODO output - 0 for default frame buffer
 
 	public RendererComponent(int renderOrder, ulong renderMask, Clipper clipper)
 	{
@@ -56,12 +58,12 @@ public class RendererComponent : Component, IRenderer
 		_commandList.Begin();
 
 		// set frame buffer
-		_commandList.SetFramebuffer(Engine.Graphics.Device.SwapchainFramebuffer); // TODO - texture
+		_commandList.SetFramebuffer(Engine.Graphics.Device.SwapchainFramebuffer); // TODO output - texture
 
 		// clear color target
 		if (ClearColorTarget)
 		{
-			_commandList.ClearColorTarget(0, ClearColor.VeldridRgbaFloat); // TODO - target index is always 0
+			_commandList.ClearColorTarget(0, ClearColor.VeldridRgbaFloat); // TODO output - target index is always 0
 		}
 
 		// clear depth-stencil target
@@ -118,10 +120,29 @@ public class RendererComponent : Component, IRenderer
 		}
 		
 		// draw
+		SharedPipelineId previousPipelineId = new();
 		foreach ((IMesh mesh, Pass pass) renderObject in sortedRenderObjects.Values)
 		{
+			SharedPipelineId pipelineId = new(
+				renderObject.pass.Id,
+				renderObject.mesh.SharedMesh.SharedVertexLayout.Id,
+				renderObject.mesh.SharedMesh.Topology,
+				OutputId
+			);
 			
-			
+			if (pipelineId != previousPipelineId)
+			{
+				SharedPipeline sharedPipeline = Engine.Shared.GetOrCreatePipeline(
+					pipelineId,
+					renderObject.mesh.SharedMesh,
+					renderObject.pass,
+					Engine.Graphics.Device.SwapchainFramebuffer.OutputDescription
+				); // TODO output - custom output
+				
+				_commandList.SetPipeline(sharedPipeline.Pipeline);
+				previousPipelineId = pipelineId;
+			}
+
 			renderObject.pass.SetupDrawing(_commandList); // TODO - cache
 			renderObject.mesh.Draw(_commandList);
 		}

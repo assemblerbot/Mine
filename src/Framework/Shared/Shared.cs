@@ -4,18 +4,17 @@ namespace Mine.Framework;
 
 public sealed class Shared : IDisposable
 {
-	private readonly Dictionary<(string, int), SharedMesh> _meshes        = new();
-	private readonly Dictionary<string, SharedMaterial>    _materials     = new();
-	private readonly Dictionary<string, SharedTexture>     _textures      = new();
-	private readonly Dictionary<string, SharedPipeline>    _pipelines     = new();
-	private readonly List<SharedVertexLayout>              _vertexLayouts = new();
-	//private readonly List<
+	private readonly Dictionary<(string, int), SharedMesh>        _meshes        = new();
+	//private readonly Dictionary<string, SharedMaterial>           _materials     = new();
+	private readonly Dictionary<string, SharedTexture>            _textures      = new();
+	private readonly Dictionary<SharedPipelineId, SharedPipeline> _pipelines     = new();
+	private readonly List<SharedVertexLayout>                     _vertexLayouts = new();
 
 	public void Dispose()
 	{
 		DisposeDictionary(_pipelines);
 		DisposeDictionary(_meshes);
-		DisposeDictionary(_materials);
+		//DisposeDictionary(_materials);
 		DisposeDictionary(_textures);
 		_vertexLayouts.Clear();
 	}
@@ -56,5 +55,17 @@ public sealed class Shared : IDisposable
 		}
 
 		dictionary.Clear();
+	}
+
+	public SharedPipeline GetOrCreatePipeline(SharedPipelineId pipelineId, SharedMesh mesh, Pass pass, OutputDescription output)
+	{
+		if(_pipelines.TryGetValue(pipelineId, out SharedPipeline? pipeline))
+		{
+			return pipeline;
+		}
+
+		pipeline = new SharedPipeline(mesh, pass, output);
+		_pipelines.Add(pipelineId, pipeline);
+		return pipeline;
 	}
 }

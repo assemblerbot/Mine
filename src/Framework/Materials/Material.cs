@@ -3,7 +3,6 @@ namespace Mine.Framework;
 public abstract class Material : IDisposable
 {
 	public readonly Pass[] Passes;
-	public abstract ulong   Id { get; }
 
 	public Material(params Pass[] passes)
 	{

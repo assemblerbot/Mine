@@ -6,11 +6,17 @@ public sealed class ShaderResourceUniformBuffer : ShaderResource
 {
 	public readonly ShaderConstant[] Constants;
 
-	private DeviceBuffer? _buffer;
+	private DeviceBuffer?    _buffer;
 
 	public ShaderResourceUniformBuffer(string name, ShaderStages stages, ShaderResourceStorage storage, params ShaderConstant[] constants) : base(name, ResourceKind.UniformBuffer, stages, storage)
 	{
 		Constants = constants;
+	}
+
+	public ShaderResourceUniformBuffer(string name, ShaderStages stages, UniformBufferKind kind)
+		: base(name, ResourceKind.UniformBuffer, stages, ShaderResourceStorage.None)
+	{
+		
 	}
 
 	public BufferDescription CreateDescription()
@@ -34,5 +40,10 @@ public sealed class ShaderResourceUniformBuffer : ShaderResource
 	{
 		_buffer?.Dispose();
 		_buffer = null;
+	}
+
+	public override void Update()
+	{
+		
 	}
 }

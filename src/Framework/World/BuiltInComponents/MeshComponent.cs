@@ -2,32 +2,40 @@ using Veldrid;
 
 namespace Mine.Framework;
 
-public class MeshComponent : Component
+public class MeshComponent : Component, IMesh
 {
 	public BoundingBoxFloat BoundingBox;
 
-	public SharedMesh? Mesh;
-	public Material? Material;
+	private SharedMesh _sharedMesh;
+	private Material   _material;
+	private ulong      _renderMask;
 
-	public MeshComponent(SharedMesh? mesh, Material? material)
+	public SharedMesh SharedMesh => _sharedMesh;
+	public Material   Material   => _material;
+	public ulong      RenderMask => _renderMask;
+
+	public MeshComponent(SharedMesh sharedMesh, Material material, ulong renderMask)
 	{
-		Mesh     = mesh;
-		Material = material;
+		_sharedMesh = sharedMesh;
+		_material   = material;
+		_renderMask = renderMask;
 	}
 
-	public MeshComponent(SceneReference? sceneReference, int meshIndex, Material? material)
+	public MeshComponent(SceneReference? sceneReference, int meshIndex, Material? material, ulong renderMask)
 	{
+		// TODO - empty object (cube), empty material
 		if (sceneReference is null)
 		{
-			Mesh = null;
+			_sharedMesh = null;
 		}
 		else
 		{
 			Scene? scene = sceneReference.Value;
-			Mesh = scene?.Meshes is null ? null : Engine.Shared.GetOrCreateMesh(sceneReference.Path, meshIndex, scene.Meshes[meshIndex]);
+			_sharedMesh = scene?.Meshes is null ? null : Engine.Shared.GetOrCreateMesh(sceneReference.Path, meshIndex, scene.Meshes[meshIndex]);
 		}
 
-		Material = material;
+		_material   = material;
+		_renderMask = renderMask;
 	}
 	public override void AfterAddedToWorld()
 	{
@@ -37,5 +45,12 @@ public class MeshComponent : Component
 	public override void BeforeRemovedFromWorld()
 	{
 		//Engine.World.UnregisterMesh(TODO);
+	}
+
+	public void Draw(CommandList commandList)
+	{
+		commandList.SetVertexBuffer(0, _sharedMesh.VertexBuffer); // TODO - slot index?
+		commandList.SetIndexBuffer(_sharedMesh.IndexBuffer, _sharedMesh.IndexBufferFormat);
+		commandList.DrawIndexed(_sharedMesh.IndexCount, 1, 0, 0, 0);
 	}
 }
