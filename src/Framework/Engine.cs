@@ -20,6 +20,7 @@ public sealed class Engine
 	private readonly Resources       _resources = new();
 	private          Shared          _shared    = new();
 	private readonly Paths           _paths;
+	private readonly Timing          _timing = new();
 
 	public static Types     Types     => _instance._types;
 	public static Config    Config    => _instance._config;
@@ -30,6 +31,7 @@ public sealed class Engine
 	public static Resources Resources => _instance._resources;
 	public static Shared    Shared    => _instance._shared;
 	public static Paths     Paths     => _instance._paths;
+	public static Timing    Timing    => _instance._timing;
 	
 	private Action? _onLoad;
 	private Action? _onExit;
@@ -95,6 +97,7 @@ public sealed class Engine
 
 	private void OnUpdate(double timeDelta)
 	{
+		_timing.UpdateCalled();
 		_world.Update(timeDelta);
 		_input.EndOfFrame();
 
@@ -106,6 +109,7 @@ public sealed class Engine
 
 	private void OnRender(double timeDelta)
 	{
+		_timing.RenderCalled();
 		_graphics.BeginOfFrame();
 		_world.Render();
 		_graphics.EndOfFrame();

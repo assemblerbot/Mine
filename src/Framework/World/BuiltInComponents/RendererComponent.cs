@@ -91,24 +91,24 @@ public abstract class RendererComponent : Component, IRenderer
 
 	private void RenderMeshes()
 	{
-		List<IMesh> meshes = Clipper.CollectMeshes(this);
+		List<MeshComponent> meshes = Clipper.CollectMeshes(this);
 		if (meshes.Count == 0)
 		{
 			return;
 		}
 
-		List<ILight>? lights = null;
+		List<LightComponent>? lights = null;
 		foreach (string pass in Passes)
 		{
 			RenderPass(pass, meshes, ref lights);
 		}
 	}
 
-	private void RenderPass(string passName, List<IMesh> meshes, ref List<ILight>? lights)
+	private void RenderPass(string passName, List<MeshComponent> meshes, ref List<LightComponent>? lights)
 	{
 		// collect and sort meshes by order of their render passes
-		SortedList<int, (IMesh mesh, Pass pass)> sortedRenderObjects = new(meshes.Count);
-		foreach (IMesh mesh in meshes)
+		SortedList<int, (MeshComponent mesh, Pass pass)> sortedRenderObjects = new(meshes.Count);
+		foreach (MeshComponent mesh in meshes)
 		{
 			Pass? pass = mesh.Material.FindPassByName(passName);
 			if (pass == null)
@@ -120,8 +120,9 @@ public abstract class RendererComponent : Component, IRenderer
 		}
 		
 		// draw
+		int              worldMatrixIndex   = -1;
 		SharedPipelineId previousPipelineId = new();
-		foreach ((IMesh mesh, Pass pass) renderObject in sortedRenderObjects.Values)
+		foreach ((MeshComponent mesh, Pass pass) renderObject in sortedRenderObjects.Values)
 		{
 			SharedPipelineId pipelineId = new(
 				renderObject.pass.Id,
@@ -139,12 +140,37 @@ public abstract class RendererComponent : Component, IRenderer
 					Engine.Graphics.Device.SwapchainFramebuffer.OutputDescription
 				); // TODO output - custom output
 				
-				_commandList.SetPipeline(sharedPipeline.Pipeline);
+				_commandList!.SetPipeline(sharedPipeline.Pipeline);
 				previousPipelineId = pipelineId;
+				
+				// set resources
+				worldMatrixIndex = -1;
+				for (int i = 0; i < renderObject.pass.ShaderResourceSetsKind.Length; ++i)
+				{
+					switch (renderObject.pass.ShaderResourceSetsKind[i])
+					{
+						case ShaderResourceSetKind.WorldMatrix:
+							worldMatrixIndex = i; // will be set later and for each mesh
+							break;
+						case ShaderResourceSetKind.ViewProjectionMatrix:
+							// TODO
+							break;
+						case ShaderResourceSetKind.MaterialProperties:
+							// TODO
+							break;
+						case ShaderResourceSetKind.Uninitialized:
+						default:
+							throw new ArgumentOutOfRangeException();
+					}
+				}
 			}
 
-			renderObject.pass.SetupDrawing(_commandList); // TODO - cache
-			renderObject.mesh.Draw(_commandList);
+			if (worldMatrixIndex != -1)
+			{
+				_commandList!.SetGraphicsResourceSet((uint)worldMatrixIndex, renderObject.mesh.Entity.ShaderResourceWorldMatrix.ResourceSet);
+			}
+
+			renderObject.mesh.Draw(_commandList!);
 		}
 
 		//lights = Clipper.CollectLights(this);

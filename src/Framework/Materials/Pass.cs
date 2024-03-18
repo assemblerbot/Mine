@@ -13,11 +13,17 @@ public sealed class Pass : IDisposable
 	public readonly RasterizerStateDescription   RasterizerStateDescription;
 	public readonly MaterialShader               VertexShader;
 	public readonly MaterialShader               PixelShader;
-	public readonly ShaderResourceSet[]          ShaderResourceSets;
-	
-	public readonly ResourceLayout[]             ResourceLayouts;
+	public readonly ShaderResourceSetKind[]      ShaderResourceSetsKind;
 
 	public Shader[]? Shaders;
+
+	public ResourceLayout[] ResourceLayouts
+	{
+		get
+		{
+			
+		}
+	}
 	
 	public Pass(
 		ulong                        id,
@@ -28,7 +34,7 @@ public sealed class Pass : IDisposable
 		RasterizerStateDescription   rasterizerStateDescription,
 		MaterialShader               vertexShader,
 		MaterialShader               pixelShader,
-		ShaderResourceSet[]          shaderResourceSets
+		ShaderResourceSetKind[]      shaderResourceSetsKind
 	)
 	{
 		Id                           = id;
@@ -39,21 +45,7 @@ public sealed class Pass : IDisposable
 		RasterizerStateDescription   = rasterizerStateDescription;
 		VertexShader                 = vertexShader;
 		PixelShader                  = pixelShader;
-		ShaderResourceSets           = shaderResourceSets;
-
-		ResourceLayouts = new ResourceLayout[shaderResourceSets.Length];
-		for (int i = 0; i < shaderResourceSets.Length; ++i)
-		{
-			ResourceLayouts[i] = shaderResourceSets[i].ResourceLayout!;
-		}
-	}
-
-	public void SetupDrawing(CommandList commandList)
-	{
-		for (int i = 0; i < ShaderResourceSets.Length; ++i)
-		{
-			commandList.SetGraphicsResourceSet((uint)i, ShaderResourceSets[i].ResourceSet!);
-		}
+		ShaderResourceSetsKind       = shaderResourceSetsKind;
 	}
 
 	private void CreateShaders()
@@ -71,11 +63,6 @@ public sealed class Pass : IDisposable
 			}
 
 			Shaders = null;
-		}
-
-		for (int i = 0; i < ShaderResourceSets.Length; ++i)
-		{
-			ShaderResourceSets[i].Dispose();
 		}
 	}
 }

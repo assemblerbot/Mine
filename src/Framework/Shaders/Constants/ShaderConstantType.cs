@@ -13,9 +13,9 @@ public static class ShaderConstantTypeExtensions
 	{
 		return type switch
 		{
-			ShaderConstantType.Float4 => 4 *sizeof(float),
-			ShaderConstantType.Int4 => 4 *sizeof(int),
-			ShaderConstantType.Float4x4 => 16 *sizeof(float),
+			ShaderConstantType.Float4 => 4    * sizeof(float),
+			ShaderConstantType.Int4 => 4      * sizeof(int),
+			ShaderConstantType.Float4x4 => 16 * sizeof(float),
 			_ => 0
 		};
 	}

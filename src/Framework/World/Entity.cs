@@ -1,6 +1,6 @@
 namespace Mine.Framework;
 
-public sealed partial class Entity
+public sealed partial class Entity : IDisposable
 {
 	private string _name;
 	public  string Name => _name;
@@ -22,14 +22,10 @@ public sealed partial class Entity
 	// layers
 	public ulong RenderingLayers = 0;
 
-	public Entity()
+	public Entity(string name = "(Entity)")
 	{
-		_name = "(Entity)";
-	}
-
-	public Entity(string name)
-	{
-		_name = name;
+		_name                      = name;
+		_shaderResourceWorldMatrix = new ShaderResourceSetWorldMatrix(this);
 	}
 	
 	public void CallOnComponents<TComponent>(Action<TComponent> func) where TComponent : Component

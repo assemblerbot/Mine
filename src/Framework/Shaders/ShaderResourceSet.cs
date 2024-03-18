@@ -2,7 +2,10 @@ using Veldrid;
 
 namespace Mine.Framework;
 
-public sealed class ShaderResourceSet : IDisposable
+// TODO - change to abstract
+//  this class will be custom resource set used in material, it can and should manage its own layout
+//  built-in resource sets will have fixed structure and their layouts will be stored in Shared
+public class ShaderResourceSet : IDisposable
 {
 	public readonly ShaderResource[] Resources;
 
@@ -48,7 +51,7 @@ public sealed class ShaderResourceSet : IDisposable
 			bindableResources[i] = Resources[i].GetOrCreateBindableResource();
 		}
 
-		ResourceSetDescription description = new (GetOrCreateResourceLayout(), bindableResources);
+		ResourceSetDescription description = new(GetOrCreateResourceLayout(), bindableResources);
 		_resourceSet = Engine.Graphics.Factory.CreateResourceSet(description);
 		return _resourceSet;
 	}
@@ -65,5 +68,9 @@ public sealed class ShaderResourceSet : IDisposable
 		{
 			Resources[i].Dispose();
 		}
+	}
+
+	public virtual void Update()
+	{
 	}
 }

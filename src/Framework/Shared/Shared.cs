@@ -6,9 +6,11 @@ public sealed class Shared : IDisposable
 {
 	private readonly Dictionary<(string, int), SharedMesh>        _meshes        = new();
 	//private readonly Dictionary<string, SharedMaterial>           _materials     = new();
-	private readonly Dictionary<string, SharedTexture>            _textures      = new();
-	private readonly Dictionary<SharedPipelineId, SharedPipeline> _pipelines     = new();
-	private readonly List<SharedVertexLayout>                     _vertexLayouts = new();
+	private readonly Dictionary<string, SharedTexture>            _textures                 = new();
+	private readonly Dictionary<SharedPipelineId, SharedPipeline> _pipelines                = new();
+	private readonly List<SharedVertexLayout>                     _vertexLayouts            = new();
+	private readonly SharedResourceSetLayouts                     _sharedResourceSetLayouts = new();
+	
 
 	public void Dispose()
 	{
@@ -17,6 +19,7 @@ public sealed class Shared : IDisposable
 		//DisposeDictionary(_materials);
 		DisposeDictionary(_textures);
 		_vertexLayouts.Clear();
+		_sharedResourceSetLayouts.Dispose();
 	}
 
 	public SharedMesh GetOrCreateMesh(string reference, int meshIndex, SceneMesh sceneMesh)

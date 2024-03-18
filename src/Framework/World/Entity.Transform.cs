@@ -1,3 +1,5 @@
+using Veldrid;
+
 namespace Mine.Framework;
 
 // Transform part of entity:
@@ -16,7 +18,7 @@ public sealed partial class Entity
 		AllDirty = MatricesDirty
 	}
 
-	private TransformFlags _transformFlags = TransformFlags.AllDirty;
+	private TransformFlags _transformFlags          = TransformFlags.AllDirty;
 
 	// local coordinates in parent space
 	private Point3Float _localPosition = Point3Float.Zero;
@@ -57,7 +59,8 @@ public sealed partial class Entity
 	public QuaternionFloat WorldRotation => Parent is null ? -LocalRotation : QuaternionFloat.CreateFromRotationMatrix(LocalToWorldMatrix);
 	
 	// transform coordinates that are local to this entity to world space
-	private Matrix4x4Float _localToWorldMatrix = Matrix4x4Float.Identity;
+	public ulong          LocatToWorldMatrixUpdatedAt = 0;
+	private Matrix4x4Float _localToWorldMatrix      = Matrix4x4Float.Identity;
 	public  Matrix4x4Float LocalToWorldMatrix
 	{
 		get
@@ -70,8 +73,9 @@ public sealed partial class Entity
 				Matrix4x4Float scale     = Matrix4x4Float.CreateScaleMatrix(LocalScale);
 
 				Matrix4x4Float local = Matrix4x4Float.Mul(Matrix4x4Float.Mul(scale, rotate), translate);
-				_localToWorldMatrix =  Parent is null ? local : Matrix4x4Float.Mul(local, Parent.LocalToWorldMatrix);
-				_transformFlags     &= ~TransformFlags.LocalToWorldMatrixDirty;
+				_localToWorldMatrix          =  Parent is null ? local : Matrix4x4Float.Mul(local, Parent.LocalToWorldMatrix);
+				_transformFlags              &= ~TransformFlags.LocalToWorldMatrixDirty;
+				LocatToWorldMatrixUpdatedAt =  Engine.Timing.UpdateFrame;
 			}
 			return _localToWorldMatrix;
 		}
@@ -97,6 +101,18 @@ public sealed partial class Entity
 		private set => _worldToLocalMatrix = value;
 	}
 	
+	// resource for shader
+	private readonly ShaderResourceSet _shaderResourceWorldMatrix;
+
+	public ShaderResourceSet ShaderResourceWorldMatrix
+	{
+		get
+		{
+			_shaderResourceWorldMatrix.Update();
+			return _shaderResourceWorldMatrix;
+		}
+	}
+
 	#region Helpers
 	private void PropagateFlagToChildren(TransformFlags flag)
 	{

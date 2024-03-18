@@ -98,41 +98,46 @@ void main()
 					new MaterialShader(PixelShaderAsset,  ShaderStages.Fragment, "Main"),
 					
 					new[] {
-						      new ShaderResourceSet(
-							      new ShaderResourceUniformBuffer( // TODO - semantic per buffer not per constant
-								      "Transform", ShaderStages.Vertex, ShaderResourceStorage.Mesh,
-								      new ShaderConstant("WorldMatrix", ShaderConstantSemantic.WorldMatrix, ShaderConstantType.Float4x4)
-							      ),
-							      new ShaderResourceUniformBuffer(
-								      "Projection", ShaderStages.Vertex, ShaderResourceStorage.Renderer,
-								      new ShaderConstant("ViewProjectionMatrix", ShaderConstantSemantic.ViewProjectionMatrix, ShaderConstantType.Float4x4)
-							      ),
-							      new ShaderResourceUniformBuffer(
-								      "Animation", ShaderStages.Vertex, ShaderResourceStorage.Entity,
-								      new ShaderConstant("Animation", ShaderConstantSemantic.Custom, ShaderConstantType.Float4)
-							      )
-						      ),
-						      new ShaderResourceSet(
-							      new ShaderResourceUniformBuffer(
-								      "Light0", ShaderStages.Fragment, ShaderResourceStorage.Light,
-								      new ShaderConstant("LightColor",     ShaderConstantSemantic.Custom, ShaderConstantType.Float4),
-								      new ShaderConstant("LightDirection", ShaderConstantSemantic.Custom, ShaderConstantType.Float4)
-							      ),
-							      new ShaderResourceTextureReadOnly(
-								      "MainTexture", ShaderStages.Fragment,
-								      mainTexture
-							      ),
-							      new ShaderResourceSampler(
-								      "MainTextureSampler", ShaderStages.Fragment,
-								      new SamplerDescription(
-									      SamplerAddressMode.Wrap, SamplerAddressMode.Wrap, SamplerAddressMode.Wrap,
-									      SamplerFilter.MinLinear_MagLinear_MipLinear,
-									      ComparisonKind.Always,
-									      0,1,1,0,SamplerBorderColor.OpaqueWhite
-								      )
-							      )
-						      ),
+						      ShaderResourceSetKind.WorldMatrix,
+						      ShaderResourceSetKind.ViewProjectionMatrix,
+						      ShaderResourceSetKind.MaterialProperties
 					      }
+					//  
+					//  new ShaderResourceSet(
+					//   new ShaderResourceUniformBuffer( // TODO - semantic per buffer not per constant
+					//    "Transform", ShaderStages.Vertex,
+					//    new ShaderConstant("WorldMatrix", ShaderConstantType.Float4x4)
+					//   ),
+					//   new ShaderResourceUniformBuffer(
+					//    "Projection", ShaderStages.Vertex,
+					//    new ShaderConstant("ViewProjectionMatrix", ShaderConstantType.Float4x4)
+					//   ),
+					//   new ShaderResourceUniformBuffer(
+					//    "Animation", ShaderStages.Vertex,
+					//    new ShaderConstant("Animation", ShaderConstantType.Float4)
+					//   )
+					//  ),
+					//  new ShaderResourceSet(
+					//   new ShaderResourceUniformBuffer(
+					//    "Light0", ShaderStages.Fragment,
+					//    new ShaderConstant("LightColor",     ShaderConstantType.Float4),
+					//    new ShaderConstant("LightDirection", ShaderConstantType.Float4)
+					//   ),
+					//   new ShaderResourceTextureReadOnly(
+					//    "MainTexture", ShaderStages.Fragment,
+					//    mainTexture
+					//   ),
+					//   new ShaderResourceSampler(
+					//    "MainTextureSampler", ShaderStages.Fragment,
+					//    new SamplerDescription(
+					//     SamplerAddressMode.Wrap, SamplerAddressMode.Wrap, SamplerAddressMode.Wrap,
+					//     SamplerFilter.MinLinear_MagLinear_MipLinear,
+					//     ComparisonKind.Always,
+					//     0,1,1,0,SamplerBorderColor.OpaqueWhite
+					//    )
+					//   )
+					//  ),
+					// }
 				)
 				//new Pass("Shadow", null, null)
 			)
@@ -223,7 +228,7 @@ void main()
 			scissorTestEnabled: false);
 
 		pipelineDescription.PrimitiveTopology = PrimitiveTopology.TriangleStrip; // mesh
-		pipelineDescription.ResourceLayouts   = Array.Empty<ResourceLayout>(); // material
+		pipelineDescription.ResourceLayouts   = Array.Empty<ResourceLayout>();   // material
 
 		pipelineDescription.ShaderSet = new ShaderSetDescription(
 			vertexLayouts: new VertexLayoutDescription[] { vertexLayout }, // mesh - must be same as mesh, but shader input vertex layout may be different

@@ -6,11 +6,11 @@ public sealed class World : IDisposable
 
 	private readonly ManagedList<IUpdatable> _updatables  = new(); // sorted by update order
 	private readonly ManagedList<IRenderer>  _renderers   = new(); // sorted by render order
-	private readonly List<IMesh>       _meshes = new();
-	private readonly List<ILight>            _lights      = new();
+	private readonly List<MeshComponent>       _meshes = new();
+	private readonly List<LightComponent>            _lights      = new();
 
-	public IReadOnlyList<IMesh> Meshes => _meshes;
-	public IReadOnlyList<ILight>      Lights      => _lights;
+	public IReadOnlyList<MeshComponent> Meshes => _meshes;
+	public IReadOnlyList<LightComponent>      Lights      => _lights;
 	
 	#region Add/Remove
 	public void Add(Entity entity)
@@ -152,23 +152,23 @@ public sealed class World : IDisposable
 	}
 
 	//---
-	public void RegisterMesh(IMesh mesh)
+	public void RegisterMesh(MeshComponent mesh)
 	{
 		_meshes.Add(mesh);
 	}
 
-	public void UnregisterMesh(IMesh mesh)
+	public void UnregisterMesh(MeshComponent mesh)
 	{
 		_meshes.Remove(mesh);
 	}
 	
 	//---
-	public void RegisterLight(ILight light)
+	public void RegisterLight(LightComponent light)
 	{
 		_lights.Add(light);
 	}
 
-	public void UnregisterLight(ILight light)
+	public void UnregisterLight(LightComponent light)
 	{
 		_lights.Remove(light);
 	}

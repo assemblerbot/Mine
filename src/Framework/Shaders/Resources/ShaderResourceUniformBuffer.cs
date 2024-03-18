@@ -8,15 +8,9 @@ public sealed class ShaderResourceUniformBuffer : ShaderResource
 
 	private DeviceBuffer?    _buffer;
 
-	public ShaderResourceUniformBuffer(string name, ShaderStages stages, ShaderResourceStorage storage, params ShaderConstant[] constants) : base(name, ResourceKind.UniformBuffer, stages, storage)
+	public ShaderResourceUniformBuffer(string name, ShaderStages stages, params ShaderConstant[] constants) : base(name, ResourceKind.UniformBuffer, stages)
 	{
 		Constants = constants;
-	}
-
-	public ShaderResourceUniformBuffer(string name, ShaderStages stages, UniformBufferKind kind)
-		: base(name, ResourceKind.UniformBuffer, stages, ShaderResourceStorage.None)
-	{
-		
 	}
 
 	public BufferDescription CreateDescription()
@@ -25,7 +19,7 @@ public sealed class ShaderResourceUniformBuffer : ShaderResource
 		return new BufferDescription((uint)sizeInBytes, BufferUsage.UniformBuffer);
 	}
 
-	public override BindableResource GetOrCreateBindableResource()
+	public DeviceBuffer GetOrCreateBuffer()
 	{
 		if (_buffer is not null)
 		{
@@ -34,6 +28,11 @@ public sealed class ShaderResourceUniformBuffer : ShaderResource
 
 		_buffer = Engine.Graphics.Factory.CreateBuffer(CreateDescription());
 		return _buffer;
+	}
+
+	public override BindableResource GetOrCreateBindableResource()
+	{
+		return GetOrCreateBuffer();
 	}
 
 	public override void Dispose()
