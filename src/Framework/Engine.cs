@@ -91,6 +91,7 @@ public sealed class Engine
 	{
 		_graphics = new Graphics(_window.View, _graphicsBackend);
 		_input    = new Input(_window.View);
+		_shared.Init();
 		_resources.Init();
 		_onLoad?.Invoke();
 	}

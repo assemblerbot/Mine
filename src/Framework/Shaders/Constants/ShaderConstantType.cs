@@ -1,5 +1,6 @@
 namespace Mine.Framework;
 
+/*
 public enum ShaderConstantType
 {
 	Float4,
@@ -20,3 +21,4 @@ public static class ShaderConstantTypeExtensions
 		};
 	}
 }
+*/

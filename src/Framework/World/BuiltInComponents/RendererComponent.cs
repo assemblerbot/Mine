@@ -23,6 +23,8 @@ public abstract class RendererComponent : Component, IRenderer
 
 	private ulong OutputId = 0; // TODO output - 0 for default frame buffer
 
+	private ShaderResourceSetViewProjectionMatrix _shaderResourceSetViewProjection;
+
 	public RendererComponent(int renderOrder, ulong renderMask, Clipper clipper)
 	{
 		RenderOrder = renderOrder;

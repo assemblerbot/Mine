@@ -21,7 +21,28 @@ public sealed class Pass : IDisposable
 	{
 		get
 		{
-			
+			ResourceLayout[] result = new ResourceLayout[ShaderResourceSetsKind.Length];
+
+			for (int i = 0; i < ShaderResourceSetsKind.Length; ++i)
+			{
+				switch (ShaderResourceSetsKind[i])
+				{
+					case ShaderResourceSetKind.WorldMatrix:
+						result[i] = Engine.Shared.ResourceSetLayouts.WorldMatrix;
+						break;
+					case ShaderResourceSetKind.ViewProjectionMatrix:
+						result[i] = Engine.Shared.ResourceSetLayouts.ViewProjectionMatrix;
+						break;
+					case ShaderResourceSetKind.MaterialProperties:
+						// TODO
+						break;
+					case ShaderResourceSetKind.Uninitialized:
+					default:
+						throw new ArgumentOutOfRangeException();
+				}
+			}
+
+			return result;
 		}
 	}
 	

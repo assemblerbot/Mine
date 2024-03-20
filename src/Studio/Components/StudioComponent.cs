@@ -55,6 +55,8 @@ public sealed class StudioComponent : Component, IUpdatable
 		LoadSettings();
 
 		CreateDebugEntities();
+
+		Tests.Run();
 	}
 
 	public override void BeforeRemovedFromWorld()
@@ -93,7 +95,7 @@ public sealed class StudioComponent : Component, IUpdatable
 	
 	private void InitImGui()
 	{
-		Engine.World.Add(new Entity("ImGui").AddComponent<ImGuiComponent>().Entity);
+		Engine.World.Root.AddChild(new Entity("ImGui").AddComponent<ImGuiComponent>().Entity);
 		ImGui.GetIO().ConfigFlags |= ImGuiConfigFlags.DockingEnable;
 	}
 	
@@ -238,7 +240,7 @@ public sealed class StudioComponent : Component, IUpdatable
 		// instantiate prefab
 		//Entity suzanne = Engine.World.Instantiate(Suzanne);
 		
-		Engine.World.Add(new Entity("Test Object").AddComponent<TestRenderComponent>().Entity);
+		Engine.World.Root.AddChild(new Entity("Test Object").AddComponent<TestRenderComponent>().Entity);
 
 		// mesh
 		{
@@ -247,14 +249,14 @@ public sealed class StudioComponent : Component, IUpdatable
 
 			// TODO material
 			
-			Engine.World.Add(entity);
+			Engine.World.Root.AddChild(entity);
 		}
 		
 		// camera
 		{
 			Entity          entity          = new Entity("Camera");
 			//RendererComponent rendererComponent = entity.AddComponent(new RendererComponent(0, ulong.MaxValue, new MaskClipper()));
-			Engine.World.Add(entity);
+			Engine.World.Root.AddChild(entity);
 
 			entity.LocalPosition = new Point3Float(0, -10, 0);
 		}

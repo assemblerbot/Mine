@@ -2,35 +2,23 @@ namespace Mine.Framework;
 
 public sealed class World : IDisposable
 {
-	private List<Entity> _entities = new();
+	public readonly Entity Root = new();
 
-	private readonly ManagedList<IUpdatable> _updatables  = new(); // sorted by update order
-	private readonly ManagedList<IRenderer>  _renderers   = new(); // sorted by render order
-	private readonly List<MeshComponent>       _meshes = new();
-	private readonly List<LightComponent>            _lights      = new();
+	private readonly ManagedList<IUpdatable> _updatables = new(); // sorted by update order
+	private readonly ManagedList<IRenderer>  _renderers  = new(); // sorted by render order
 
-	public IReadOnlyList<MeshComponent> Meshes => _meshes;
-	public IReadOnlyList<LightComponent>      Lights      => _lights;
-	
+	private readonly List<MeshComponent>          _meshes = new();
+	public           IReadOnlyList<MeshComponent> Meshes => _meshes;
+
+	private readonly List<LightComponent>          _lights = new();
+	public           IReadOnlyList<LightComponent> Lights => _lights;
+
+	public World()
+	{
+		Root.SetFlags(EntityFlags.Default | EntityFlags.IsInWorld);
+	}
+
 	#region Add/Remove
-	public void Add(Entity entity)
-	{
-		_entities.Add(entity);
-		entity.AfterAddedToWorld();
-	}
-
-	public void Remove(Entity entity)
-	{
-		int index = _entities.IndexOf(entity);
-		if (index == -1)
-		{
-			return;
-		}
-
-		entity.BeforeRemovedFromWorld();
-		_entities.Remove(entity);
-	}
-
 	public Entity? Instantiate(SceneReference? sceneReference, Entity? parent = null)
 	{
 		if (sceneReference is null)
@@ -68,11 +56,11 @@ public sealed class World : IDisposable
 		Entity entity = new (sceneNode.Name);
 		if (parent is null)
 		{
-			Add(entity);
+			Root.AddChild(entity);
 		}
 		else
 		{
-			entity.SetParent(parent);
+			parent.AddChild(entity);
 		}
 
 		entity.LocalPosition = localPosition;
@@ -95,7 +83,7 @@ public sealed class World : IDisposable
 	private void InstantiateRecursive(SceneNode sceneNode, Entity parent)
 	{
 		Entity entity = new (sceneNode.Name);
-		entity.SetParent(parent);
+		parent.AddChild(entity);
 
 		entity.LocalPosition = sceneNode.Translation.Point3;
 		entity.LocalRotation = sceneNode.Rotation;
@@ -176,11 +164,6 @@ public sealed class World : IDisposable
 	
 	public void Dispose()
 	{
-		for (int i = 0; i < _entities.Count; ++i)
-		{
-			_entities[i].BeforeRemovedFromWorld();
-			_entities[i].Dispose();
-		}
-		_entities.Clear();
+		Root.Dispose();
 	}
 }

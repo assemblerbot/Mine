@@ -3,7 +3,6 @@ using System.Text;
 using Mine.Framework;
 using Veldrid;
 using Veldrid.SPIRV;
-using ShaderConstantType = Mine.Framework.ShaderConstantType;
 
 namespace Mine.Studio;
 

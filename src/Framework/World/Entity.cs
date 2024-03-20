@@ -5,10 +5,16 @@ public sealed partial class Entity : IDisposable
 	private string _name;
 	public  string Name => _name;
 
-	private bool _activeSelf        = true;
-	public  bool ActiveSelf        => _activeSelf;
-	public  bool ActiveInHierarchy => _activeSelf && (_parent is null || _parent.ActiveInHierarchy);
+	private EntityFlags _flags = EntityFlags.Default;
+	public  EntityFlags Flags => _flags;
 
+	public bool ActiveSelf        => (_flags & EntityFlags.ActiveSelf) != 0;
+	public bool ActiveInHierarchy => ActiveSelf && (_parent is null || _parent.ActiveInHierarchy);
+
+	public bool IsInWorld => (_flags & EntityFlags.IsInWorld) != 0;
+	
+	public bool IsDisposed => (_flags & EntityFlags.IsDisposed) != 0;
+	
 	// hierarchy
 	private Entity?      _parent = null;
 	public  Entity?      Parent => _parent;
@@ -24,8 +30,7 @@ public sealed partial class Entity : IDisposable
 
 	public Entity(string name = "(Entity)")
 	{
-		_name                      = name;
-		_shaderResourceWorldMatrix = new ShaderResourceSetWorldMatrix(this);
+		_name = name;
 	}
 	
 	public void CallOnComponents<TComponent>(Action<TComponent> func) where TComponent : Component
@@ -51,44 +56,31 @@ public sealed partial class Entity : IDisposable
 
 	public void Dispose()
 	{
-		for (int i = 0; i < _components.Count; ++i)
-		{
-			_components[i].Dispose();
-		}
-		_components.Clear();
+		_flags |= EntityFlags.IsDisposed;
 
 		for (int i = 0; i < _children.Count; ++i)
 		{
 			_children[i].Dispose();
 		}
 		_children.Clear();
+		
+		for (int i = 0; i < _components.Count; ++i)
+		{
+			_components[i].Dispose();
+		}
+		_components.Clear();
+
+		_shaderResourceWorldMatrix?.Dispose();
 	}
 
 	#region Activity
 	public void SetActive(bool active)
 	{
-		_activeSelf = active;
+		_flags = active ? _flags | EntityFlags.ActiveSelf : _flags & ~EntityFlags.ActiveSelf;
 	}
 	#endregion
 	
 	#region Hierarchy
-	public void SetParent(Entity? parent)
-	{
-		if (_parent is not null)
-		{
-			_parent._children.Remove(this);
-			_parent = null;
-		}
-
-		_parent = parent;
-		if (_parent == null)
-		{
-			return;
-		}
-
-		_parent._children.Add(this);
-	}
-
 	public Entity? GetChild(string path)
 	{
 		string[] pathChunks = path.Split('/');
@@ -110,6 +102,75 @@ public sealed partial class Entity : IDisposable
 
 		return current;
 	}
+
+	public void AddChild(Entity entity)
+	{
+		bool wasInWorld = entity.IsInWorld;
+		if (wasInWorld && !IsInWorld)
+		{
+			entity.BeforeRemovedFromWorld();
+		}
+
+		entity.SetParent(this);
+
+		if (!wasInWorld && IsInWorld)
+		{
+			entity.AfterAddedToWorld();
+		}
+	}
+
+	public void RemoveChild(Entity entity)
+	{
+		if (entity.IsInWorld)
+		{
+			entity.BeforeRemovedFromWorld();
+		}
+
+		entity.SetParent(null);
+	}
+
+	public void Destroy()
+	{
+		if (_parent is not null)
+		{
+			_parent.DestroyChild(this);
+		}
+		else
+		{
+			Dispose();
+		}
+	}
+	
+	public void DestroyChild(Entity entity)
+	{
+		RemoveChild(entity);
+		entity.Dispose();
+	}
+
+	public void DestroyChildren()
+	{
+		while (Children.Count > 0)
+		{
+			DestroyChild(Children[^1]);
+		}
+	}
+
+	private void SetParent(Entity? parent)
+	{
+		if (_parent is not null)
+		{
+			_parent._children.Remove(this);
+			_parent = null;
+		}
+
+		_parent = parent;
+		if (_parent == null)
+		{
+			return;
+		}
+
+		_parent._children.Add(this);
+	}
 	#endregion
 
 	#region Component management
@@ -122,8 +183,6 @@ public sealed partial class Entity : IDisposable
 	{
 		component.SetEntity(this);
 		_components.Add(component);
-
-		component.OnInstantiate();
 		return component;
 	}
 
@@ -136,14 +195,15 @@ public sealed partial class Entity : IDisposable
 			return;
 		}
 
-		_components.RemoveAt(index); // TODO - not sure if this should be called here or posponed until end of Update
+		_components.RemoveAt(index);
 	}
 	
 	#endregion
 
-	#region Scene Add/Remove
+	#region Internal Add/Remove
 	internal void AfterAddedToWorld()
 	{
+		_flags |= EntityFlags.IsInWorld;
 		for (int i = 0; i < _components.Count; ++i)
 		{
 			_components[i].AfterAddedToWorld();
@@ -151,7 +211,10 @@ public sealed partial class Entity : IDisposable
 		
 		for (int i = 0; i < _children.Count; ++i)
 		{
-			_children[i].AfterAddedToWorld();
+			if (!_children[i].IsInWorld)
+			{
+				_children[i].AfterAddedToWorld();
+			}
 		}
 	}
 
@@ -166,7 +229,12 @@ public sealed partial class Entity : IDisposable
 		{
 			_components[i].BeforeRemovedFromWorld();
 		}
+		_flags &= ~EntityFlags.IsInWorld;
 	}
 
+	internal void SetFlags(EntityFlags flags)
+	{
+		_flags = flags;
+	}
 	#endregion
 }

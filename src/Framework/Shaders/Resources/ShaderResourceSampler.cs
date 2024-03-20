@@ -29,8 +29,4 @@ public sealed class ShaderResourceSampler : ShaderResource
 		_sampler?.Dispose();
 		_sampler = null;
 	}
-
-	public override void Update()
-	{
-	}
 }

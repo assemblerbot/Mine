@@ -18,7 +18,7 @@ internal static class Program
 
 	private static void OnLoad()
 	{
-		Engine.World.Add(new Entity("Studio").AddComponent<StudioComponent>().Entity);
+		Engine.World.Root.AddChild(new Entity("Studio").AddComponent<StudioComponent>().Entity);
 	}
 
 	private static void OnExit()

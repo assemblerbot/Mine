@@ -5,12 +5,18 @@ namespace Mine.Framework;
 public sealed class SharedResourceSetLayouts : IDisposable
 {
 	// layout per kind
-	private ResourceLayout? _worldMatrix;
-	private ResourceLayout? _viewProjectionMatrix; 
-	
+	public ResourceLayout WorldMatrix = null!;
+	public ResourceLayout ViewProjectionMatrix = null!;
+
+	public void Init()
+	{
+		WorldMatrix          = Engine.Graphics.Factory.CreateResourceLayout(ShaderResourceSetWorldMatrix.GetResourceLayoutDescription());
+		ViewProjectionMatrix = Engine.Graphics.Factory.CreateResourceLayout(ShaderResourceSetViewProjectionMatrix.GetResourceLayoutDescription());
+	}
+
 	public void Dispose()
 	{
-		_worldMatrix?.Dispose();
-		_viewProjectionMatrix?.Dispose();
+		WorldMatrix?.Dispose();
+		ViewProjectionMatrix?.Dispose();
 	}
 }

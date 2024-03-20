@@ -3,12 +3,12 @@ namespace Mine.Framework;
 // clip objects based on render mask only
 public class MaskClipper : Clipper
 {
-	public override List<IMesh> CollectMeshes(IRenderer renderer)
+	public override List<MeshComponent> CollectMeshes(IRenderer renderer)
 	{
 		return Collect(renderer, Engine.World.Meshes);
 	}
 
-	public override List<ILight> CollectLights(IRenderer renderer)
+	public override List<LightComponent> CollectLights(IRenderer renderer)
 	{
 		return Collect(renderer, Engine.World.Lights);
 	}

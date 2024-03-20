@@ -2,7 +2,7 @@ using Veldrid;
 
 namespace Mine.Framework;
 
-public class MeshComponent : Component
+public class MeshComponent : Component, IRenderable
 {
 	public BoundingBoxFloat BoundingBox;
 

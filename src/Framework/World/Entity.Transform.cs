@@ -59,8 +59,8 @@ public sealed partial class Entity
 	public QuaternionFloat WorldRotation => Parent is null ? -LocalRotation : QuaternionFloat.CreateFromRotationMatrix(LocalToWorldMatrix);
 	
 	// transform coordinates that are local to this entity to world space
-	public ulong          LocatToWorldMatrixUpdatedAt = 0;
-	private Matrix4x4Float _localToWorldMatrix      = Matrix4x4Float.Identity;
+	private ulong          _localToWorldMatrixUpdatedAt = 0;
+	private Matrix4x4Float _localToWorldMatrix          = Matrix4x4Float.Identity;
 	public  Matrix4x4Float LocalToWorldMatrix
 	{
 		get
@@ -75,7 +75,7 @@ public sealed partial class Entity
 				Matrix4x4Float local = Matrix4x4Float.Mul(Matrix4x4Float.Mul(scale, rotate), translate);
 				_localToWorldMatrix          =  Parent is null ? local : Matrix4x4Float.Mul(local, Parent.LocalToWorldMatrix);
 				_transformFlags              &= ~TransformFlags.LocalToWorldMatrixDirty;
-				LocatToWorldMatrixUpdatedAt =  Engine.Timing.UpdateFrame;
+				_localToWorldMatrixUpdatedAt =  Engine.Timing.UpdateFrame;
 			}
 			return _localToWorldMatrix;
 		}
@@ -102,14 +102,21 @@ public sealed partial class Entity
 	}
 	
 	// resource for shader
-	private readonly ShaderResourceSet _shaderResourceWorldMatrix;
+	private ShaderResourceSetWorldMatrix? _shaderResourceWorldMatrix;
+	private ulong                         _shaderResourceWorldMatrixUpdatedAt = 0;
 
-	public ShaderResourceSet ShaderResourceWorldMatrix
+	public ShaderResourceSetWorldMatrix ShaderResourceWorldMatrix
 	{
 		get
 		{
-			_shaderResourceWorldMatrix.Update();
-			return _shaderResourceWorldMatrix;
+			if (_shaderResourceWorldMatrixUpdatedAt < _localToWorldMatrixUpdatedAt || _shaderResourceWorldMatrixUpdatedAt == 0)
+			{
+				_shaderResourceWorldMatrixUpdatedAt =   _localToWorldMatrixUpdatedAt;
+				_shaderResourceWorldMatrix        ??= new ShaderResourceSetWorldMatrix();
+				_shaderResourceWorldMatrix.Set(_localToWorldMatrix);
+			}
+
+			return _shaderResourceWorldMatrix!;
 		}
 	}
 

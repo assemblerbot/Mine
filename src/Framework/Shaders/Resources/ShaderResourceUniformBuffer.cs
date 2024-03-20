@@ -4,19 +4,17 @@ namespace Mine.Framework;
 
 public sealed class ShaderResourceUniformBuffer : ShaderResource
 {
-	public readonly ShaderConstant[] Constants;
+	private uint          _sizeInBytes;
+	private DeviceBuffer? _buffer;
 
-	private DeviceBuffer?    _buffer;
-
-	public ShaderResourceUniformBuffer(string name, ShaderStages stages, params ShaderConstant[] constants) : base(name, ResourceKind.UniformBuffer, stages)
+	public ShaderResourceUniformBuffer(string name, ShaderStages stages, uint sizeInBytes) : base(name, ResourceKind.UniformBuffer, stages)
 	{
-		Constants = constants;
+		_sizeInBytes = sizeInBytes;
 	}
 
 	public BufferDescription CreateDescription()
 	{
-		int sizeInBytes = Constants.Sum(constant => constant.SizeInBytes);
-		return new BufferDescription((uint)sizeInBytes, BufferUsage.UniformBuffer);
+		return new BufferDescription(_sizeInBytes, BufferUsage.UniformBuffer);
 	}
 
 	public DeviceBuffer GetOrCreateBuffer()
@@ -39,10 +37,5 @@ public sealed class ShaderResourceUniformBuffer : ShaderResource
 	{
 		_buffer?.Dispose();
 		_buffer = null;
-	}
-
-	public override void Update()
-	{
-		
 	}
 }

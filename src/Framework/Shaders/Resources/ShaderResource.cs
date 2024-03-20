@@ -22,5 +22,4 @@ public abstract class ShaderResource
 
 	public abstract BindableResource GetOrCreateBindableResource();
 	public abstract void             Dispose();
-	public abstract void             Update();
 }

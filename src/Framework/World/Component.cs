@@ -11,10 +11,6 @@ public class Component
 	}
 
 	// 'event' functions
-	public virtual void OnInstantiate()
-	{
-	}
-
 	public virtual void AfterAddedToWorld()
 	{
 	}
