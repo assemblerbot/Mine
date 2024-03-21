@@ -22,4 +22,8 @@ public class Component
 	public virtual void Dispose()
 	{
 	}
+
+	public virtual void AfterEntityFlagsChanged(EntityFlags oldFlags, EntityFlags newFlags)
+	{
+	}
 }

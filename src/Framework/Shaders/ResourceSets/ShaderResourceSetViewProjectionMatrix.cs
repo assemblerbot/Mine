@@ -9,8 +9,10 @@ public sealed class ShaderResourceSetViewProjectionMatrix : ShaderResourceSet
 	{
 	}
 
-	public override void Update()
+	public void Set(Matrix4x4Float viewProjection)
 	{
+		ShaderResourceUniformBuffer uniformBuffer = (ShaderResourceUniformBuffer)Resources[0];
+		Engine.Graphics.Device.UpdateBuffer(uniformBuffer.GetOrCreateBuffer(), 0, viewProjection);
 	}
 
 	public static ResourceLayoutDescription GetResourceLayoutDescription()

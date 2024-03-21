@@ -58,3 +58,7 @@ World.Root.RemoveChild(entityA);        // BeforeRemovedFromWorld() called on bo
 Entity entity = World.Root.FindChild(path);
 entity.Destroy();         // BeforeRemovedFromWorld() called then Dispose()
 ```
+
+### AfterEntityFlagsChanged
+- called after any of entity's flags was changed
+ 

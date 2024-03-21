@@ -23,31 +23,36 @@ public abstract class RendererComponent : Component, IRenderer
 
 	private ulong OutputId = 0; // TODO output - 0 for default frame buffer
 
-	private ShaderResourceSetViewProjectionMatrix _shaderResourceSetViewProjection;
+	protected ShaderResourceSetViewProjectionMatrix _shaderResourceSetViewProjection = new();
 
 	public RendererComponent(int renderOrder, ulong renderMask, Clipper clipper)
 	{
-		RenderOrder = renderOrder;
-		RenderMask  = renderMask;
-		Clipper     = clipper;
+		RenderOrder  = renderOrder;
+		RenderMask   = renderMask;
+		Clipper      = clipper;
+
+		_commandList = Engine.Graphics.Factory.CreateCommandList();
 	}
 
 	public override void AfterAddedToWorld()
 	{
-		_commandList = Engine.Graphics.Factory.CreateCommandList();
-		
 		Engine.World.RegisterRenderer(this);
 	}
 
 	public override void BeforeRemovedFromWorld()
 	{
 		Engine.World.UnregisterRenderer(this);
+	}
 
+	public override void Dispose()
+	{
 		_commandList?.Dispose();
 		_commandList = null!;
 
 		_framebuffer?.Dispose();
 		_framebuffer = null;
+
+		_shaderResourceSetViewProjection.Dispose();
 	}
 
 	public virtual void Render()
@@ -155,7 +160,7 @@ public abstract class RendererComponent : Component, IRenderer
 							worldMatrixIndex = i; // will be set later and for each mesh
 							break;
 						case ShaderResourceSetKind.ViewProjectionMatrix:
-							// TODO
+							_commandList!.SetGraphicsResourceSet((uint)i, _shaderResourceSetViewProjection.ResourceSet);
 							break;
 						case ShaderResourceSetKind.MaterialProperties:
 							// TODO

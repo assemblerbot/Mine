@@ -8,18 +8,6 @@ namespace Mine.Framework;
 // - matrices are evaluated at access
 public sealed partial class Entity
 {
-	[Flags]
-	private enum TransformFlags
-	{
-		None                    = 0,
-		LocalToWorldMatrixDirty = 0x01,
-		WorldToLocalMatrixDirty = 0x02,
-		MatricesDirty = LocalToWorldMatrixDirty | WorldToLocalMatrixDirty,
-		AllDirty = MatricesDirty
-	}
-
-	private TransformFlags _transformFlags          = TransformFlags.AllDirty;
-
 	// local coordinates in parent space
 	private Point3Float _localPosition = Point3Float.Zero;
 	public Point3Float LocalPosition
@@ -28,7 +16,7 @@ public sealed partial class Entity
 		set
 		{
 			_localPosition   =  value;
-			PropagateFlagToChildren(TransformFlags.MatricesDirty);
+			PropagateFlagsToChildren(EntityFlags.MatricesDirty);
 		}
 	}
 
@@ -39,7 +27,7 @@ public sealed partial class Entity
 		set
 		{
 			_localRotation   =  value;
-			PropagateFlagToChildren(TransformFlags.MatricesDirty);
+			PropagateFlagsToChildren(EntityFlags.MatricesDirty);
 		}
 	}
 
@@ -50,7 +38,7 @@ public sealed partial class Entity
 		set
 		{
 			_localScale      =  value;
-			PropagateFlagToChildren(TransformFlags.MatricesDirty);
+			PropagateFlagsToChildren(EntityFlags.MatricesDirty);
 		}
 	}
 
@@ -65,7 +53,7 @@ public sealed partial class Entity
 	{
 		get
 		{
-			if ((_transformFlags & TransformFlags.LocalToWorldMatrixDirty) != 0)
+			if (IsFlags(EntityFlags.LocalToWorldMatrixDirty))
 			{
 				Console.WriteLine($"Updating matrix, parent is null: {Parent is null}");
 				Matrix4x4Float translate = Matrix4x4Float.CreateTranslationMatrix(LocalPosition.Vector3);
@@ -74,7 +62,7 @@ public sealed partial class Entity
 
 				Matrix4x4Float local = Matrix4x4Float.Mul(Matrix4x4Float.Mul(scale, rotate), translate);
 				_localToWorldMatrix          =  Parent is null ? local : Matrix4x4Float.Mul(local, Parent.LocalToWorldMatrix);
-				_transformFlags              &= ~TransformFlags.LocalToWorldMatrixDirty;
+				ClearFlags(EntityFlags.LocalToWorldMatrixDirty);
 				_localToWorldMatrixUpdatedAt =  Engine.Timing.UpdateFrame;
 			}
 			return _localToWorldMatrix;
@@ -87,13 +75,13 @@ public sealed partial class Entity
 	{
 		get
 		{
-			if ((_transformFlags & TransformFlags.WorldToLocalMatrixDirty) != 0)
+			if (IsFlags(EntityFlags.WorldToLocalMatrixDirty))
 			{
 				if (LocalToWorldMatrix.Invert(out Matrix4x4Float invertedMatrix))
 				{
 					_worldToLocalMatrix = invertedMatrix;
 				}
-				_transformFlags &= ~TransformFlags.WorldToLocalMatrixDirty;
+				ClearFlags(EntityFlags.WorldToLocalMatrixDirty);
 			}
 
 			return _worldToLocalMatrix;
@@ -103,31 +91,18 @@ public sealed partial class Entity
 	
 	// resource for shader
 	private ShaderResourceSetWorldMatrix? _shaderResourceWorldMatrix;
-	private ulong                         _shaderResourceWorldMatrixUpdatedAt = 0;
-
 	public ShaderResourceSetWorldMatrix ShaderResourceWorldMatrix
 	{
 		get
 		{
-			if (_shaderResourceWorldMatrixUpdatedAt < _localToWorldMatrixUpdatedAt || _shaderResourceWorldMatrixUpdatedAt == 0)
+			if (IsFlags(EntityFlags.ShaderResourceWorldMatrixDirty))
 			{
-				_shaderResourceWorldMatrixUpdatedAt =   _localToWorldMatrixUpdatedAt;
 				_shaderResourceWorldMatrix        ??= new ShaderResourceSetWorldMatrix();
-				_shaderResourceWorldMatrix.Set(_localToWorldMatrix);
+				_shaderResourceWorldMatrix.Set(LocalToWorldMatrix);
+				ClearFlags(EntityFlags.ShaderResourceWorldMatrixDirty);
 			}
 
 			return _shaderResourceWorldMatrix!;
 		}
 	}
-
-	#region Helpers
-	private void PropagateFlagToChildren(TransformFlags flag)
-	{
-		_transformFlags |= flag;
-		for (int i = 0; i < Children.Count; ++i)
-		{
-			Children[i].PropagateFlagToChildren(flag);
-		}
-	}
-	#endregion
 }

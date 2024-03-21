@@ -8,16 +8,15 @@ public sealed partial class Entity : IDisposable
 	private EntityFlags _flags = EntityFlags.Default;
 	public  EntityFlags Flags => _flags;
 
-	public bool ActiveSelf        => (_flags & EntityFlags.ActiveSelf) != 0;
+	public bool ActiveSelf        => IsFlags(EntityFlags.ActiveSelf);
 	public bool ActiveInHierarchy => ActiveSelf && (_parent is null || _parent.ActiveInHierarchy);
 
-	public bool IsInWorld => (_flags & EntityFlags.IsInWorld) != 0;
-	
-	public bool IsDisposed => (_flags & EntityFlags.IsDisposed) != 0;
+	public bool IsInWorld => IsFlags(EntityFlags.IsInWorld);
+	public bool IsDisposed => IsFlags(EntityFlags.IsDisposed);
 	
 	// hierarchy
-	private Entity?      _parent = null;
-	public  Entity?      Parent => _parent;
+	private Entity? _parent = null;
+	public  Entity? Parent => _parent;
 	
 	private List<Entity>          _children = new();
 	public  IReadOnlyList<Entity> Children => _children;
@@ -25,9 +24,6 @@ public sealed partial class Entity : IDisposable
 	// components
 	private List<Component> _components = new();
 	
-	// layers
-	public ulong RenderingLayers = 0;
-
 	public Entity(string name = "(Entity)")
 	{
 		_name = name;
@@ -56,7 +52,7 @@ public sealed partial class Entity : IDisposable
 
 	public void Dispose()
 	{
-		_flags |= EntityFlags.IsDisposed;
+		SetFlags(EntityFlags.IsDisposed);
 
 		for (int i = 0; i < _children.Count; ++i)
 		{
@@ -76,7 +72,14 @@ public sealed partial class Entity : IDisposable
 	#region Activity
 	public void SetActive(bool active)
 	{
-		_flags = active ? _flags | EntityFlags.ActiveSelf : _flags & ~EntityFlags.ActiveSelf;
+		if (active)
+		{
+			SetFlags(EntityFlags.ActiveSelf);
+		}
+		else
+		{
+			ClearFlags(EntityFlags.ActiveSelf);
+		}
 	}
 	#endregion
 	
@@ -200,10 +203,10 @@ public sealed partial class Entity : IDisposable
 	
 	#endregion
 
-	#region Internal Add/Remove
-	internal void AfterAddedToWorld()
+	#region Internal
+	private void AfterAddedToWorld()
 	{
-		_flags |= EntityFlags.IsInWorld;
+		SetFlags(EntityFlags.IsInWorld);
 		for (int i = 0; i < _components.Count; ++i)
 		{
 			_components[i].AfterAddedToWorld();
@@ -218,7 +221,7 @@ public sealed partial class Entity : IDisposable
 		}
 	}
 
-	internal void BeforeRemovedFromWorld()
+	private void BeforeRemovedFromWorld()
 	{
 		for (int i = 0; i < _children.Count; ++i)
 		{
@@ -229,12 +232,49 @@ public sealed partial class Entity : IDisposable
 		{
 			_components[i].BeforeRemovedFromWorld();
 		}
-		_flags &= ~EntityFlags.IsInWorld;
+		ClearFlags(EntityFlags.IsInWorld);
 	}
 
 	internal void SetFlags(EntityFlags flags)
 	{
-		_flags = flags;
+		EntityFlags oldFlags = _flags;
+		_flags |= flags;
+		if (_flags != oldFlags)
+		{
+			NotifyComponentsAboutFlagsChanged(oldFlags);
+		}
+	}
+
+	internal void ClearFlags(EntityFlags flags)
+	{
+		EntityFlags oldFlags = _flags;
+		_flags &= ~flags;
+		if (_flags != oldFlags)
+		{
+			NotifyComponentsAboutFlagsChanged(oldFlags);
+		}
+	}
+
+	internal bool IsFlags(EntityFlags flags)
+	{
+		return (_flags & flags) == flags;
+	}
+
+	private void PropagateFlagsToChildren(EntityFlags flags)
+	{
+		SetFlags(flags);
+		for (int i = 0; i < Children.Count; ++i)
+		{
+			Children[i].PropagateFlagsToChildren(flags);
+		}
+	}
+
+	private void NotifyComponentsAboutFlagsChanged(EntityFlags oldFlags)
+	{
+		for (int i = 0; i < _components.Count; ++i)
+		{
+			_components[i].AfterEntityFlagsChanged(oldFlags, _flags);
+		}
 	}
 	#endregion
 }

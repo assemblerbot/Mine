@@ -15,7 +15,7 @@ public sealed class World : IDisposable
 
 	public World()
 	{
-		Root.SetFlags(EntityFlags.Default | EntityFlags.IsInWorld);
+		Root.SetFlags(EntityFlags.IsInWorld);
 	}
 
 	#region Add/Remove
