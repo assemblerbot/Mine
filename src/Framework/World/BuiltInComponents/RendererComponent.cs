@@ -23,8 +23,6 @@ public abstract class RendererComponent : Component, IRenderer
 
 	private ulong OutputId = 0; // TODO output - 0 for default frame buffer
 
-	protected ShaderResourceSetViewProjectionMatrix _shaderResourceSetViewProjection = new();
-
 	public RendererComponent(int renderOrder, ulong renderMask, Clipper clipper)
 	{
 		RenderOrder  = renderOrder;
@@ -51,8 +49,6 @@ public abstract class RendererComponent : Component, IRenderer
 
 		_framebuffer?.Dispose();
 		_framebuffer = null;
-
-		_shaderResourceSetViewProjection.Dispose();
 	}
 
 	public virtual void Render()
@@ -96,6 +92,8 @@ public abstract class RendererComponent : Component, IRenderer
 	{
 	}
 
+	public abstract ShaderResourceSetViewProjectionMatrix GetShaderResourceSetViewProjectionMatrix();
+	
 	private void RenderMeshes()
 	{
 		List<MeshComponent> meshes = Clipper.CollectMeshes(this);
@@ -138,6 +136,7 @@ public abstract class RendererComponent : Component, IRenderer
 				OutputId
 			);
 			
+			// pipeline is different - change it
 			if (pipelineId != previousPipelineId)
 			{
 				SharedPipeline sharedPipeline = Engine.Shared.GetOrCreatePipeline(
@@ -160,7 +159,7 @@ public abstract class RendererComponent : Component, IRenderer
 							worldMatrixIndex = i; // will be set later and for each mesh
 							break;
 						case ShaderResourceSetKind.ViewProjectionMatrix:
-							_commandList!.SetGraphicsResourceSet((uint)i, _shaderResourceSetViewProjection.ResourceSet);
+							_commandList!.SetGraphicsResourceSet((uint)i, GetShaderResourceSetViewProjectionMatrix().ResourceSet);
 							break;
 						case ShaderResourceSetKind.MaterialProperties:
 							// TODO
@@ -172,11 +171,13 @@ public abstract class RendererComponent : Component, IRenderer
 				}
 			}
 
+			// update world matrix
 			if (worldMatrixIndex != -1)
 			{
 				_commandList!.SetGraphicsResourceSet((uint)worldMatrixIndex, renderObject.mesh.Entity.ShaderResourceWorldMatrix.ResourceSet);
 			}
 
+			// draw
 			renderObject.mesh.Draw(_commandList!);
 		}
 

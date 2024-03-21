@@ -99,7 +99,7 @@ void main()
 					new[] {
 						      ShaderResourceSetKind.WorldMatrix,
 						      ShaderResourceSetKind.ViewProjectionMatrix,
-						      ShaderResourceSetKind.MaterialProperties
+						      //ShaderResourceSetKind.MaterialProperties,
 					      }
 					//  
 					//  new ShaderResourceSet(
