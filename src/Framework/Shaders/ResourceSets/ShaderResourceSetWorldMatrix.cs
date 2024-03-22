@@ -5,7 +5,7 @@ namespace Mine.Framework;
 public sealed class ShaderResourceSetWorldMatrix : ShaderResourceSet
 {
 	public ShaderResourceSetWorldMatrix()
-		: base(new ShaderResourceUniformBuffer("WorldTransform", ShaderStages.Vertex, Matrix4x4Float.SizeInBytes)) // TODO
+		: base(new ShaderResourceUniformBuffer("WorldMatrixConstants", ShaderStages.Vertex, Matrix4x4Float.SizeInBytes)) // TODO
 	{
 	}
 
@@ -18,7 +18,7 @@ public sealed class ShaderResourceSetWorldMatrix : ShaderResourceSet
 	public static ResourceLayoutDescription GetResourceLayoutDescription()
 	{
 		return new ResourceLayoutDescription(
-			new ResourceLayoutElementDescription("WorldTransform", ResourceKind.UniformBuffer, ShaderStages.Vertex)
+			new ResourceLayoutElementDescription("WorldMatrixConstants", ResourceKind.UniformBuffer, ShaderStages.Vertex)
 		);
 	}
 }

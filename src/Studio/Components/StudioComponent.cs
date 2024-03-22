@@ -5,7 +5,6 @@ using Migration;
 using Mine.Framework;
 using Mine.ImGuiPlugin;
 using NativeFileDialogSharp;
-using Scene = Mine.Framework.Scene;
 
 namespace Mine.Studio;
 
@@ -54,9 +53,7 @@ public sealed class StudioComponent : Component, IUpdatable
 
 		LoadSettings();
 
-		CreateDebugEntities();
-
-		Tests.Run();
+		Testing();
 	}
 
 	public override void BeforeRemovedFromWorld()
@@ -234,13 +231,25 @@ public sealed class StudioComponent : Component, IUpdatable
 		// }
 	}
 
+	
+	
+	//-------------------------------------------------------------------------------------
+	// Testing
+	//-------------------------------------------------------------------------------------
+	private void Testing()
+	{
+		//Engine.World.Root.AddChild(new Entity("Test render").AddComponent<TestRenderComponent>().Entity);
+		Engine.World.Root.AddChild(new Entity("Test").AddComponent<TestComponent>().Entity);
+		//CreateDebugEntities();
+		//Tests.Run();
+	}
+
 	public static SceneReference Suzanne = new(@"Test/suzanne.fbx.scene"); // that will be generated
 	private void CreateDebugEntities()
 	{
 		// instantiate prefab
 		//Entity suzanne = Engine.World.Instantiate(Suzanne);
 		
-		Engine.World.Root.AddChild(new Entity("Test Object").AddComponent<TestRenderComponent>().Entity);
 
 		// mesh
 		{

@@ -60,6 +60,17 @@ public partial record struct Vector3Float
 	}
 	#endregion
 	
+	#region Transformations
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public Vector3Float Transform(Matrix4x4Float matrix)
+	{
+		return new Vector3Float(
+			X * matrix.M11 + Y * matrix.M21 + Z * matrix.M31,
+			X * matrix.M12 + Y * matrix.M22 + Z * matrix.M32,
+			X * matrix.M13 + Y * matrix.M23 + Z * matrix.M33);
+	}
+	#endregion
+	
 	#region Magnitude and normalization
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public float SquareMagnitude()
@@ -108,4 +119,9 @@ public partial record struct Vector3Float
 	}
 
 	#endregion
+
+	public override string ToString()
+	{
+		return $"{X},{Y},{Z}";
+	}
 }

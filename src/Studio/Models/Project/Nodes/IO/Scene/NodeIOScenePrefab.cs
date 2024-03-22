@@ -29,12 +29,13 @@ public static class NodeIOScenePrefab
 			writer.WriteLine("	{");
 
 			writer.WriteLine($"		SceneReference? asset = AssetDatabase.Assets[\"{node.Meta!.Guid}\"] as SceneReference;");
-			writer.WriteLine("		Entity? instance = Engine.World.Instantiate(asset, parent);");
+			writer.WriteLine("		Entity? instance = PrefabUtility.Instantiate(asset);");
 			writer.WriteLine("		if (instance is null)");
 			writer.WriteLine("		{");
 			writer.WriteLine($"			throw new NullReferenceException(\"Asset with id '{node.Meta!.Guid}' is missing!\");");
 			writer.WriteLine("		}");
 			WriteNodeRecursive(writer, settings, settings.Root, "");
+			writer.WriteLine("		parent.AddChild(instance);");
 			writer.WriteLine("		return instance;");
 			
 			writer.WriteLine("	}");
@@ -66,7 +67,7 @@ public static class NodeIOScenePrefab
 					string materialName = settings.Materials[settings.Meshes[node.Meshes[i]].MaterialIndex].Name;
 					
 					writer.Write(i > 0 ? "			.Entity" : "			");
-					writer.WriteLine($".AddComponent(new MeshComponent(asset, {node.Meshes[i]}, null)) // mesh:{meshName} material:{materialName}");
+					writer.WriteLine($".AddComponent(new MeshComponent(asset, {node.Meshes[i]}, null, ulong.MaxValue)) // mesh:{meshName} material:{materialName}");
 				}
 
 				writer.WriteLine("			;");

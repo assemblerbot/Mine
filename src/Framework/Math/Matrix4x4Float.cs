@@ -218,8 +218,8 @@ public record struct Matrix4x4Float
 
 	public static Matrix4x4Float CreateViewLookAtLH(Point3Float eye, Point3Float at, Vector3Float up)
 	{
-		Vector3Float zAxis = at - eye; zAxis.Normalize();
-		Vector3Float xAxis = Vector3Float.Cross(up, zAxis);	xAxis.Normalize();
+		Vector3Float zAxis = (at - eye).Normalized();
+		Vector3Float xAxis = Vector3Float.Cross(up, zAxis).Normalized();
 		Vector3Float yAxis = Vector3Float.Cross(zAxis, xAxis);
 
 		Vector3Float eyeVector = eye.Vector3;

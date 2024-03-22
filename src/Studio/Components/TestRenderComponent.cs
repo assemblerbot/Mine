@@ -93,8 +93,8 @@ void main()
 						depthClipEnabled:true,
 						scissorTestEnabled:false
 					),
-					new MaterialShader(VertexShaderAsset, ShaderStages.Vertex,   "Main"),
-					new MaterialShader(PixelShaderAsset,  ShaderStages.Fragment, "Main"),
+					new MaterialShader(VertexShaderAsset, ShaderStages.Vertex,   "main"),
+					new MaterialShader(PixelShaderAsset,  ShaderStages.Fragment, "main"),
 					
 					new[] {
 						      ShaderResourceSetKind.WorldMatrix,

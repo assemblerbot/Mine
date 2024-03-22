@@ -15,15 +15,15 @@ public sealed class SharedPipeline : IDisposable
 	{
 		GraphicsPipelineDescription description = new()
 		                                          {
-			                                          BlendState = pass.BlendStateDescription,
+			                                          BlendState        = pass.BlendStateDescription,
 			                                          DepthStencilState = pass.DepthStencilStateDescription,
-			                                          RasterizerState = pass.RasterizerStateDescription,
+			                                          RasterizerState   = pass.RasterizerStateDescription,
 			                                          PrimitiveTopology = mesh.Topology,
-			                                          ResourceLayouts = pass.ResourceLayouts,
+			                                          ResourceLayouts   = pass.ResourceLayouts,
 			                                          ShaderSet = new(
 				                                          new[] { mesh.SharedVertexLayout.VertexLayoutDescription },
 				                                          pass.Shaders
-				                                      ),
+			                                          ),
 			                                          Outputs = output
 		                                          };
 

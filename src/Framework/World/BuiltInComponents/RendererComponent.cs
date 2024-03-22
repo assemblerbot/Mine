@@ -7,7 +7,7 @@ public abstract class RendererComponent : Component, IRenderer
 	public int          RenderOrder { get; private set; }
 	public ulong        RenderMask  { get; private set; }
 	public Clipper      Clipper;
-	public List<string> Passes = new();
+	public List<string> Passes;
 
 	public bool            ClearColorTarget      = true;
 	public Color4FloatRGBA ClearColor = Color4FloatRGBA.Black;
@@ -23,11 +23,12 @@ public abstract class RendererComponent : Component, IRenderer
 
 	private ulong OutputId = 0; // TODO output - 0 for default frame buffer
 
-	public RendererComponent(int renderOrder, ulong renderMask, Clipper clipper)
+	public RendererComponent(int renderOrder, ulong renderMask, Clipper clipper, List<string> passes)
 	{
-		RenderOrder  = renderOrder;
-		RenderMask   = renderMask;
-		Clipper      = clipper;
+		RenderOrder = renderOrder;
+		RenderMask  = renderMask;
+		Clipper     = clipper;
+		Passes      = passes;
 
 		_commandList = Engine.Graphics.Factory.CreateCommandList();
 	}
@@ -84,6 +85,8 @@ public abstract class RendererComponent : Component, IRenderer
 
 		// render
 		RenderMeshes();
+		
+		// end
 		_commandList.End();
 		Engine.Graphics.Device.SubmitCommands(_commandList);
 	}
@@ -126,7 +129,7 @@ public abstract class RendererComponent : Component, IRenderer
 		
 		// draw
 		int              worldMatrixIndex   = -1;
-		SharedPipelineId previousPipelineId = new();
+		SharedPipelineId currentPipelineId = new();
 		foreach ((MeshComponent mesh, Pass pass) renderObject in sortedRenderObjects.Values)
 		{
 			SharedPipelineId pipelineId = new(
@@ -137,7 +140,7 @@ public abstract class RendererComponent : Component, IRenderer
 			);
 			
 			// pipeline is different - change it
-			if (pipelineId != previousPipelineId)
+			if (pipelineId != currentPipelineId)
 			{
 				SharedPipeline sharedPipeline = Engine.Shared.GetOrCreatePipeline(
 					pipelineId,
@@ -147,7 +150,7 @@ public abstract class RendererComponent : Component, IRenderer
 				); // TODO output - custom output
 				
 				_commandList!.SetPipeline(sharedPipeline.Pipeline);
-				previousPipelineId = pipelineId;
+				currentPipelineId = pipelineId;
 				
 				// set resources
 				worldMatrixIndex = -1;

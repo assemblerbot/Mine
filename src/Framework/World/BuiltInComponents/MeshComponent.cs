@@ -39,12 +39,12 @@ public class MeshComponent : Component, IRenderable
 	}
 	public override void AfterAddedToWorld()
 	{
-		//Engine.World.RegisterMesh(TODO);
+		Engine.World.RegisterMesh(this);
 	}
 
 	public override void BeforeRemovedFromWorld()
 	{
-		//Engine.World.UnregisterMesh(TODO);
+		Engine.World.UnregisterMesh(this);
 	}
 
 	public void Draw(CommandList commandList)

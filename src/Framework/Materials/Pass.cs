@@ -15,7 +15,8 @@ public sealed class Pass : IDisposable
 	public readonly MaterialShader               PixelShader;
 	public readonly ShaderResourceSetKind[]      ShaderResourceSetsKind;
 
-	public Shader[]? Shaders;
+	private Shader[]? _shaders;
+	public  Shader[]  Shaders => _shaders ??= Engine.Graphics.Factory.CreateFromSpirv(VertexShader.CreateDescription(), PixelShader.CreateDescription());
 
 	public ResourceLayout[] ResourceLayouts
 	{
@@ -69,21 +70,16 @@ public sealed class Pass : IDisposable
 		ShaderResourceSetsKind       = shaderResourceSetsKind;
 	}
 
-	private void CreateShaders()
-	{
-		Shaders = Engine.Graphics.Factory.CreateFromSpirv(VertexShader.CreateDescription(), PixelShader.CreateDescription());
-	}
-
 	public void Dispose()
 	{
-		if (Shaders != null)
+		if (_shaders != null)
 		{
-			foreach (var shader in Shaders)
+			foreach (var shader in _shaders)
 			{
 				shader?.Dispose();
 			}
 
-			Shaders = null;
+			_shaders = null;
 		}
 	}
 }
