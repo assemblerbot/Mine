@@ -1,5 +1,3 @@
-using Mine.Studio;
-
 namespace Mine.Studio;
 
 public sealed class ProjectAssetFileNode : ProjectNode
