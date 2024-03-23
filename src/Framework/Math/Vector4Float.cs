@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace Mine.Framework;
@@ -21,4 +22,35 @@ public record struct Vector4Float
 		Z = z;
 		W = w;
 	}
+	
+	#region Magnitude and normalization
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public float SquareMagnitude()
+	{
+		return X * X + Y * Y + Z * Z + W * W;
+	}
+
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public float Magnitude()
+	{
+		return MathF.Sqrt(SquareMagnitude());
+	}
+	
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public Vector4Float Normalized()
+	{
+		float magnitude = Magnitude();
+		return new Vector4Float(X / magnitude, Y / magnitude, Z / magnitude, W / magnitude);
+	}
+
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public void Normalize()
+	{
+		float magnitude = Magnitude();
+		X /= magnitude;
+		Y /= magnitude;
+		Z /= magnitude;
+		W /= magnitude;
+	}
+	#endregion
 }

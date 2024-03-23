@@ -164,8 +164,11 @@ public abstract class RendererComponent : Component, IRenderer
 						case ShaderResourceSetKind.ViewProjectionMatrix:
 							_commandList!.SetGraphicsResourceSet((uint)i, GetShaderResourceSetViewProjectionMatrix().ResourceSet);
 							break;
-						case ShaderResourceSetKind.MaterialProperties:
-							// TODO
+						case ShaderResourceSetKind.VertexMaterialProperties:
+							_commandList!.SetGraphicsResourceSet((uint)i, renderObject.pass.VertexShaderConstBuffer!.ResourceSet);
+							break;
+						case ShaderResourceSetKind.PixelMaterialProperties:
+							_commandList!.SetGraphicsResourceSet((uint)i, renderObject.pass.PixelShaderConstBuffer!.ResourceSet);
 							break;
 						case ShaderResourceSetKind.Uninitialized:
 						default:

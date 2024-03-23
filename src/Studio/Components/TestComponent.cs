@@ -15,10 +15,11 @@ public sealed class TestComponent : Component, IUpdatable
 	
 	private class TestMaterial : Material
 	{
-		public Vector4Float LightColor     { set => SetShaderConstant("LightColor",     value); }
-		public Vector4Float LightDirection { set => SetShaderConstant("LightDirection", value); }
+		// dynamic access
+		public Vector4Float    LightDirection { set => SetShaderConstant("Main", ShaderStages.Vertex,   "LightDirection", value); }
+		public Color4FloatRGBA SurfaceColor   { set => SetShaderConstant("Main", ShaderStages.Fragment, "SurfaceColor",   value); }
 
-		private static ulong _mainPassId = Engine.NextUniqueId;
+		private static readonly ulong _mainPassId = Engine.NextUniqueId; // TODO - I don't like it
 		
 		public TestMaterial(
 			AssetReference mainTexture
@@ -41,26 +42,39 @@ public sealed class TestComponent : Component, IUpdatable
 						depthClipEnabled:true,
 						scissorTestEnabled:false
 					),
+
 					new MaterialShader(VertexShaderAsset, ShaderStages.Vertex,   "main"),
 					new MaterialShader(PixelShaderAsset,  ShaderStages.Fragment, "main"),
 					
 					new[] {
 						      ShaderResourceSetKind.WorldMatrix,
 						      ShaderResourceSetKind.ViewProjectionMatrix,
-						      //ShaderResourceSetKind.MaterialProperties,
-					      }
+						      ShaderResourceSetKind.VertexMaterialProperties,
+						      ShaderResourceSetKind.PixelMaterialProperties,
+					      },
+					
+					new PassShaderConstBuffer(
+						"MaterialVertex",
+						new PassShaderConstBufferVector4Float("LightDirection", new Vector4Float(1,1,1,0).Normalized())
+					),
+					
+					new PassShaderConstBuffer(
+						"MaterialPixel",
+						new PassShaderConstBufferColor4FloatRGBA("SurfaceColor", new Color4FloatRGBA(0f,0.5f,1.0f,1f))
+					)
 				)
 			)
-		{
-		}
+		{}
 	}
 
-	private Entity? _testEntity;
-	private float   _time = 0;
+	private TestMaterial _material;
+	private Entity?      _testEntity;
+	private float        _time = 0;
 	
 	public override void AfterAddedToWorld()
 	{
-		_testEntity = InstantiateTestPrefab(Entity, new TestMaterial(null!));
+		_material   = new TestMaterial(null!);
+		_testEntity = InstantiateTestPrefab(Entity, _material);
 		CreateCamera();
 		Engine.World.RegisterUpdatable(this);
 	}
@@ -103,6 +117,7 @@ public sealed class TestComponent : Component, IUpdatable
 			_testEntity.LocalRotation = QuaternionFloat.CreateFromYawPitchRoll(_time, _time * 0.3f, _time * 0.1f);
 			//_testEntity.LocalPosition = new Point3Float(0, 0, _time);
 			//_testEntity.LocalScale    = new Vector3Float(0.01f, 0.01f, 0.01f);
+			_material.SurfaceColor = new Color4FloatRGBA(MathF.Sin(_time) * 0.5f + 0.5f, 0.5f, 1f, 1f);
 		}
 	}
 }

@@ -14,6 +14,8 @@ public sealed class Pass : IDisposable
 	public readonly MaterialShader               VertexShader;
 	public readonly MaterialShader               PixelShader;
 	public readonly ShaderResourceSetKind[]      ShaderResourceSetsKind;
+	public readonly PassShaderConstBuffer?       VertexShaderConstBuffer;
+	public readonly PassShaderConstBuffer?       PixelShaderConstBuffer;
 
 	private Shader[]? _shaders;
 	public  Shader[]  Shaders => _shaders ??= Engine.Graphics.Factory.CreateFromSpirv(VertexShader.CreateDescription(), PixelShader.CreateDescription());
@@ -34,8 +36,11 @@ public sealed class Pass : IDisposable
 					case ShaderResourceSetKind.ViewProjectionMatrix:
 						result[i] = Engine.Shared.ResourceSetLayouts.ViewProjectionMatrix;
 						break;
-					case ShaderResourceSetKind.MaterialProperties:
-						// TODO
+					case ShaderResourceSetKind.VertexMaterialProperties:
+						result[i] = VertexShaderConstBuffer!.ResourceLayout;
+						break;
+					case ShaderResourceSetKind.PixelMaterialProperties:
+						result[i] = PixelShaderConstBuffer!.ResourceLayout;
 						break;
 					case ShaderResourceSetKind.Uninitialized:
 					default:
@@ -56,7 +61,9 @@ public sealed class Pass : IDisposable
 		RasterizerStateDescription   rasterizerStateDescription,
 		MaterialShader               vertexShader,
 		MaterialShader               pixelShader,
-		ShaderResourceSetKind[]      shaderResourceSetsKind
+		ShaderResourceSetKind[]      shaderResourceSetsKind,
+		PassShaderConstBuffer?       vertexShaderConstBuffer = null,
+		PassShaderConstBuffer?       pixelShaderConstBuffer  = null
 	)
 	{
 		Id                           = id;
@@ -68,6 +75,26 @@ public sealed class Pass : IDisposable
 		VertexShader                 = vertexShader;
 		PixelShader                  = pixelShader;
 		ShaderResourceSetsKind       = shaderResourceSetsKind;
+		VertexShaderConstBuffer      = vertexShaderConstBuffer;
+		PixelShaderConstBuffer       = pixelShaderConstBuffer;
+
+		if (VertexShaderConstBuffer is not null)
+		{
+			VertexShaderConstBuffer.Stages = ShaderStages.Vertex;
+		}
+		else if(shaderResourceSetsKind.Contains(ShaderResourceSetKind.VertexMaterialProperties))
+		{
+			throw new InvalidOperationException("Vertex shader const buffer is missing!");
+		}
+
+		if (PixelShaderConstBuffer is not null)
+		{
+			PixelShaderConstBuffer.Stages = ShaderStages.Fragment;
+		}
+		else if(shaderResourceSetsKind.Contains(ShaderResourceSetKind.PixelMaterialProperties))
+		{
+			throw new InvalidOperationException("Pixel shader const buffer is missing!");
+		}
 	}
 
 	public void Dispose()
@@ -81,5 +108,8 @@ public sealed class Pass : IDisposable
 
 			_shaders = null;
 		}
+
+		VertexShaderConstBuffer?.Dispose();
+		PixelShaderConstBuffer?.Dispose();
 	}
 }

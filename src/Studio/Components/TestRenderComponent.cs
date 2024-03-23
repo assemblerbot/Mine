@@ -67,9 +67,6 @@ void main()
 
 	private class MyMaterial : Material
 	{
-		public Vector4Float LightColor     { set => SetShaderConstant("LightColor",     value); }
-		public Vector4Float LightDirection { set => SetShaderConstant("LightDirection", value); }
-
 		private static ulong _mainPassId = Engine.NextUniqueId;
 		
 		public MyMaterial(

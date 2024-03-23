@@ -6,5 +6,6 @@ public enum ShaderResourceSetKind
 	
 	WorldMatrix,
 	ViewProjectionMatrix,
-	MaterialProperties,
+	VertexMaterialProperties,
+	PixelMaterialProperties,
 }

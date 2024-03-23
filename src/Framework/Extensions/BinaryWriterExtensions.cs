@@ -16,6 +16,22 @@ public static class BinaryWriterExtensions
 		writer.Write(vector.Z);
 	}
 
+	public static void Write(this BinaryWriter writer, Point4Float point)
+	{
+		writer.Write(point.X);
+		writer.Write(point.Y);
+		writer.Write(point.Z);
+		writer.Write(point.W);
+	}
+
+	public static void Write(this BinaryWriter writer, Vector4Float vector)
+	{
+		writer.Write(vector.X);
+		writer.Write(vector.Y);
+		writer.Write(vector.Z);
+		writer.Write(vector.W);
+	}
+	
 	public static void Write(this BinaryWriter writer, Point2Float point)
 	{
 		writer.Write(point.X);
