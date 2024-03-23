@@ -4,9 +4,10 @@ namespace Mine.Framework;
 
 public sealed class PassConstBuffer : IDisposable
 {
-	public readonly string                         Name;
+	public readonly string                   Name;
+	public readonly ShaderResourceSetKind    Kind;
 	public readonly PassConstBufferElement[] Elements;
-	public readonly int                            SizeInBytes;
+	public readonly int                      SizeInBytes;
 	
 	public  ShaderStages Stages { get; internal set; }
 
@@ -64,9 +65,10 @@ public sealed class PassConstBuffer : IDisposable
 		}
 	}
 
-	public PassConstBuffer(string name, params PassConstBufferElement[] elements)
+	public PassConstBuffer(string name, ShaderResourceSetKind kind, params PassConstBufferElement[] elements)
 	{
 		Name     = name;
+		Kind     = kind;
 		Elements = elements;
 
 		SizeInBytes = 0;

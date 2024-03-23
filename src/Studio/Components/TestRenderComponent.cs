@@ -65,6 +65,7 @@ void main()
 	public static AssetReference PixelShaderAsset  = new(@"diffuse.psh.spirv");
 	public static AssetReference TextureAsset      = new(@"diffuse.png");
 
+	/*
 	private class MyMaterial : Material
 	{
 		private static ulong _mainPassId = Engine.NextUniqueId;
@@ -140,14 +141,15 @@ void main()
 		{
 		}
 	}
+	*/
 
 	public override void AfterAddedToWorld()
 	{
 		{
 			// DEBUG
-			MyMaterial material = new (
-				null
-			);
+			// MyMaterial material = new (
+			// 	null
+			// );
 		}
 
 		Vector3Float test = new(1.111f, 2.222f, 3.333f);

@@ -16,8 +16,8 @@ public sealed class TestComponent : Component, IUpdatable
 	private class TestMaterial : Material
 	{
 		// dynamic access
-		public Vector4Float    LightDirection { set => SetShaderConstant("Main", ShaderStages.Vertex,   "LightDirection", value); }
-		public Color4FloatRGBA SurfaceColor   { set => SetShaderConstant("Main", ShaderStages.Fragment, "SurfaceColor",   value); }
+		public Vector4Float    LightDirection { set => SetShaderConstant("Main", ShaderResourceSetKind.MaterialProperties0, "LightDirection", value); }
+		public Color4FloatRGBA SurfaceColor   { set => SetShaderConstant("Main", ShaderResourceSetKind.MaterialProperties1, "SurfaceColor",   value); }
 
 		private static readonly ulong _mainPassId = Engine.NextUniqueId; // TODO - I don't like it
 		
@@ -47,21 +47,25 @@ public sealed class TestComponent : Component, IUpdatable
 					new MaterialShader(PixelShaderAsset,  ShaderStages.Fragment, "main"),
 					
 					new[] {
-						      ShaderResourceSetKind.WorldMatrix,
-						      ShaderResourceSetKind.ViewProjectionMatrix,
-						      ShaderResourceSetKind.VertexMaterialProperties,
-						      ShaderResourceSetKind.PixelMaterialProperties,
+						      (ShaderResourceSetKind.WorldMatrix, ShaderStages.Vertex),
+						      (ShaderResourceSetKind.ViewProjectionMatrix, ShaderStages.Vertex),
+						      (ShaderResourceSetKind.MaterialProperties0, ShaderStages.Vertex),
+						      (ShaderResourceSetKind.MaterialProperties1, ShaderStages.Fragment),
 					      },
 					
-					new PassConstBuffer(
-						"MaterialVertex",
-						new PassConstBufferVector4Float("LightDirection", new Vector4Float(1,1,1,0).Normalized())
-					),
+					new[] {
+						new PassConstBuffer(
+							"MaterialVertex",
+							ShaderResourceSetKind.MaterialProperties0,
+							new PassConstBufferVector4Float("LightDirection", new Vector4Float(1,1,1,0).Normalized())
+						),
 					
-					new PassConstBuffer(
-						"MaterialPixel",
-						new PassConstBufferColor4FloatRgba("SurfaceColor", new Color4FloatRGBA(0f,0.5f,1.0f,1f))
-					)
+						new PassConstBuffer(
+							"MaterialPixel",
+							ShaderResourceSetKind.MaterialProperties1,
+							new PassConstBufferColor4FloatRgba("SurfaceColor", new Color4FloatRGBA(0f,0.5f,1.0f,1f))
+						)
+					}
 				)
 			)
 		{}

@@ -154,9 +154,9 @@ public abstract class RendererComponent : Component, IRenderer
 				
 				// set resources
 				worldMatrixIndex = -1;
-				for (int i = 0; i < renderObject.pass.ShaderResourceSetsKind.Length; ++i)
+				for (int i = 0; i < renderObject.pass.ShaderResourceSets.Length; ++i)
 				{
-					switch (renderObject.pass.ShaderResourceSetsKind[i])
+					switch (renderObject.pass.ShaderResourceSets[i].kind)
 					{
 						case ShaderResourceSetKind.WorldMatrix:
 							worldMatrixIndex = i; // will be set later and for each mesh
@@ -164,11 +164,15 @@ public abstract class RendererComponent : Component, IRenderer
 						case ShaderResourceSetKind.ViewProjectionMatrix:
 							_commandList!.SetGraphicsResourceSet((uint)i, GetShaderResourceSetViewProjectionMatrix().ResourceSet);
 							break;
-						case ShaderResourceSetKind.VertexMaterialProperties:
-							_commandList!.SetGraphicsResourceSet((uint)i, renderObject.pass.VertexShaderConstBuffer!.ResourceSet);
-							break;
-						case ShaderResourceSetKind.PixelMaterialProperties:
-							_commandList!.SetGraphicsResourceSet((uint)i, renderObject.pass.PixelShaderConstBuffer!.ResourceSet);
+						case ShaderResourceSetKind.MaterialProperties0:
+						case ShaderResourceSetKind.MaterialProperties1:
+						case ShaderResourceSetKind.MaterialProperties2:
+						case ShaderResourceSetKind.MaterialProperties3:
+						case ShaderResourceSetKind.MaterialProperties4:
+						case ShaderResourceSetKind.MaterialProperties5:
+						case ShaderResourceSetKind.MaterialProperties6:
+						case ShaderResourceSetKind.MaterialProperties7:
+							_commandList!.SetGraphicsResourceSet((uint)i, renderObject.pass.GetConstBuffer(renderObject.pass.ShaderResourceSets[i].kind).ResourceSet);
 							break;
 						case ShaderResourceSetKind.Uninitialized:
 						default:
