@@ -2,15 +2,15 @@ using Veldrid;
 
 namespace Mine.Framework;
 
-public abstract class PassShaderConstBufferElement
+public abstract class PassConstBufferElement
 {
 	public readonly string                       Name;
-	public readonly ShaderConstBufferElementKind Kind;
+	public readonly PassConstBufferElementKind Kind;
 	public abstract int                          SizeInBytes { get; }
 
 	public Action SetDirty { get; internal set; }
 
-	protected PassShaderConstBufferElement(string name, ShaderConstBufferElementKind kind)
+	protected PassConstBufferElement(string name, PassConstBufferElementKind kind)
 	{
 		Name = name;
 		Kind = kind;

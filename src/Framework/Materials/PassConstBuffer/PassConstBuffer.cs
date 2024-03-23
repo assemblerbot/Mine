@@ -2,10 +2,10 @@ using Veldrid;
 
 namespace Mine.Framework;
 
-public sealed class PassShaderConstBuffer : IDisposable
+public sealed class PassConstBuffer : IDisposable
 {
 	public readonly string                         Name;
-	public readonly PassShaderConstBufferElement[] Elements;
+	public readonly PassConstBufferElement[] Elements;
 	public readonly int                            SizeInBytes;
 	
 	public  ShaderStages Stages { get; internal set; }
@@ -64,13 +64,13 @@ public sealed class PassShaderConstBuffer : IDisposable
 		}
 	}
 
-	public PassShaderConstBuffer(string name, params PassShaderConstBufferElement[] elements)
+	public PassConstBuffer(string name, params PassConstBufferElement[] elements)
 	{
 		Name     = name;
 		Elements = elements;
 
 		SizeInBytes = 0;
-		foreach (PassShaderConstBufferElement element in elements)
+		foreach (PassConstBufferElement element in elements)
 		{
 			element.SetDirty =  SetDirty;
 			SizeInBytes      += element.SizeInBytes;
@@ -96,7 +96,7 @@ public sealed class PassShaderConstBuffer : IDisposable
 			using MemoryStream memory = new (vertexData);
 			using BinaryWriter writer = new (memory);
 			
-			foreach (PassShaderConstBufferElement element in Elements)
+			foreach (PassConstBufferElement element in Elements)
 			{
 				element.Write(writer);
 			}

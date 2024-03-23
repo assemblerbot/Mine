@@ -53,14 +53,14 @@ public sealed class TestComponent : Component, IUpdatable
 						      ShaderResourceSetKind.PixelMaterialProperties,
 					      },
 					
-					new PassShaderConstBuffer(
+					new PassConstBuffer(
 						"MaterialVertex",
-						new PassShaderConstBufferVector4Float("LightDirection", new Vector4Float(1,1,1,0).Normalized())
+						new PassConstBufferVector4Float("LightDirection", new Vector4Float(1,1,1,0).Normalized())
 					),
 					
-					new PassShaderConstBuffer(
+					new PassConstBuffer(
 						"MaterialPixel",
-						new PassShaderConstBufferColor4FloatRGBA("SurfaceColor", new Color4FloatRGBA(0f,0.5f,1.0f,1f))
+						new PassConstBufferColor4FloatRgba("SurfaceColor", new Color4FloatRGBA(0f,0.5f,1.0f,1f))
 					)
 				)
 			)
@@ -103,7 +103,15 @@ public sealed class TestComponent : Component, IUpdatable
 
 	public void CreateCamera()
 	{
-		Entity entity = new Entity().AddComponent(new CameraComponent(0, ulong.MaxValue, new MaskClipper(), new List<string>{"Main"})).Entity;
+		Entity entity = new Entity().AddComponent(
+			new CameraComponent(
+				0,
+				ulong.MaxValue,
+				new MaskClipper(),
+				new List<string>{"Main"}
+			)
+		).Entity;
+		
 		entity.LocalPosition = new Point3Float(0, 0, -3);
 		Engine.World.Root.AddChild(entity);
 	}

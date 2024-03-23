@@ -1,6 +1,6 @@
 namespace Mine.Framework;
 
-public class PassShaderConstBufferVector4Float : PassShaderConstBufferElement
+public class PassConstBufferVector4Float : PassConstBufferElement
 {
 	private Vector4Float _value;
 	public Vector4Float Value
@@ -14,8 +14,8 @@ public class PassShaderConstBufferVector4Float : PassShaderConstBufferElement
 
 	public override int SizeInBytes => Vector4Float.SizeInBytes;
 
-	public PassShaderConstBufferVector4Float(string name, Vector4Float value)
-		: base(name, ShaderConstBufferElementKind.Float4)
+	public PassConstBufferVector4Float(string name, Vector4Float value)
+		: base(name, PassConstBufferElementKind.Float4)
 	{
 		_value = value;
 	}

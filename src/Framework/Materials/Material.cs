@@ -28,17 +28,17 @@ public abstract class Material : IDisposable
 	#region Set constants
 	public void SetShaderConstant(string passName, ShaderStages stage, string elementName, Vector4Float value)
 	{
-		var element = (PassShaderConstBufferVector4Float)FindElement(passName, stage, elementName);
+		var element = (PassConstBufferVector4Float)FindElement(passName, stage, elementName);
 		element.Value = value;
 	}
 
 	public void SetShaderConstant(string passName, ShaderStages stage, string elementName, Color4FloatRGBA value)
 	{
-		var element = (PassShaderConstBufferColor4FloatRGBA)FindElement(passName, stage, elementName);
+		var element = (PassConstBufferColor4FloatRgba)FindElement(passName, stage, elementName);
 		element.Value = value;
 	}
 	
-	private PassShaderConstBufferElement FindElement(string passName, ShaderStages stage, string elementName)
+	private PassConstBufferElement FindElement(string passName, ShaderStages stage, string elementName)
 	{
 		Pass? pass = FindPassByName(passName);
 		if (pass is null)
@@ -46,7 +46,7 @@ public abstract class Material : IDisposable
 			throw new NullReferenceException($"Pass '{passName}' not found!");
 		}
 
-		PassShaderConstBuffer? constBuffer = null;
+		PassConstBuffer? constBuffer = null;
 		if ((stage & ShaderStages.Vertex) == ShaderStages.Vertex)
 		{
 			constBuffer = pass.VertexShaderConstBuffer;
@@ -61,7 +61,7 @@ public abstract class Material : IDisposable
 			throw new NullReferenceException($"Pass '{passName}' doesn't have required const buffer for given stage!");
 		}
 
-		PassShaderConstBufferElement? element = constBuffer.Elements.FirstOrDefault(x => x.Name == elementName);
+		PassConstBufferElement? element = constBuffer.Elements.FirstOrDefault(x => x.Name == elementName);
 		if (element is null)
 		{
 			throw new NullReferenceException($"Pass '{passName}' doesn't have element '{elementName}'!");

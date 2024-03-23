@@ -1,6 +1,6 @@
 namespace Mine.Framework;
 
-public enum ShaderConstBufferElementKind
+public enum PassConstBufferElementKind
 {
 	Float4,
 	Float4x4,

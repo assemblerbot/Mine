@@ -14,8 +14,8 @@ public sealed class Pass : IDisposable
 	public readonly MaterialShader               VertexShader;
 	public readonly MaterialShader               PixelShader;
 	public readonly ShaderResourceSetKind[]      ShaderResourceSetsKind;
-	public readonly PassShaderConstBuffer?       VertexShaderConstBuffer;
-	public readonly PassShaderConstBuffer?       PixelShaderConstBuffer;
+	public readonly PassConstBuffer?       VertexShaderConstBuffer;
+	public readonly PassConstBuffer?       PixelShaderConstBuffer;
 
 	private Shader[]? _shaders;
 	public  Shader[]  Shaders => _shaders ??= Engine.Graphics.Factory.CreateFromSpirv(VertexShader.CreateDescription(), PixelShader.CreateDescription());
@@ -62,8 +62,8 @@ public sealed class Pass : IDisposable
 		MaterialShader               vertexShader,
 		MaterialShader               pixelShader,
 		ShaderResourceSetKind[]      shaderResourceSetsKind,
-		PassShaderConstBuffer?       vertexShaderConstBuffer = null,
-		PassShaderConstBuffer?       pixelShaderConstBuffer  = null
+		PassConstBuffer?       vertexShaderConstBuffer = null,
+		PassConstBuffer?       pixelShaderConstBuffer  = null
 	)
 	{
 		Id                           = id;
