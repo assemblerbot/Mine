@@ -22,7 +22,7 @@ public abstract class ProjectNode : ISelectable
 	public    Metadata? Meta;
 	protected NodeIO?   IO;
 
-	public          string Extension => Regex.Match(Path.GetFileName(AbsolutePath), @"\..*").Value.ToLower(); //Path.GetExtension(AbsolutePath).ToLower(); // cache if needed
+	public          string Extension => Regex.Match(Path.GetFileName(AbsolutePath), @"\..*").Value.ToLower(); // something.fbx => .fbx //Path.GetExtension(AbsolutePath).ToLower(); // cache if needed
 	public abstract bool   Exists    { get; }
 
 	protected ProjectNode(ProjectModel project, string name, string absolutePath, string relativePath, bool hasMetaFile)

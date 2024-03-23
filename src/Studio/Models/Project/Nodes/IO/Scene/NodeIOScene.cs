@@ -213,8 +213,8 @@ public sealed class NodeIOScene : NodeIO<Assimp.Scene>
 		if (assimpScene.RootNode != null)
 		{
 			scene.Root      = new SceneNode();
-			ImportNode(scene.Root, assimpScene.RootNode);
-			ImportChildNodesRecursive(scene.Root, assimpScene.RootNode);
+			ImportNode(scene.Root, assimpScene.RootNode, settings);
+			ImportChildNodesRecursive(scene.Root, assimpScene.RootNode, settings);
 		}
 
 		// import
@@ -224,33 +224,41 @@ public sealed class NodeIOScene : NodeIO<Assimp.Scene>
 		File.WriteAllBytes(absolutePath, json);
 	}
 
-	private void ImportChildNodesRecursive(SceneNode targetNode, Node source)
+	private void ImportChildNodesRecursive(SceneNode targetNode, Node source, NodeIOSceneSettings settings)
 	{
 		if (source.Children == null)
 		{
 			return;
 		}
-
+		
 		foreach (Node sourceChild in source.Children)
 		{
 			targetNode.Children ??= new List<SceneNode>();
 
 			SceneNode child = new();
-			ImportNode(child, sourceChild);
+			ImportNode(child, sourceChild, settings);
 			targetNode.Children.Add(child);
 
-			ImportChildNodesRecursive(child, sourceChild);
+			ImportChildNodesRecursive(child, sourceChild, settings);
 		}
 	}
 
-	private void ImportNode(SceneNode targetNode, Node source)
+	private void ImportNode(SceneNode targetNode, Node source, NodeIOSceneSettings settings)
 	{
 		targetNode.Name = source.Name;
 
 		source.Transform.Decompose(out Vector3D scale, out Quaternion rotation, out Vector3D translation);
 		targetNode.Translation = new Vector3Float(translation.X, translation.Y, translation.Z);
 		targetNode.Rotation    = new QuaternionFloat(rotation.X, rotation.Y, rotation.Z, rotation.W);
-		targetNode.Scale       = new Vector3Float(scale.X, scale.Y, scale.Z);
+
+		if (settings.CompensateFBXScale && source.Parent is not null && source.Parent.Parent is null)
+		{
+			targetNode.Scale = new Vector3Float(scale.X * 0.01f, scale.Y * 0.01f, scale.Z * 0.01f);	// convert cm -> m
+		}
+		else
+		{
+			targetNode.Scale = new Vector3Float(scale.X, scale.Y, scale.Z);
+		}
 
 		if (source.HasMeshes)
 		{
@@ -265,6 +273,12 @@ public sealed class NodeIOScene : NodeIO<Assimp.Scene>
 	public override NodeIOSettings CreateImportSettings()
 	{
 		NodeIOSceneSettings settings = new NodeIOSceneSettings();
+		
+		if (Owner.Extension == ".fbx")
+		{
+			settings.CompensateFBXScale = true;
+		}
+
 		UpdateImportSettings(settings);
 		return settings;
 	}

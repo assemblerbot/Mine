@@ -7,6 +7,7 @@ namespace Mine.Studio;
 public sealed class NodeIOSceneSettings : NodeIOSettings
 {
 	public float NormalSmoothingAngle = 15f;
+	public bool  CompensateFBXScale   = false;
 	
 	[ReadOnlyInInspector] public List<NodeIOSceneMeshSettings> Meshes = new();
 
@@ -23,6 +24,7 @@ public interface INodeIOSceneSettingsMigratable : INodeIOSettingsMigratable;
 public class NodeIOSceneSettings_000 : NodeIOSettings_000, INodeIOSceneSettingsMigratable
 {
 	public float SmoothingAngle;
+	public bool  CompensateFBXScale;
 	
 	[MigrateField] public List<INodeIOSceneMeshSettingsMigratable> Meshes;
 

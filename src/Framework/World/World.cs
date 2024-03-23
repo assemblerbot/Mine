@@ -2,7 +2,7 @@ namespace Mine.Framework;
 
 public sealed class World : IDisposable
 {
-	public readonly Entity Root = new();
+	public readonly Entity Root = new("ROOT");
 
 	private readonly ManagedList<IUpdatable> _updatables = new(); // sorted by update order
 	private readonly ManagedList<IRenderer>  _renderers  = new(); // sorted by render order

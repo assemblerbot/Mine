@@ -90,7 +90,7 @@ public sealed class TestComponent : Component, IUpdatable
 	public void CreateCamera()
 	{
 		Entity entity = new Entity().AddComponent(new CameraComponent(0, ulong.MaxValue, new MaskClipper(), new List<string>{"Main"})).Entity;
-		entity.LocalPosition = new Point3Float(0, 0, -30);
+		entity.LocalPosition = new Point3Float(0, 0, -3);
 		Engine.World.Root.AddChild(entity);
 	}
 
@@ -101,7 +101,8 @@ public sealed class TestComponent : Component, IUpdatable
 		if (_testEntity is not null)
 		{
 			_testEntity.LocalRotation = QuaternionFloat.CreateFromYawPitchRoll(_time, _time * 0.3f, _time * 0.1f);
-			_testEntity.LocalPosition = new Point3Float(0, 0, _time);
+			//_testEntity.LocalPosition = new Point3Float(0, 0, _time);
+			//_testEntity.LocalScale    = new Vector3Float(0.01f, 0.01f, 0.01f);
 		}
 	}
 }
