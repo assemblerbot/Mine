@@ -2,12 +2,12 @@ using Mine.Framework;
 
 namespace Mine.Studio;
 
-[NodeIO]
-public sealed class NodeIOCopy : NodeIO<byte[]>
+[Importer]
+public sealed class ImporterCopy : Importer<byte[]>
 {
 	public override string ReferenceType => nameof(AssetReference);
 	
-	public NodeIOCopy(ProjectNode owner) : base(owner)
+	public ImporterCopy(ProjectNode owner) : base(owner)
 	{
 	}
 
@@ -64,12 +64,12 @@ public sealed class NodeIOCopy : NodeIO<byte[]>
 		relativeResourcePath = Owner.RelativePath;
 	}
 
-	public override NodeIOSettings CreateImportSettings()
+	public override ImporterSettings CreateImportSettings()
 	{
-		return new NodeIOCopySettings();
+		return new ImporterCopySettings();
 	}
 
-	public override bool UpdateImportSettings(NodeIOSettings settings)
+	public override bool UpdateImportSettings(ImporterSettings settings)
 	{
 		return false;
 	}

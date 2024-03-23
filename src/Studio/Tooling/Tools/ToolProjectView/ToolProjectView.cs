@@ -249,7 +249,7 @@ public sealed class ToolProjectView : Tool
 
 		ConsoleViewModel.LogInfo($"Writing prefab to file: '{path}'");
 		StudioModel.Project.PauseWatchers();
-		NodeIOScenePrefab.CreatePrefab(path, _contextMenuActivatedAt!);
+		ImporterScenePrefab.CreatePrefab(path, _contextMenuActivatedAt!);
 		StudioModel.Project.ResumeWatchers();
 	}
 	#endregion

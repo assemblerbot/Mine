@@ -5,7 +5,7 @@ using SixLabors.ImageSharp.Formats.Png;
 namespace Mine.Studio;
 
 [Serializable, SerializedClassId("79e3e75f-a6c2-465b-b815-fd68fb46972a")]
-public sealed class PngNodeIOSettings : NodeIOSettings
+public sealed class PngImporterSettings : ImporterSettings
 {
 	public override ProjectNodeType NodeType => ProjectNodeType.AssetImage;
 
@@ -17,11 +17,11 @@ public sealed class PngNodeIOSettings : NodeIOSettings
 }
 
 #region Migration
-[MigratableInterface(typeof(PngNodeIOSettings))]
-public interface IPngNodeIOSettingsMigratable : INodeIOSettingsMigratable;
+[MigratableInterface(typeof(PngImporterSettings))]
+public interface IPngImporterSettingsMigratable : IImporterSettingsMigratable;
 
-[Serializable, LatestVersion(typeof(PngNodeIOSettings))]
-public class PngNodeIOSettings_000 : NodeIOSettings_000, IPngNodeIOSettingsMigratable
+[Serializable, LatestVersion(typeof(PngImporterSettings))]
+public class PngImporterSettings_000 : ImporterSettings_000, IPngImporterSettingsMigratable
 {
     public PngBitDepth BitDepth;
     public PngColorType ColorType;

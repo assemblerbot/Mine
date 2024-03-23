@@ -2,12 +2,12 @@ using Mine.Framework;
 
 namespace Mine.Studio;
 
-[NodeIO(ProjectNodeType.AssetMaterial)]
-public sealed class NodeIOMaterial : NodeIO<Material>
+[Importer(ProjectNodeType.AssetMaterial)]
+public sealed class ImporterMaterial : Importer<Material>
 {
 	public override string ReferenceType => nameof(AssetReference); // TODO - remove ?
 	
-	public NodeIOMaterial(ProjectNode owner) : base(owner)
+	public ImporterMaterial(ProjectNode owner) : base(owner)
 	{
 	}
 
@@ -24,12 +24,12 @@ public sealed class NodeIOMaterial : NodeIO<Material>
 		relativeResourcePath = null;
 	}
 
-	public override NodeIOSettings CreateImportSettings()
+	public override ImporterSettings CreateImportSettings()
 	{
-		return new NodeIOMaterialSettings();
+		return new ImporterMaterialSettings();
 	}
 
-	public override bool UpdateImportSettings(NodeIOSettings settings)
+	public override bool UpdateImportSettings(ImporterSettings settings)
 	{
 		return false;
 	}

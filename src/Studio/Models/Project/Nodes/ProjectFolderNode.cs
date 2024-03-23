@@ -17,7 +17,7 @@ public class ProjectFolderNode : ProjectNode
 
 	public override void Init(CancellationToken cancellationToken)
 	{
-		IO = StudioGlobals.NodeIORegistry.CreateNodeIO(this);
+		IO = StudioGlobals.ImporterRegistry.CreateImporter(this);
 		IO.UpdateCache();
 		
 		if (HasMetaFile)

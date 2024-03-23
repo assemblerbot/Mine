@@ -10,7 +10,7 @@ public class Metadata
 	[ReadOnlyInInspector] public string? Hash  = null;
 	public                       string? ReferenceField = null;
 
-	public NodeIOSettings? NodeIOSettings = null;
+	public ImporterSettings? ImporterSettings = null;
 
 	public void UpdateGuid()
 	{
@@ -45,14 +45,14 @@ public class Metadata_001 : IMetadataMigratable
 	public string? Guid;
 	public string? Hash;
 	
-	[MigrateField] public List<INodeIOSettingsMigratable>? NodeIOSettings;
+	[MigrateField] public List<IImporterSettingsMigratable>? ImporterSettings;
 	
 	public void Migrate(Metadata_000 prev)
 	{
 		Guid  = prev.Guid;
 		Hash  = null; // to force reimport
 		
-		NodeIOSettings = new List<INodeIOSettingsMigratable>();
+		ImporterSettings = new List<IImporterSettingsMigratable>();
 	}
 }
 
@@ -63,7 +63,7 @@ public class Metadata_002 : IMetadataMigratable
 	public string? Hash;
 	public string? ReferenceField;
 	
-	[MigrateField] public INodeIOSettingsMigratable? NodeIOSettings;
+	[MigrateField] public IImporterSettingsMigratable? ImporterSettings;
 	
 	public void Migrate(Metadata_001 prev)
 	{
@@ -71,7 +71,7 @@ public class Metadata_002 : IMetadataMigratable
 		Hash  = null; // to force reimport
 		ReferenceField = null;
 		
-		NodeIOSettings = null;
+		ImporterSettings = null;
 	}
 }
 #endregion

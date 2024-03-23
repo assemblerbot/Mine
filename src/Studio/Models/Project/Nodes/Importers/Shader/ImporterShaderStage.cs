@@ -1,7 +1,7 @@
 namespace Mine.Studio;
 
 // Note: name of stages are used as input to shader compiler! Don't rename without checking it first!
-public enum NodeIOShaderStage
+public enum ImporterShaderStage
 {
 	vertex      = 0,
 	fragment    = 1,

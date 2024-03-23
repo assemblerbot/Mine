@@ -1,6 +1,6 @@
 namespace Mine.Studio;
 
-public static class NodeIOScenePrefab
+public static class ImporterScenePrefab
 {
 	public static void CreatePrefab(string path, ProjectNode node)
 	{
@@ -8,7 +8,7 @@ public static class NodeIOScenePrefab
 		{
 			string prefabName = Path.GetFileNameWithoutExtension(path);
 
-			NodeIOSceneSettings? settings   = node.Meta?.NodeIOSettings as NodeIOSceneSettings;
+			ImporterSceneSettings? settings   = node.Meta?.ImporterSettings as ImporterSceneSettings;
 			if (settings is null)
 			{
 				ConsoleViewModel.LogError("Import settings are missing! Cannot create prefab.");
@@ -50,36 +50,36 @@ public static class NodeIOScenePrefab
 		}
 	}
 
-	private static void WriteNodeRecursive(StreamWriter writer, NodeIOSceneSettings settings, NodeIOSceneHierarchyNodeSettings node, string thisPath)
+	private static void WriteNodeRecursive(StreamWriter writer, ImporterSceneSettings settings, ImporterSceneHierarchyNodeSettings importerSceneHierarchyNode, string thisPath)
 	{
 		if (!string.IsNullOrEmpty(thisPath))
 		{
-			if (node.Meshes.Count == 0)
+			if (importerSceneHierarchyNode.Meshes.Count == 0)
 			{
 				writer.WriteLine($"		// instance.GetChild(\"{thisPath}\")!");
 			}
 			else
 			{
 				writer.WriteLine($"		instance.GetChild(\"{thisPath}\")!");
-				for (int i = 0; i < node.Meshes.Count; ++i)
+				for (int i = 0; i < importerSceneHierarchyNode.Meshes.Count; ++i)
 				{
-					string meshName     = settings.Meshes[node.Meshes[i]].Name;
-					string materialName = settings.Materials[settings.Meshes[node.Meshes[i]].MaterialIndex].Name;
+					string meshName     = settings.Meshes[importerSceneHierarchyNode.Meshes[i]].Name;
+					string materialName = settings.Materials[settings.Meshes[importerSceneHierarchyNode.Meshes[i]].MaterialIndex].Name;
 					
 					writer.Write(i > 0 ? "			.Entity" : "			");
-					writer.WriteLine($".AddComponent(new MeshComponent(asset, {node.Meshes[i]}, null, ulong.MaxValue)) // mesh:{meshName} material:{materialName}");
+					writer.WriteLine($".AddComponent(new MeshComponent(asset, {importerSceneHierarchyNode.Meshes[i]}, null, ulong.MaxValue)) // mesh:{meshName} material:{materialName}");
 				}
 
 				writer.WriteLine("			;");
 			}
 		}
 
-		if (node.Children is null)
+		if (importerSceneHierarchyNode.Children is null)
 		{
 			return;
 		}
 
-		foreach (NodeIOSceneHierarchyNodeSettings child in node.Children)
+		foreach (ImporterSceneHierarchyNodeSettings child in importerSceneHierarchyNode.Children)
 		{
 			WriteNodeRecursive(writer, settings, child, $"{thisPath}/{child.Name}");
 		}

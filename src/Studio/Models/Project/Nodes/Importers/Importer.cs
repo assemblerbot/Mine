@@ -1,11 +1,11 @@
 namespace Mine.Studio;
 
-public abstract class NodeIO
+public abstract class Importer
 {
 	protected readonly ProjectNode Owner;
 	public abstract    string      ReferenceType { get; }
 
-	protected NodeIO(ProjectNode owner)
+	protected Importer(ProjectNode owner)
 	{
 		Owner = owner;
 	}
@@ -15,13 +15,13 @@ public abstract class NodeIO
 
 	public abstract void Import(string resourcesRootPath, out string? relativeResourcePath);
 
-	public abstract NodeIOSettings CreateImportSettings();
-	public abstract bool           UpdateImportSettings(NodeIOSettings settings); // returns true if settings were changed
+	public abstract ImporterSettings CreateImportSettings();
+	public abstract bool           UpdateImportSettings(ImporterSettings settings); // returns true if settings were changed
 }
 
-public abstract class NodeIO<TData> : NodeIO
+public abstract class Importer<TData> : Importer
 {
-	protected NodeIO(ProjectNode owner) : base(owner)
+	protected Importer(ProjectNode owner) : base(owner)
 	{
 	}
 

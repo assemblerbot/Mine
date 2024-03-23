@@ -3,14 +3,14 @@ using Migration;
 namespace Mine.Studio;
 
 [Serializable, SerializedClassId("4c7e4c73-e41f-4044-a733-ef7d6df38f41")]
-public sealed class NodeIOSceneHierarchyNodeSettings
+public sealed class ImporterSceneHierarchyNodeSettings
 {
 	[ReadOnlyInInspector] public string                                  Name;
-	[ReadOnlyInInspector] public List<NodeIOSceneHierarchyNodeSettings>? Children  = null;
+	[ReadOnlyInInspector] public List<ImporterSceneHierarchyNodeSettings>? Children  = null;
 	[ReadOnlyInInspector] public List<int>                               Meshes    = new();
 	[ReadOnlyInInspector] public List<int>                               Materials = new();
 
-	public NodeIOSceneHierarchyNodeSettings(string name)
+	public ImporterSceneHierarchyNodeSettings(string name)
 	{
 		Name = name;
 	}
@@ -18,15 +18,15 @@ public sealed class NodeIOSceneHierarchyNodeSettings
 
 #region Migration
 
-[MigratableInterface(typeof(NodeIOSceneHierarchyNodeSettings))]
-public interface INodeIOSceneHierarchyNodeSettingsMigratable;
+[MigratableInterface(typeof(ImporterSceneHierarchyNodeSettings))]
+public interface IImporterSceneHierarchyNodeSettingsMigratable;
 
-[Serializable, LatestVersion(typeof(NodeIOSceneHierarchyNodeSettings))]
-public class NodeIOSceneHierarchyNodeSettings_000 : INodeIOSceneHierarchyNodeSettingsMigratable
+[Serializable, LatestVersion(typeof(ImporterSceneHierarchyNodeSettings))]
+public class ImporterSceneHierarchyNodeSettings_000 : IImporterSceneHierarchyNodeSettingsMigratable
 {
 	public string Name;
 	
-	[MigrateField] public List<INodeIOSceneHierarchyNodeSettingsMigratable>? Children;
+	[MigrateField] public List<IImporterSceneHierarchyNodeSettingsMigratable>? Children;
 	public                List<int>                                          Meshes;
 	public                List<int>                                          Materials;
 }

@@ -20,7 +20,7 @@ public abstract class ProjectNode : ISelectable
 	[ReadOnlyInInspector] public bool HasMetaFile;
 	
 	public    Metadata? Meta;
-	protected NodeIO?   IO;
+	protected Importer?   IO;
 
 	public          string Extension => Regex.Match(Path.GetFileName(AbsolutePath), @"\..*").Value.ToLower(); // something.fbx => .fbx //Path.GetExtension(AbsolutePath).ToLower(); // cache if needed
 	public abstract bool   Exists    { get; }
@@ -53,10 +53,10 @@ public abstract class ProjectNode : ISelectable
 			CreateMetaFile();
 		}
 
-		NodeIOSettings importSettings = IO!.CreateImportSettings();
-		if (Meta!.NodeIOSettings is null || importSettings.GetType() != Meta.NodeIOSettings.GetType())
+		ImporterSettings importSettings = IO!.CreateImportSettings();
+		if (Meta!.ImporterSettings is null || importSettings.GetType() != Meta.ImporterSettings.GetType())
 		{
-			Meta.NodeIOSettings = importSettings;
+			Meta.ImporterSettings = importSettings;
 		}
 
 		UpdateMetaFile();
@@ -74,7 +74,7 @@ public abstract class ProjectNode : ISelectable
 		Type = type;
 	}
 
-	public T? GetNodeIO<T>() where T : NodeIO
+	public T? GetImporter<T>() where T : Importer
 	{
 		return IO as T;
 	}

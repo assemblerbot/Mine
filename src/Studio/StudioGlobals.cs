@@ -13,8 +13,8 @@ public sealed class StudioGlobals
 	private readonly MigrationManager _migrationManager = new(Assembly);
 	public static    MigrationManager MigrationManager => _this._migrationManager;
 
-	private readonly NodeIORegistry _nodeIORegistry = new();
-	public static    NodeIORegistry NodeIORegistry => _this._nodeIORegistry;
+	private readonly ImporterRegistry _importerRegistry = new();
+	public static    ImporterRegistry ImporterRegistry => _this._importerRegistry;
 
 	public StudioGlobals()
 	{

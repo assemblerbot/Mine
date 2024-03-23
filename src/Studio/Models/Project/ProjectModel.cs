@@ -867,7 +867,7 @@ public sealed class ProjectModel
 
 					try
 					{
-						NodeIO  io           = node.GetNodeIO<NodeIO>()!;
+						Importer  io           = node.GetImporter<Importer>()!;
 						io.Import(_projectSettings!.AbsoluteResourcesPath, out string? resourcePath);
 						if (resourcePath is not null)
 						{
@@ -1010,7 +1010,7 @@ public sealed class ProjectModel
 					ProjectNode? node = root.FindNode(path);
 					if (node != null && node.Exists)
 					{
-						NodeIO<TData>? io = node.GetNodeIO<NodeIO<TData>>();
+						Importer<TData>? io = node.GetImporter<Importer<TData>>();
 						if (io is not null)
 						{
 							TData? data = io.Load();
@@ -1035,7 +1035,7 @@ public sealed class ProjectModel
 					ProjectNode? node = root.FindNode(path);
 					if (node != null && node.Exists)
 					{
-						NodeIO<TData>? io = node.GetNodeIO<NodeIO<TData>>();
+						Importer<TData>? io = node.GetImporter<Importer<TData>>();
 						if (io is not null)
 						{
 							io.Save(data);
@@ -1059,7 +1059,7 @@ public sealed class ProjectModel
 					ProjectNode? node = root.FindNode(path);
 					if (node != null && node.Exists)
 					{
-						NodeIO? io = node.GetNodeIO<NodeIO>();
+						Importer? io = node.GetImporter<Importer>();
 						if (io is not null)
 						{
 							io.UpdateCache();
