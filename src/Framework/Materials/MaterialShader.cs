@@ -5,13 +5,12 @@ namespace Mine.Framework;
 public sealed class MaterialShader
 {
 	public readonly AssetReference Asset;
-	public readonly ShaderStages   Stages;
 	public readonly string         EntryPoint;
+	public          ShaderStages   Stages { get; internal set; }
 
-	public MaterialShader(AssetReference asset, ShaderStages stages, string entryPoint)
+	public MaterialShader(AssetReference asset, string entryPoint)
 	{
 		Asset      = asset;
-		Stages     = stages;
 		EntryPoint = entryPoint;
 	}
 

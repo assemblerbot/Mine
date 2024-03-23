@@ -82,6 +82,9 @@ public sealed class Pass : IDisposable
 		ShaderResourceSets           = shaderResourceSets;
 		ShaderConstBuffers           = shaderConstBuffers;
 
+		VertexShader.Stages = ShaderStages.Vertex;
+		PixelShader.Stages  = ShaderStages.Fragment;
+		
 		for(int i=0; i < ShaderConstBuffers.Length; ++i)
 		{
 			PassConstBuffer buffer = ShaderConstBuffers[i];

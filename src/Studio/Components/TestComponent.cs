@@ -11,7 +11,7 @@ public sealed class TestComponent : Component, IUpdatable
 	public static SceneReference TestAsset = new(@"Test/cube.fbx.scene");
 
 	public static AssetReference VertexShaderAsset = new(@"Test/test.vsh.spirv");
-	public static AssetReference PixelShaderAsset = new(@"Test/test.psh.spirv");
+	public static AssetReference PixelShaderAsset  = new(@"Test/test.psh.spirv");
 	
 	private class TestMaterial : Material
 	{
@@ -43,8 +43,8 @@ public sealed class TestComponent : Component, IUpdatable
 						scissorTestEnabled:false
 					),
 
-					new MaterialShader(VertexShaderAsset, ShaderStages.Vertex,   "main"),
-					new MaterialShader(PixelShaderAsset,  ShaderStages.Fragment, "main"),
+					new MaterialShader(VertexShaderAsset, "main"),
+					new MaterialShader(PixelShaderAsset,  "main"),
 					
 					new[] {
 						      (ShaderResourceSetKind.WorldMatrix, ShaderStages.Vertex),
@@ -54,18 +54,18 @@ public sealed class TestComponent : Component, IUpdatable
 					      },
 					
 					new[] {
-						new PassConstBuffer(
-							"MaterialVertex",
-							ShaderResourceSetKind.MaterialProperties0,
-							new PassConstBufferVector4Float("LightDirection", new Vector4Float(1,1,1,0).Normalized())
-						),
+						      new PassConstBuffer(
+							      "MaterialVertex",
+							      ShaderResourceSetKind.MaterialProperties0,
+							      new PassConstBufferVector4Float("LightDirection", new Vector4Float(1, -1, 1, 0).Normalized())
+						      ),
 					
-						new PassConstBuffer(
-							"MaterialPixel",
-							ShaderResourceSetKind.MaterialProperties1,
-							new PassConstBufferColor4FloatRgba("SurfaceColor", new Color4FloatRGBA(0f,0.5f,1.0f,1f))
-						)
-					}
+						      new PassConstBuffer(
+							      "MaterialPixel",
+							      ShaderResourceSetKind.MaterialProperties1,
+							      new PassConstBufferColor4FloatRgba("SurfaceColor", new Color4FloatRGBA(0f, 0.5f, 1.0f, 1f))
+						      )
+					      }
 				)
 			)
 		{}
