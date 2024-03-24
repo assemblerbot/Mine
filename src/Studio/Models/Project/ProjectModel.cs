@@ -867,11 +867,11 @@ public sealed class ProjectModel
 
 					try
 					{
-						Importer  io           = node.GetImporter<Importer>()!;
-						io.Import(_projectSettings!.AbsoluteResourcesPath, out string? resourcePath);
+						Importer importer = node.GetImporter<Importer>()!;
+						importer.Import(_projectSettings!.AbsoluteResourcesPath, out string? resourcePath);
 						if (resourcePath is not null)
 						{
-							_assetDatabase![node.Meta.Guid!] = new StudioAssetDatabaseItem(node.Meta.Guid!, node.Meta.ReferenceField, resourcePath, io.ReferenceType);
+							_assetDatabase![node.Meta.Guid!] = new StudioAssetDatabaseItem(node.Meta.Guid!, node.Meta.ReferenceField, resourcePath, importer.ReferenceType);
 						}
 					}
 					catch (Exception e)
@@ -1010,10 +1010,10 @@ public sealed class ProjectModel
 					ProjectNode? node = root.FindNode(path);
 					if (node != null && node.Exists)
 					{
-						Importer<TData>? io = node.GetImporter<Importer<TData>>();
-						if (io is not null)
+						Importer<TData>? importer = node.GetImporter<Importer<TData>>();
+						if (importer is not null)
 						{
-							TData? data = io.Load();
+							TData? data = importer.Load();
 							onComplete?.Invoke(data);
 							return;
 						}
@@ -1035,10 +1035,10 @@ public sealed class ProjectModel
 					ProjectNode? node = root.FindNode(path);
 					if (node != null && node.Exists)
 					{
-						Importer<TData>? io = node.GetImporter<Importer<TData>>();
-						if (io is not null)
+						Importer<TData>? importer = node.GetImporter<Importer<TData>>();
+						if (importer is not null)
 						{
-							io.Save(data);
+							importer.Save(data);
 							onComplete?.Invoke(true);
 							return;
 						}
@@ -1059,10 +1059,10 @@ public sealed class ProjectModel
 					ProjectNode? node = root.FindNode(path);
 					if (node != null && node.Exists)
 					{
-						Importer? io = node.GetImporter<Importer>();
-						if (io is not null)
+						Importer? importer = node.GetImporter<Importer>();
+						if (importer is not null)
 						{
-							io.UpdateCache();
+							importer.UpdateCache();
 						}
 					}
 				}

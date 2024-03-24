@@ -27,8 +27,8 @@ public class ProjectScriptFileNode : ProjectNode
 			SetNodeType(ProjectNodeType.ScriptFile);
 		}
 
-		IO = StudioGlobals.ImporterRegistry.CreateImporter(this);
-		IO.UpdateCache();
+		Importer = StudioGlobals.ImporterRegistry.CreateImporter(this);
+		Importer.UpdateCache();
 		
 		Meta = new Metadata
 		       {

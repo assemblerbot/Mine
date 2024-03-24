@@ -13,8 +13,8 @@ public sealed class ProjectAssetFileNode : ProjectNode
 	public override void Init(CancellationToken cancellationToken)
 	{
 		SetNodeType(ProjectNodeTypeExtensions.FromAssetExtension(Extension));
-		IO = StudioGlobals.ImporterRegistry.CreateImporter(this);
-		IO.UpdateCache();
+		Importer = StudioGlobals.ImporterRegistry.CreateImporter(this);
+		Importer.UpdateCache();
 		
 		CreateMetaFile();
 		if (Meta == null)
@@ -25,11 +25,11 @@ public sealed class ProjectAssetFileNode : ProjectNode
 		bool ioSettingsChanged = false;
 		if (Meta.ImporterSettings == null)
 		{
-			Meta.ImporterSettings = IO.CreateImportSettings();
+			Meta.ImporterSettings = Importer.CreateImportSettings();
 			ioSettingsChanged   = true;
 		}
 
-		ioSettingsChanged |= IO.UpdateImportSettings(Meta.ImporterSettings);
+		ioSettingsChanged |= Importer.UpdateImportSettings(Meta.ImporterSettings);
 
 		if (ioSettingsChanged)
 		{
