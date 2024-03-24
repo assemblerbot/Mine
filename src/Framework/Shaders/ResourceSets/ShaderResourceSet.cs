@@ -7,8 +7,10 @@ namespace Mine.Framework;
 //  built-in resource sets will have fixed structure and their layouts will be stored in Shared
 public class ShaderResourceSet : IDisposable
 {
+	// shader stage independent
 	public readonly ShaderResource[] Resources;
 
+	// shader stage dependent
 	private ResourceLayout? _resourceLayout;
 	private ResourceSet?    _resourceSet;
 
@@ -55,7 +57,7 @@ public class ShaderResourceSet : IDisposable
 		_resourceSet = Engine.Graphics.Factory.CreateResourceSet(description);
 		return _resourceSet;
 	}
-
+ 
 	public void Dispose()
 	{
 		_resourceSet?.Dispose();
@@ -68,9 +70,5 @@ public class ShaderResourceSet : IDisposable
 		{
 			Resources[i].Dispose();
 		}
-	}
-
-	public virtual void Update()
-	{
 	}
 }

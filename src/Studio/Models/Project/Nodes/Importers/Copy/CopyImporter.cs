@@ -3,11 +3,11 @@ using Mine.Framework;
 namespace Mine.Studio;
 
 [Importer]
-public sealed class ImporterCopy : Importer<byte[]>
+public sealed class CopyImporter : Importer<byte[]>
 {
 	public override string ReferenceType => nameof(AssetReference);
 	
-	public ImporterCopy(ProjectNode owner) : base(owner)
+	public CopyImporter(ProjectNode owner) : base(owner)
 	{
 	}
 
@@ -66,7 +66,7 @@ public sealed class ImporterCopy : Importer<byte[]>
 
 	public override ImporterSettings CreateImportSettings()
 	{
-		return new ImporterCopySettings();
+		return new CopyImporterSettings();
 	}
 
 	public override bool UpdateImportSettings(ImporterSettings settings)

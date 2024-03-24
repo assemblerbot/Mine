@@ -1,6 +1,6 @@
 namespace Mine.Studio;
 
-public static class ImporterScenePrefab
+public static class SceneImporterPrefab
 {
 	public static void CreatePrefab(string path, ProjectNode node)
 	{
@@ -8,7 +8,7 @@ public static class ImporterScenePrefab
 		{
 			string prefabName = Path.GetFileNameWithoutExtension(path);
 
-			ImporterSceneSettings? settings   = node.Meta?.ImporterSettings as ImporterSceneSettings;
+			SceneImporterSettings? settings   = node.Meta?.ImporterSettings as SceneImporterSettings;
 			if (settings is null)
 			{
 				ConsoleViewModel.LogError("Import settings are missing! Cannot create prefab.");
@@ -50,36 +50,36 @@ public static class ImporterScenePrefab
 		}
 	}
 
-	private static void WriteNodeRecursive(StreamWriter writer, ImporterSceneSettings settings, ImporterSceneHierarchyNodeSettings importerSceneHierarchyNode, string thisPath)
+	private static void WriteNodeRecursive(StreamWriter writer, SceneImporterSettings settings, SceneImporterHierarchyNodeSettings sceneImporterHierarchyNode, string thisPath)
 	{
 		if (!string.IsNullOrEmpty(thisPath))
 		{
-			if (importerSceneHierarchyNode.Meshes.Count == 0)
+			if (sceneImporterHierarchyNode.Meshes.Count == 0)
 			{
 				writer.WriteLine($"		// instance.GetChild(\"{thisPath}\")!");
 			}
 			else
 			{
 				writer.WriteLine($"		instance.GetChild(\"{thisPath}\")!");
-				for (int i = 0; i < importerSceneHierarchyNode.Meshes.Count; ++i)
+				for (int i = 0; i < sceneImporterHierarchyNode.Meshes.Count; ++i)
 				{
-					string meshName     = settings.Meshes[importerSceneHierarchyNode.Meshes[i]].Name;
-					string materialName = settings.Materials[settings.Meshes[importerSceneHierarchyNode.Meshes[i]].MaterialIndex].Name;
+					string meshName     = settings.Meshes[sceneImporterHierarchyNode.Meshes[i]].Name;
+					string materialName = settings.Materials[settings.Meshes[sceneImporterHierarchyNode.Meshes[i]].MaterialIndex].Name;
 					
 					writer.Write(i > 0 ? "			.Entity" : "			");
-					writer.WriteLine($".AddComponent(new MeshComponent(asset, {importerSceneHierarchyNode.Meshes[i]}, null, ulong.MaxValue)) // mesh:{meshName} material:{materialName}");
+					writer.WriteLine($".AddComponent(new MeshComponent(asset, {sceneImporterHierarchyNode.Meshes[i]}, null, ulong.MaxValue)) // mesh:{meshName} material:{materialName}");
 				}
 
 				writer.WriteLine("			;");
 			}
 		}
 
-		if (importerSceneHierarchyNode.Children is null)
+		if (sceneImporterHierarchyNode.Children is null)
 		{
 			return;
 		}
 
-		foreach (ImporterSceneHierarchyNodeSettings child in importerSceneHierarchyNode.Children)
+		foreach (SceneImporterHierarchyNodeSettings child in sceneImporterHierarchyNode.Children)
 		{
 			WriteNodeRecursive(writer, settings, child, $"{thisPath}/{child.Name}");
 		}

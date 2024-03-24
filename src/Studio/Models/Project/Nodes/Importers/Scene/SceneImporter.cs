@@ -7,11 +7,11 @@ using Veldrid;
 namespace Mine.Studio;
 
 [Importer(ProjectNodeType.AssetScene)]
-public sealed class ImporterScene : Importer<Assimp.Scene>
+public sealed class SceneImporter : Importer<Assimp.Scene>
 {
 	public override string ReferenceType => nameof(SceneReference);
 	
-	public ImporterScene(ProjectNode owner) : base(owner)
+	public SceneImporter(ProjectNode owner) : base(owner)
 	{
 	}
 
@@ -27,7 +27,7 @@ public sealed class ImporterScene : Importer<Assimp.Scene>
 	{
 		throw new NotImplementedException();
 		
-		// ImporterSceneSettings? settings = Owner.Meta?.ImporterSettings as ImporterSceneSettings;
+		// SceneImporterSettings? settings = Owner.Meta?.ImporterSettings as SceneImporterSettings;
 		// if (settings == null)
 		// {
 		// 	return null;
@@ -53,12 +53,12 @@ public sealed class ImporterScene : Importer<Assimp.Scene>
 		// 	Mesh assimpMesh = assimpScene.Meshes[i];
 		// 	if (i == settings.Meshes.Count)
 		// 	{
-		// 		settings.Meshes.Add(new ImporterSceneMeshSettings(assimpMesh.Name));
+		// 		settings.Meshes.Add(new SceneImporterMeshSettings(assimpMesh.Name));
 		// 		settingsChanged = true;
 		// 	}
 		// 	else if(settings.Meshes[i].Name != assimpMesh.Name)
 		// 	{
-		// 		settings.Meshes[i] = new ImporterSceneMeshSettings(assimpMesh.Name);
+		// 		settings.Meshes[i] = new SceneImporterMeshSettings(assimpMesh.Name);
 		// 		settingsChanged    = true;
 		// 	}
 		// }
@@ -81,7 +81,7 @@ public sealed class ImporterScene : Importer<Assimp.Scene>
 
 	public override void Import(string resourcesRootPath, out string? relativeResourcePath)
 	{
-		ImporterSceneSettings? settings = Owner.Meta?.ImporterSettings as ImporterSceneSettings;
+		SceneImporterSettings? settings = Owner.Meta?.ImporterSettings as SceneImporterSettings;
 		if (settings == null)
 		{
 			ConsoleViewModel.LogError($"Cannot import '{Owner.RelativePath}'. Settings are missing or invalid!");
@@ -224,7 +224,7 @@ public sealed class ImporterScene : Importer<Assimp.Scene>
 		File.WriteAllBytes(absolutePath, json);
 	}
 
-	private void ImportChildNodesRecursive(SceneNode targetNode, Node source, ImporterSceneSettings settings)
+	private void ImportChildNodesRecursive(SceneNode targetNode, Node source, SceneImporterSettings settings)
 	{
 		if (source.Children == null)
 		{
@@ -243,7 +243,7 @@ public sealed class ImporterScene : Importer<Assimp.Scene>
 		}
 	}
 
-	private void ImportNode(SceneNode targetNode, Node source, ImporterSceneSettings settings)
+	private void ImportNode(SceneNode targetNode, Node source, SceneImporterSettings settings)
 	{
 		targetNode.Name = source.Name;
 
@@ -272,7 +272,7 @@ public sealed class ImporterScene : Importer<Assimp.Scene>
 
 	public override ImporterSettings CreateImportSettings()
 	{
-		ImporterSceneSettings settings = new ImporterSceneSettings();
+		SceneImporterSettings settings = new SceneImporterSettings();
 		
 		if (Owner.Extension == ".fbx")
 		{
@@ -285,7 +285,7 @@ public sealed class ImporterScene : Importer<Assimp.Scene>
 
 	public override bool UpdateImportSettings(ImporterSettings settings)
 	{
-		ImporterSceneSettings? sceneSettings = settings as ImporterSceneSettings;
+		SceneImporterSettings? sceneSettings = settings as SceneImporterSettings;
 		if (sceneSettings == null)
 		{
 			return false;
@@ -311,7 +311,7 @@ public sealed class ImporterScene : Importer<Assimp.Scene>
 			ref sceneSettings.Meshes,
 			scene.Meshes.Count,
 			(settingsMesh, index) => settingsMesh.Name != scene.Meshes[index].Name || settingsMesh.MaterialIndex != scene.Meshes[index].MaterialIndex,
-			index => sceneSettings.Meshes[index] = new ImporterSceneMeshSettings(scene.Meshes[index].Name, scene.Meshes[index].MaterialIndex)
+			index => sceneSettings.Meshes[index] = new SceneImporterMeshSettings(scene.Meshes[index].Name, scene.Meshes[index].MaterialIndex)
 		);
 
 		//----- materials
@@ -319,35 +319,35 @@ public sealed class ImporterScene : Importer<Assimp.Scene>
 			ref sceneSettings.Materials,
 			scene.MaterialCount,
 			(settingsMaterial, index) => settingsMaterial.Name != scene.Materials[index].Name,
-			index => sceneSettings.Materials[index] = new ImporterSceneMaterialSettings(scene.Materials[index].Name)
+			index => sceneSettings.Materials[index] = new SceneImporterMaterialSettings(scene.Materials[index].Name)
 		);
 		
 		//----- hierarchy
 		Node root = scene.RootNode ?? new Node();
-		sceneSettings.Root ??= new ImporterSceneHierarchyNodeSettings(root.Name);
+		sceneSettings.Root ??= new SceneImporterHierarchyNodeSettings(root.Name);
 		settingsChanged    |=  UpdateImportSettingsHierarchyNode(root, sceneSettings.Root);
 
 		return settingsChanged;
 	}
 
-	private bool UpdateImportSettingsHierarchyNode(Node node, ImporterSceneHierarchyNodeSettings sceneSettingsImporterSceneHierarchyNode)
+	private bool UpdateImportSettingsHierarchyNode(Node node, SceneImporterHierarchyNodeSettings sceneImporterHierarchyNodeSettings)
 	{
 		bool settingsChanged = false;
 
 		// children
 		settingsChanged |= ResizeAndUpdateList(
-			ref sceneSettingsImporterSceneHierarchyNode.Children,
+			ref sceneImporterHierarchyNodeSettings.Children,
 			node.ChildCount,
 			(child, index) => child.Name != node.Children[index].Name,
-			index => sceneSettingsImporterSceneHierarchyNode.Children![index] = new ImporterSceneHierarchyNodeSettings(node.Children[index].Name)
+			index => sceneImporterHierarchyNodeSettings.Children![index] = new SceneImporterHierarchyNodeSettings(node.Children[index].Name)
 		);
 
 		// meshes
 		settingsChanged |= ResizeAndUpdateList(
-			ref sceneSettingsImporterSceneHierarchyNode.Meshes,
+			ref sceneImporterHierarchyNodeSettings.Meshes,
 			node.HasMeshes ? node.MeshCount : 0,
 			(meshIndex, index) => meshIndex != node.MeshIndices[index],
-			index => sceneSettingsImporterSceneHierarchyNode.Meshes[index] = node.MeshIndices[index]
+			index => sceneImporterHierarchyNodeSettings.Meshes[index] = node.MeshIndices[index]
 		);
 
 		return settingsChanged;

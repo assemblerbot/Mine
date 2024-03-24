@@ -5,7 +5,7 @@ namespace Mine.Studio;
 public sealed class ImporterRegistry
 {
 	private readonly Dictionary<ProjectNodeType, Type> _types    = new();
-	private readonly Type                              _fallback = typeof(ImporterCopy);
+	private readonly Type                              _fallback = typeof(CopyImporter);
 
 	public ImporterRegistry()
 	{

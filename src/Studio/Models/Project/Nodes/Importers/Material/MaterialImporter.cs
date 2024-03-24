@@ -3,11 +3,11 @@ using Mine.Framework;
 namespace Mine.Studio;
 
 [Importer(ProjectNodeType.AssetMaterial)]
-public sealed class ImporterMaterial : Importer<Material>
+public sealed class MaterialImporter : Importer<Material>
 {
 	public override string ReferenceType => nameof(AssetReference); // TODO - remove ?
 	
-	public ImporterMaterial(ProjectNode owner) : base(owner)
+	public MaterialImporter(ProjectNode owner) : base(owner)
 	{
 	}
 
@@ -26,7 +26,7 @@ public sealed class ImporterMaterial : Importer<Material>
 
 	public override ImporterSettings CreateImportSettings()
 	{
-		return new ImporterMaterialSettings();
+		return new MaterialImporterSettings();
 	}
 
 	public override bool UpdateImportSettings(ImporterSettings settings)

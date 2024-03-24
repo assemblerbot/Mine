@@ -1,6 +1,6 @@
 namespace Mine.Studio;
 
-public class ImporterPng
+public class PngImporter
 {
 	
 }

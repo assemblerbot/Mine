@@ -4,6 +4,10 @@ namespace Mine.Framework;
 
 public sealed class SharedResourceSetLayouts : IDisposable
 {
+	private class ResourceLayoutCombined
+	{
+	}
+
 	// layout per kind
 	public ResourceLayout WorldMatrix = null!;
 	public ResourceLayout ViewProjectionMatrix = null!;

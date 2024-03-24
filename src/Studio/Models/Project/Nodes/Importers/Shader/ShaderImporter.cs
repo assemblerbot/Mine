@@ -2,12 +2,12 @@ using Mine.Framework;
 
 namespace Mine.Studio;
 
-public abstract class ImporterShader : Importer
+public abstract class ShaderImporter : Importer
 {
 	private static readonly string _compilerAbsolutePath = Path.Join(Engine.Paths.ApplicationAbsolutePath, "Tools\\win-x64\\glslc.exe"); // TODO - platform
 	public override         string ReferenceType => nameof(AssetReference);                                                             // TODO - remove ?
 
-	public ImporterShader(ProjectNode owner) : base(owner)
+	public ShaderImporter(ProjectNode owner) : base(owner)
 	{
 	}
 
@@ -24,7 +24,7 @@ public abstract class ImporterShader : Importer
 		relativeResourcePath = Owner.RelativePath.Replace(".hlsl", ".spirv").Replace(".glsl", ".spirv");
 		string targetPath         = Path.Join(resourcesRootPath, relativeResourcePath);
 
-		ImporterShaderSettings? settings = Owner.Meta?.ImporterSettings as ImporterShaderSettings;
+		ShaderImporterSettings? settings = Owner.Meta?.ImporterSettings as ShaderImporterSettings;
 		if (settings is null)
 		{
 			ConsoleViewModel.LogError($"Cannot import '{Owner.RelativePath}' - settings are missing or invalid!");
