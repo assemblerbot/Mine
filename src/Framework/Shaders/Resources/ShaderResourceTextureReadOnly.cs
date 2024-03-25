@@ -9,7 +9,7 @@ public sealed class ShaderResourceTextureReadOnly : ShaderResource
 	private Texture?     _texture;
 	private TextureView? _textureView;
 	
-	public ShaderResourceTextureReadOnly(string name, ShaderStages stages, AssetReference reference) : base(name, ResourceKind.TextureReadOnly, stages)
+	public ShaderResourceTextureReadOnly(string name, AssetReference reference) : base(name, ResourceKind.TextureReadOnly)
 	{
 		Reference = reference;
 	}

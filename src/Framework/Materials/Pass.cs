@@ -33,10 +33,10 @@ public sealed class Pass : IDisposable
 				switch (ShaderResourceSets[i].kind)
 				{
 					case ShaderResourceSetKind.WorldMatrix:
-						result[i] = Engine.Shared.ResourceSetLayouts.WorldMatrix;
+						result[i] = Engine.Shared.ResourceSetLayouts.WorldMatrix.Get(ShaderResourceSets[i].stages);
 						break;
 					case ShaderResourceSetKind.ViewProjectionMatrix:
-						result[i] = Engine.Shared.ResourceSetLayouts.ViewProjectionMatrix;
+						result[i] = Engine.Shared.ResourceSetLayouts.ViewProjectionMatrix.Get(ShaderResourceSets[i].stages);
 						break;
 					case ShaderResourceSetKind.MaterialProperties0:
 					case ShaderResourceSetKind.MaterialProperties1:
@@ -46,7 +46,7 @@ public sealed class Pass : IDisposable
 					case ShaderResourceSetKind.MaterialProperties5:
 					case ShaderResourceSetKind.MaterialProperties6:
 					case ShaderResourceSetKind.MaterialProperties7:
-						result[i] = GetConstBuffer(ShaderResourceSets[i].kind).ResourceLayout;
+						result[i] = GetConstBuffer(ShaderResourceSets[i].kind).GetResourceLayout(ShaderResourceSets[i].stages);
 						break;
 					case ShaderResourceSetKind.Uninitialized:
 					default:
@@ -99,8 +99,6 @@ public sealed class Pass : IDisposable
 			{
 				throw new InvalidOperationException($"Constant buffer `{buffer.Name}` doesn't have shader resource set declaration!");
 			}
-			
-			buffer.Stages = ShaderResourceSets[index].stages;
 			
 			_constBufferIndex[(int) buffer.Kind - (int) ShaderResourceSetKind.MaterialPropertiesMin] = i;
 		}

@@ -2,69 +2,59 @@ using Veldrid;
 
 namespace Mine.Framework;
 
-// TODO - change to abstract
-//  this class will be custom resource set used in material, it can and should manage its own layout
-//  built-in resource sets will have fixed structure and their layouts will be stored in Shared
 public class ShaderResourceSet : IDisposable
 {
 	// shader stage independent
 	public readonly ShaderResource[] Resources;
 
 	// shader stage dependent
-	private ResourceLayout? _resourceLayout;
-	private ResourceSet?    _resourceSet;
-
-	public ResourceLayout ResourceLayout => GetOrCreateResourceLayout();
-	public ResourceSet    ResourceSet    => GetOrCreateResourceSet();
+	private readonly MultiStageResourceLayout _resourceLayout;
+	private readonly MultiStageResourceSet    _resourceSet;
 
 	public ShaderResourceSet(params ShaderResource[] resources)
 	{
-		Resources = resources;
+		Resources       = resources;
+		
+		_resourceLayout = new MultiStageResourceLayout(GetResourceLayoutDescription);
+		_resourceSet    = new MultiStageResourceSet(GetResourceSetDescription);
 	}
 
-	private ResourceLayout GetOrCreateResourceLayout()
+	public ResourceLayout GetResourceLayout(ShaderStages stages)
 	{
-		if (_resourceLayout is not null)
-		{
-			return _resourceLayout;
-		}
+		return _resourceLayout.Get(stages);
+	}
 
+	public ResourceSet GetResourceSet(ShaderStages stages)
+	{
+		return _resourceSet.Get(stages);
+	}
+
+	private ResourceLayoutDescription GetResourceLayoutDescription(ShaderStages stages)
+	{
 		ResourceLayoutElementDescription[] elements = new ResourceLayoutElementDescription[Resources.Length];
 		for (int i = 0; i < Resources.Length; ++i)
 		{
-			elements[i] = Resources[i].CreateResourceLayoutElementDescription();
+			elements[i] = Resources[i].CreateResourceLayoutElementDescription(stages);
 		}
 
-		ResourceLayoutDescription description = new(elements);
-		_resourceLayout = Engine.Graphics.Factory.CreateResourceLayout(description);
-		return _resourceLayout;
+		return new ResourceLayoutDescription(elements);
 	}
 
-	private ResourceSet GetOrCreateResourceSet()
+	private ResourceSetDescription GetResourceSetDescription(ShaderStages stages)
 	{
-		if (_resourceSet is not null)
-		{
-			return _resourceSet;
-		}
-
 		BindableResource[] bindableResources = new BindableResource[Resources.Length];
 		for (int i = 0; i < Resources.Length; ++i)
 		{
 			bindableResources[i] = Resources[i].GetOrCreateBindableResource();
 		}
 
-		ResourceSetDescription description = new(GetOrCreateResourceLayout(), bindableResources);
-		_resourceSet = Engine.Graphics.Factory.CreateResourceSet(description);
-		return _resourceSet;
+		return new ResourceSetDescription(GetResourceLayout(stages), bindableResources);
 	}
- 
+
 	public void Dispose()
 	{
-		_resourceSet?.Dispose();
-		_resourceSet = null;
-
-		_resourceLayout?.Dispose();
-		_resourceLayout = null;
+		_resourceSet.Dispose();
+		_resourceLayout.Dispose();
 
 		for (int i = 0; i < Resources.Length; ++i)
 		{

@@ -8,7 +8,7 @@ public sealed class ShaderResourceSampler : ShaderResource
 
 	private Sampler? _sampler;
 	
-	public ShaderResourceSampler(string name, ShaderStages stages, SamplerDescription samplerDescription) : base(name, ResourceKind.Sampler, stages)
+	public ShaderResourceSampler(string name, SamplerDescription samplerDescription) : base(name, ResourceKind.Sampler)
 	{
 		SamplerDescription = samplerDescription;
 	}

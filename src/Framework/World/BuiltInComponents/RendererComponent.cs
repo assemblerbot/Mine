@@ -128,7 +128,8 @@ public abstract class RendererComponent : Component, IRenderer
 		}
 		
 		// draw
-		int              worldMatrixIndex   = -1;
+		int              worldMatrixIndex  = -1;
+		ShaderStages     worldMatrixStages = ShaderStages.Vertex;
 		SharedPipelineId currentPipelineId = new();
 		foreach ((MeshComponent mesh, Pass pass) renderObject in sortedRenderObjects.Values)
 		{
@@ -156,13 +157,15 @@ public abstract class RendererComponent : Component, IRenderer
 				worldMatrixIndex = -1;
 				for (int i = 0; i < renderObject.pass.ShaderResourceSets.Length; ++i)
 				{
+					ShaderStages stages = renderObject.pass.ShaderResourceSets[i].stages;
 					switch (renderObject.pass.ShaderResourceSets[i].kind)
 					{
-						case ShaderResourceSetKind.WorldMatrix:
-							worldMatrixIndex = i; // will be set later and for each mesh
+						case ShaderResourceSetKind.WorldMatrix: // will be set later and for each mesh
+							worldMatrixIndex  = i;
+							worldMatrixStages = stages;
 							break;
 						case ShaderResourceSetKind.ViewProjectionMatrix:
-							_commandList!.SetGraphicsResourceSet((uint)i, GetShaderResourceSetViewProjectionMatrix().ResourceSet);
+							_commandList!.SetGraphicsResourceSet((uint)i, GetShaderResourceSetViewProjectionMatrix().GetResourceSet(stages));
 							break;
 						case ShaderResourceSetKind.MaterialProperties0:
 						case ShaderResourceSetKind.MaterialProperties1:
@@ -172,7 +175,7 @@ public abstract class RendererComponent : Component, IRenderer
 						case ShaderResourceSetKind.MaterialProperties5:
 						case ShaderResourceSetKind.MaterialProperties6:
 						case ShaderResourceSetKind.MaterialProperties7:
-							_commandList!.SetGraphicsResourceSet((uint)i, renderObject.pass.GetConstBuffer(renderObject.pass.ShaderResourceSets[i].kind).ResourceSet);
+							_commandList!.SetGraphicsResourceSet((uint)i, renderObject.pass.GetConstBuffer(renderObject.pass.ShaderResourceSets[i].kind).GetResourceSet(stages));
 							break;
 						case ShaderResourceSetKind.Uninitialized:
 						default:
@@ -184,7 +187,7 @@ public abstract class RendererComponent : Component, IRenderer
 			// update world matrix
 			if (worldMatrixIndex != -1)
 			{
-				_commandList!.SetGraphicsResourceSet((uint)worldMatrixIndex, renderObject.mesh.Entity.ShaderResourceWorldMatrix.ResourceSet);
+				_commandList!.SetGraphicsResourceSet((uint)worldMatrixIndex, renderObject.mesh.Entity.ShaderResourceWorldMatrix.GetResourceSet(worldMatrixStages));
 			}
 
 			// draw

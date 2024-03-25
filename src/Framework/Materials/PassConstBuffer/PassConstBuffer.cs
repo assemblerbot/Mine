@@ -9,12 +9,10 @@ public sealed class PassConstBuffer : IDisposable
 	public readonly PassConstBufferElement[] Elements;
 	public readonly int                      SizeInBytes;
 	
-	public  ShaderStages Stages { get; internal set; }
-
-	private bool          _isDirty = true;
+	private bool _isDirty = true;
 	
 	private DeviceBuffer? _constBuffer;
-	public  DeviceBuffer  ConstBuffer
+	public DeviceBuffer ConstBuffer
 	{
 		get
 		{
@@ -28,42 +26,8 @@ public sealed class PassConstBuffer : IDisposable
 		}
 	}
 
-	private ResourceLayout? _resourceLayout;
-	public ResourceLayout ResourceLayout
-	{
-		get
-		{
-			_resourceLayout ??= Engine.Graphics.Factory.CreateResourceLayout(
-				new ResourceLayoutDescription(
-					new ResourceLayoutElementDescription(Name, ResourceKind.UniformBuffer, Stages)
-				)
-			);
-			
-			return _resourceLayout;
-		}
-	}
-
-	private ResourceSet? _resourceSet;
-	public ResourceSet ResourceSet
-	{
-		get
-		{
-			_resourceSet ??= Engine.Graphics.Factory.CreateResourceSet(
-				new ResourceSetDescription(
-					ResourceLayout,
-					new[] {ConstBuffer}
-				)
-			);
-
-			if (_isDirty)
-			{
-				_isDirty = false;
-				UpdateBuffer();
-			}
-
-			return _resourceSet;
-		}
-	}
+	private readonly MultiStageResourceLayout _resourceLayout;
+	private readonly MultiStageResourceSet    _resourceSet;
 
 	public PassConstBuffer(string name, ShaderResourceSetKind kind, params PassConstBufferElement[] elements)
 	{
@@ -77,13 +41,47 @@ public sealed class PassConstBuffer : IDisposable
 			element.SetDirty =  SetDirty;
 			SizeInBytes      += element.SizeInBytes;
 		}
+		
+		_resourceLayout = new MultiStageResourceLayout(GetResourceLayoutDescription);
+		_resourceSet    = new MultiStageResourceSet(GetResourceSetDescription);
 	}
-	
+
 	public void Dispose()
 	{
-		_resourceLayout?.Dispose();
-		_resourceSet?.Dispose();
+		_resourceLayout.Dispose();
+		_resourceSet.Dispose();
 		_constBuffer?.Dispose();
+	}
+
+	private ResourceLayoutDescription GetResourceLayoutDescription(ShaderStages stages)
+	{
+		return new ResourceLayoutDescription(
+			new ResourceLayoutElementDescription(Name, ResourceKind.UniformBuffer, stages)
+		);
+	}
+
+	private ResourceSetDescription GetResourceSetDescription(ShaderStages stages)
+	{
+		return new ResourceSetDescription(
+			GetResourceLayout(stages),
+			new[] {ConstBuffer}
+		);
+	}
+
+	public ResourceLayout GetResourceLayout(ShaderStages stages)
+	{
+		return _resourceLayout.Get(stages);
+	}
+
+	public ResourceSet GetResourceSet(ShaderStages stages)
+	{
+		if (_isDirty)
+		{
+			_isDirty = false;
+			UpdateBuffer();
+		}
+
+		return _resourceSet.Get(stages);
 	}
 
 	private void SetDirty()
@@ -106,6 +104,6 @@ public sealed class PassConstBuffer : IDisposable
 			writer.Flush();
 		}
 
-		Engine.Graphics.Device.UpdateBuffer(_constBuffer, 0, vertexData);
+		Engine.Graphics.Device.UpdateBuffer(ConstBuffer, 0, vertexData);
 	}
 }

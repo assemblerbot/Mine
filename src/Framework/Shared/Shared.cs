@@ -15,7 +15,6 @@ public sealed class Shared : IDisposable
 
 	public void Init()
 	{
-		_resourceSetLayouts.Init();
 	}
 
 	public void Dispose()
