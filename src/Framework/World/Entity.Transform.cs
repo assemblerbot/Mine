@@ -94,7 +94,7 @@ public sealed partial class Entity
 	
 	// resource for shader
 	private ShaderResourceSetWorldMatrix? _shaderResourceWorldMatrix;
-	public ShaderResourceSetWorldMatrix ShaderResourceWorldMatrix
+	public  ShaderResourceSetWorldMatrix ShaderResourceWorldMatrix
 	{
 		get
 		{

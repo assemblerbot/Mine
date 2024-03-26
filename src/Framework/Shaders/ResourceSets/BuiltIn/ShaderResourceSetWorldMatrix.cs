@@ -4,10 +4,10 @@ namespace Mine.Framework;
 
 public sealed class ShaderResourceSetWorldMatrix : ShaderResourceSet
 {
-	private const string       _bufferName   = "WorldMatrixConstants";
+	public const string BufferName = "WorldMatrixConstants";
 	
 	public ShaderResourceSetWorldMatrix()
-		: base(new ShaderResourceUniformBuffer(_bufferName, Matrix4x4Float.SizeInBytes))
+		: base(new ShaderResourceUniformBuffer(BufferName, Matrix4x4Float.SizeInBytes))
 	{
 	}
 
@@ -20,7 +20,7 @@ public sealed class ShaderResourceSetWorldMatrix : ShaderResourceSet
 	public static ResourceLayoutDescription GetResourceLayoutDescription(ShaderStages stages)
 	{
 		return new ResourceLayoutDescription(
-			new ResourceLayoutElementDescription(_bufferName, ResourceKind.UniformBuffer, stages)
+			new ResourceLayoutElementDescription(BufferName, ResourceKind.UniformBuffer, stages)
 		);
 	}
 }
