@@ -9,14 +9,14 @@ public abstract class RendererComponent : Component, IRenderer
 	public Clipper      Clipper;
 	public List<string> Passes;
 
-	public bool            ClearColorTarget      = true;
-	public Color4FloatRGBA ClearColor = Color4FloatRGBA.Black;
+	public bool            ClearColorTarget = true;
+	public Color4FloatRGBA ClearColor       = Color4FloatRGBA.Black;
 
 	public bool  ClearDepthTarget = true;
 	public float ClearDepth       = 1f;
 
-	public bool  ClearStencilTarget = false;
-	public byte  ClearStencil     = 0;
+	public bool ClearStencilTarget = false;
+	public byte ClearStencil       = 0;
 
 	private CommandList? _commandList;
 	private Framebuffer? _framebuffer;
@@ -96,6 +96,8 @@ public abstract class RendererComponent : Component, IRenderer
 	}
 
 	public abstract ShaderResourceSetViewProjectionMatrix GetShaderResourceSetViewProjectionMatrix();
+	public abstract ShaderResourceSetAmbientLight         GetShaderResourceSetAmbientLight(List<LightComponent> lights);
+	public abstract ShaderResourceSetDirectionalLight     GetShaderResourceSetDirectionalLight(List<LightComponent> lights);
 	
 	private void RenderMeshes()
 	{
@@ -105,14 +107,14 @@ public abstract class RendererComponent : Component, IRenderer
 			return;
 		}
 
-		List<LightComponent>? lights = null;
+		List<LightComponent>? lightsCache = null;
 		foreach (string pass in Passes)
 		{
-			RenderPass(pass, meshes, ref lights);
+			RenderPass(pass, meshes, ref lightsCache);
 		}
 	}
 
-	private void RenderPass(string passName, List<MeshComponent> meshes, ref List<LightComponent>? lights)
+	private void RenderPass(string passName, List<MeshComponent> meshes, ref List<LightComponent>? lightsCache)
 	{
 		// collect and sort meshes by order of their render passes
 		SortedList<int, (MeshComponent mesh, Pass pass)> sortedRenderObjects = new(meshes.Count);
@@ -177,6 +179,14 @@ public abstract class RendererComponent : Component, IRenderer
 						case ShaderResourceSetKind.MaterialProperties7:
 							_commandList!.SetGraphicsResourceSet((uint)i, renderObject.pass.GetConstBuffer(renderObject.pass.ShaderResourceSets[i].kind).GetResourceSet(stages));
 							break;
+						case ShaderResourceSetKind.AmbientLight:
+							_commandList!.SetGraphicsResourceSet((uint) i, GetShaderResourceSetAmbientLight(GetCollectedLights(ref lightsCache)).GetResourceSet(stages)); 
+							break;
+						case ShaderResourceSetKind.DirectionalLight:
+							_commandList!.SetGraphicsResourceSet((uint) i, GetShaderResourceSetDirectionalLight(GetCollectedLights(ref lightsCache)).GetResourceSet(stages)); 
+							break;
+						case ShaderResourceSetKind.PointLights:
+						case ShaderResourceSetKind.SpotLights:
 						case ShaderResourceSetKind.Uninitialized:
 						default:
 							throw new ArgumentOutOfRangeException();
@@ -195,5 +205,16 @@ public abstract class RendererComponent : Component, IRenderer
 		}
 
 		//lights = Clipper.CollectLights(this);
+	}
+
+	private List<LightComponent> GetCollectedLights(ref List<LightComponent>? lightsCache)
+	{
+		if (lightsCache is not null)
+		{
+			return lightsCache;
+		}
+
+		lightsCache = Clipper.CollectLights(this);
+		return lightsCache;
 	}
 }

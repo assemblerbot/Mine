@@ -17,6 +17,11 @@ public sealed class ShaderResourceSetAmbientLight : ShaderResourceSet
 		Engine.Graphics.Device.UpdateBuffer(uniformBuffer.GetOrCreateBuffer(), 0, color);
 	}
 
+	public void SetEmpty()
+	{
+		Set(Color4FloatRGBA.Black);
+	}
+	
 	public static ResourceLayoutDescription GetResourceLayoutDescription(ShaderStages stages)
 	{
 		return new ResourceLayoutDescription(

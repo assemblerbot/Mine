@@ -23,6 +23,14 @@ public record struct Vector4Float
 		W = w;
 	}
 	
+	public Vector4Float(Vector3Float v, float w)
+	{
+		X = v.X;
+		Y = v.Y;
+		Z = v.Z;
+		W = w;
+	}
+	
 	#region Magnitude and normalization
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public float SquareMagnitude()

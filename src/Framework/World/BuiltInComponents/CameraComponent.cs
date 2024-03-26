@@ -49,6 +49,12 @@ public class CameraComponent : RendererComponent
 	
 	private          bool                                  _shaderResourceDirty             = true;
 	private readonly ShaderResourceSetViewProjectionMatrix _shaderResourceSetViewProjection = new();
+
+	private          ulong                         _shaderResourceSetAmbientLightUpdatedAt = 0;
+	private readonly ShaderResourceSetAmbientLight _shaderResourceSetAmbientLight          = new();
+
+	private          ulong                         _shaderResourceSetDirectionalLightUpdatedAt = 0;
+	private readonly ShaderResourceSetDirectionalLight _shaderResourceSetDirectionalLight          = new();
 	
 	public CameraComponent(int renderOrder, ulong renderMask, Clipper clipper, List<string> passes) : base(renderOrder, renderMask, clipper, passes)
 	{
@@ -67,14 +73,18 @@ public class CameraComponent : RendererComponent
 	{
 		base.Dispose();
 		_shaderResourceSetViewProjection.Dispose();
+		_shaderResourceSetAmbientLight.Dispose();
+		_shaderResourceSetDirectionalLight.Dispose();
 	}
 
+	#region Shader resources
 	public override ShaderResourceSetViewProjectionMatrix GetShaderResourceSetViewProjectionMatrix()
 	{
 		if (!_shaderResourceDirty)
 		{
 			return _shaderResourceSetViewProjection;
 		}
+		_shaderResourceDirty = false;
 
 		Matrix4x4Float view = Matrix4x4Float.CreateViewLookAtLH(
 			Entity.WorldPosition,
@@ -91,7 +101,51 @@ public class CameraComponent : RendererComponent
 
 		Matrix4x4Float viewProjection = Matrix4x4Float.Mul(view, projection);
 		_shaderResourceSetViewProjection.Set(viewProjection);
-		_shaderResourceDirty = false;
 		return _shaderResourceSetViewProjection;
 	}
+
+	public override ShaderResourceSetAmbientLight GetShaderResourceSetAmbientLight(List<LightComponent> lights)
+	{
+		if (_shaderResourceSetAmbientLightUpdatedAt == Engine.Timing.RenderFrame)
+		{
+			return _shaderResourceSetAmbientLight;
+		}
+		_shaderResourceSetAmbientLightUpdatedAt = Engine.Timing.RenderFrame;
+
+		int index = lights.FindIndex(x => x is AmbientLightComponent);
+		if (index == -1)
+		{
+			_shaderResourceSetAmbientLight.SetEmpty();
+		}
+		else
+		{
+			AmbientLightComponent ambientLight = (AmbientLightComponent)lights[index];
+			_shaderResourceSetAmbientLight.Set(ambientLight.Color);
+		}
+
+		return _shaderResourceSetAmbientLight;
+	}
+
+	public override ShaderResourceSetDirectionalLight GetShaderResourceSetDirectionalLight(List<LightComponent> lights)
+	{
+		if (_shaderResourceSetDirectionalLightUpdatedAt == Engine.Timing.RenderFrame)
+		{
+			return _shaderResourceSetDirectionalLight;
+		}
+		_shaderResourceSetDirectionalLightUpdatedAt = Engine.Timing.RenderFrame;
+
+		int index = lights.FindIndex(x => x is DirectionalLightComponent);
+		if (index == -1)
+		{
+			_shaderResourceSetDirectionalLight.SetEmpty();
+		}
+		else
+		{
+			DirectionalLightComponent directionalLight = (DirectionalLightComponent)lights[index];
+			_shaderResourceSetDirectionalLight.Set(directionalLight.Color, directionalLight.Entity.Forward);
+		}
+
+		return _shaderResourceSetDirectionalLight;
+	}
+	#endregion
 }

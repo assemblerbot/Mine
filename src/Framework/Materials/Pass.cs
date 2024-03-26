@@ -5,16 +5,16 @@ namespace Mine.Framework;
 
 public sealed class Pass : IDisposable
 {
-	public readonly  ulong                                               Id;
-	public readonly  string                                              Name;
-	public readonly  int                                                 Order;
-	public readonly  BlendStateDescription                               BlendStateDescription;
-	public readonly  DepthStencilStateDescription                        DepthStencilStateDescription;
-	public readonly  RasterizerStateDescription                          RasterizerStateDescription;
-	public readonly  MaterialShader                                      VertexShader;
-	public readonly  MaterialShader                                      PixelShader;
-	public readonly  (ShaderResourceSetKind kind, ShaderStages stages)[] ShaderResourceSets;
-	public readonly  PassConstBuffer[]                                   ShaderConstBuffers;
+	public readonly ulong                                               Id;
+	public readonly string                                              Name;
+	public readonly int                                                 Order;
+	public readonly BlendStateDescription                               BlendStateDescription;
+	public readonly DepthStencilStateDescription                        DepthStencilStateDescription;
+	public readonly RasterizerStateDescription                          RasterizerStateDescription;
+	public readonly MaterialShader                                      VertexShader;
+	public readonly MaterialShader                                      PixelShader;
+	public readonly (ShaderResourceSetKind kind, ShaderStages stages)[] ShaderResourceSets;
+	public readonly PassConstBuffer[]                                   ShaderConstBuffers;
 	
 	// indexation structure, const buffer index is stored in cell N for each ShaderResourceSetKind.MaterialPropertiesN 
 	private readonly int[] _constBufferIndex = new int [(int) ShaderResourceSetKind.MaterialPropertiesMax - (int) ShaderResourceSetKind.MaterialPropertiesMin + 1];
@@ -48,6 +48,14 @@ public sealed class Pass : IDisposable
 					case ShaderResourceSetKind.MaterialProperties7:
 						result[i] = GetConstBuffer(ShaderResourceSets[i].kind).GetResourceLayout(ShaderResourceSets[i].stages);
 						break;
+					case ShaderResourceSetKind.AmbientLight:
+						result[i] = Engine.Shared.ResourceSetLayouts.AmbientLight.Get(ShaderResourceSets[i].stages);
+						break;
+					case ShaderResourceSetKind.DirectionalLight:
+						result[i] = Engine.Shared.ResourceSetLayouts.DirectionalLight.Get(ShaderResourceSets[i].stages);
+						break;
+					case ShaderResourceSetKind.PointLights:
+					case ShaderResourceSetKind.SpotLights:
 					case ShaderResourceSetKind.Uninitialized:
 					default:
 						throw new ArgumentOutOfRangeException();

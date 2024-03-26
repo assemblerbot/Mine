@@ -11,6 +11,16 @@ public abstract class LightComponent : Component, IRenderable
 	{
 		_renderMask = renderMask;
 	}
+
+	public override void AfterAddedToWorld()
+	{
+		Engine.World.RegisterLight(this);
+	}
+
+	public override void BeforeRemovedFromWorld()
+	{
+		Engine.World.UnregisterLight(this);
+	}
 }
 
 //------------------------------------------------------------------------------------
@@ -18,7 +28,7 @@ public abstract class LightComponent : Component, IRenderable
 public abstract class LightComponent<TResourceSet> : LightComponent
 	where TResourceSet : ShaderResourceSet, new()
 {
-	private readonly ShaderResourceSet _resourceSet = new TResourceSet();
+	//private readonly ShaderResourceSet _resourceSet = new TResourceSet();
 
 	protected LightComponent(ulong renderMask) : base(renderMask)
 	{
@@ -26,7 +36,7 @@ public abstract class LightComponent<TResourceSet> : LightComponent
 
 	public override void Dispose()
 	{
-		_resourceSet.Dispose();
+		//_resourceSet.Dispose();
 		base.Dispose();
 	}
 }

@@ -51,6 +51,8 @@ public sealed class TestComponent : Component, IUpdatable
 						      (ShaderResourceSetKind.ViewProjectionMatrix, ShaderStages.Vertex),
 						      (ShaderResourceSetKind.MaterialProperties0, ShaderStages.Vertex),
 						      (ShaderResourceSetKind.MaterialProperties1, ShaderStages.Fragment),
+						      (ShaderResourceSetKind.AmbientLight, ShaderStages.Fragment),
+						      (ShaderResourceSetKind.DirectionalLight, ShaderStages.Fragment),
 					      },
 					
 					new[] {
@@ -80,6 +82,7 @@ public sealed class TestComponent : Component, IUpdatable
 		_material   = new TestMaterial(null!);
 		_testEntity = InstantiateTestPrefab(Entity, _material);
 		CreateCamera();
+		CreateLights();
 		Engine.World.RegisterUpdatable(this);
 	}
 
@@ -120,13 +123,36 @@ public sealed class TestComponent : Component, IUpdatable
 		Engine.World.Root.AddChild(entity);
 	}
 
+	private void CreateLights()
+	{
+		// ambient
+		{
+			AmbientLightComponent light = new (ulong.MaxValue);
+			Entity                entity       = new Entity().AddComponent(light).Entity;
+			Engine.World.Root.AddChild(entity);
+
+			light.Color = new Color4FloatRGBA(0.1f, 0.1f, 0.1f, 0f);
+		}
+		
+		// directional
+		{
+			DirectionalLightComponent light  = new (UInt64.MaxValue);
+			Entity                    entity = new Entity().AddComponent(light).Entity;
+			Engine.World.Root.AddChild(entity);
+
+			light.Color          = new Color4FloatRGBA(1.0f, 1.0f, 0.8f, 1f);
+			entity.LocalRotation = QuaternionFloat.CreateFromYawPitchRoll(0.7f, 0.7f, 0.7f);
+		}
+	}
+
 	public void Update(double timeDelta)
 	{
 		_time += (float)timeDelta;
 		
 		if (_testEntity is not null)
 		{
-			_testEntity.LocalRotation = QuaternionFloat.CreateFromYawPitchRoll(_time, _time * 0.3f, _time * 0.1f);
+			const float speed = 0.3f;
+			_testEntity.LocalRotation = QuaternionFloat.CreateFromYawPitchRoll(_time * speed, _time * 0.3f * speed, _time * 0.1f * speed);
 			//_testEntity.LocalPosition = new Point3Float(0, 0, _time);
 			//_testEntity.LocalScale    = new Vector3Float(0.01f, 0.01f, 0.01f);
 			_material.SurfaceColor = new Color4FloatRGBA(MathF.Sin(_time) * 0.5f + 0.5f, 0.5f, 1f, 1f);
