@@ -21,18 +21,8 @@ public enum ShaderResourceSetKind
 	MaterialPropertiesMax = MaterialProperties7,
 	
 	// lights
-	AmbientLight0,
-	
-	DirectionalLight0,
-	DirectionalLight1,
-	
-	PointLight0,
-	PointLight1,
-	PointLight2,
-	PointLight3,
-
-	SpotLight0,
-	SpotLight1,
-	SpotLight2,
-	SpotLight3,
+	AmbientLight,
+	DirectionalLight,
+	PointLights,
+	SpotLights,
 }
