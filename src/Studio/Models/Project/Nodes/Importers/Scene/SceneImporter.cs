@@ -82,7 +82,7 @@ public sealed class SceneImporter : Importer<Assimp.Scene>
 	public override void Import(string resourcesRootPath, out string? relativeResourcePath)
 	{
 		SceneImporterSettings? settings = Owner.Meta?.ImporterSettings as SceneImporterSettings;
-		if (settings == null)
+		if (settings is null)
 		{
 			ConsoleViewModel.LogError($"Cannot import '{Owner.RelativePath}'. Settings are missing or invalid!");
 			relativeResourcePath = null;
@@ -97,7 +97,7 @@ public sealed class SceneImporter : Importer<Assimp.Scene>
 			PostProcessSteps.Triangulate // always - only triangles are supported
 		);
 
-		if (assimpScene == null)
+		if (assimpScene is null)
 		{
 			ConsoleViewModel.LogError($"Cannot import '{Owner.RelativePath}'. Mesh was not loaded!");
 			relativeResourcePath = null;

@@ -45,6 +45,11 @@ public static class ProjectNodeTypeExtensions
 		{
 			".png" => ProjectNodeType.AssetImage,
 			".jpg" => ProjectNodeType.AssetImage,
+			".jpeg" => ProjectNodeType.AssetImage,
+			".tga" => ProjectNodeType.AssetImage,
+			".tif" => ProjectNodeType.AssetImage,
+			".tiff" => ProjectNodeType.AssetImage,
+			".bmp" => ProjectNodeType.AssetImage,
 			".fbx" => ProjectNodeType.AssetScene,
 			".obj" => ProjectNodeType.AssetScene,
 			".vsh.hlsl" => ProjectNodeType.AssetVertexShader,

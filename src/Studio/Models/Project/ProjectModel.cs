@@ -985,12 +985,22 @@ public sealed class ProjectModel
 			{
 				try
 				{
-					if (Directory.Exists(absoluteResourcesPath))
+					if (!Directory.Exists(absoluteResourcesPath))
 					{
-						Directory.Delete(absoluteResourcesPath, true);
+						Directory.CreateDirectory(absoluteResourcesPath); // make sure that Resources directory is ready and empty
+						return;
+					}
+					
+					DirectoryInfo di = new (absoluteResourcesPath);
+					foreach (FileInfo file in di.GetFiles())
+					{
+						file.Delete(); 
 					}
 
-					Directory.CreateDirectory(absoluteResourcesPath);
+					foreach (DirectoryInfo dir in di.GetDirectories())
+					{
+						dir.Delete(true);
+					}
 				}
 				catch (Exception e)
 				{
