@@ -17,7 +17,7 @@ public sealed class ToolProjectView : Tool
 	protected override string Name => ToolName;
 
 	private readonly ProjectModel                                       _projectModel;
-	private readonly Dictionary<(ProjectNode, ProjectNodeType), string> _nodeLabels = new();
+	private readonly Dictionary<(ProjectNode, ProjectNodeKind), string> _nodeLabels = new();
 	
 	private readonly Menu         _contextMenu            = new(MenuStyle.ContextMenu);
 	private          ProjectNode? _contextMenuActivatedAt = null;
@@ -114,7 +114,7 @@ public sealed class ToolProjectView : Tool
 			flags |= ImGuiTreeNodeFlags.Selected;
 		}
 		
-		if(!_nodeLabels.TryGetValue((node, node.Type), out string? label))
+		if(!_nodeLabels.TryGetValue((node, node.Kind), out string? label))
 		{
 			// if (node is ProjectFolderNode folder)
 			// {
@@ -125,8 +125,8 @@ public sealed class ToolProjectView : Tool
 			// 	label = $"{Icon.FileIconText(node.Path)} {node.Name}";
 			// }
 			//label = node.Name;
-			label = $"{node.Type.ToIcon()} {node.Name}";
-			_nodeLabels.Add((node, node.Type), label);
+			label = $"{node.Kind.ToIcon()} {node.Name}";
+			_nodeLabels.Add((node, node.Kind), label);
 		}
 		
 		bool nodeExpanded = Gui.TreeNodeEx(id, flags, label);
@@ -301,17 +301,17 @@ public sealed class ToolProjectView : Tool
 
 	private bool CanCreateScript()
 	{
-		return _contextMenuActivatedAt is not null && _contextMenuActivatedAt.Type.IsScriptsRelated();
+		return _contextMenuActivatedAt is not null && _contextMenuActivatedAt.Kind.IsScriptsRelated();
 	}
 	
 	private bool CanCreateAsset()
 	{
-		return _contextMenuActivatedAt is not null && _contextMenuActivatedAt.Type.IsAssetsRelated();
+		return _contextMenuActivatedAt is not null && _contextMenuActivatedAt.Kind.IsAssetsRelated();
 	}
 
 	private bool CanCreatePrefab()
 	{
-		return _contextMenuActivatedAt is not null && _contextMenuActivatedAt.Type == ProjectNodeType.AssetScene;
+		return _contextMenuActivatedAt is not null && _contextMenuActivatedAt.Kind == ProjectNodeKind.AssetScene;
 	}
 
 	private bool IsAnythingSelected()

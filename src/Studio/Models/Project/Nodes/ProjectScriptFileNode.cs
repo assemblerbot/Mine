@@ -24,7 +24,7 @@ public class ProjectScriptFileNode : ProjectNode
 		else
 		{
 			guid = RelativePath;
-			SetNodeType(ProjectNodeType.ScriptFile);
+			SetNodeType(ProjectNodeKind.ScriptFile);
 		}
 
 		Importer = StudioGlobals.ImporterRegistry.CreateImporter(this);

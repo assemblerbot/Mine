@@ -1,9 +1,10 @@
 using ImageMagick;
+using ImageMagick.Formats;
 using Mine.Framework;
 
 namespace Mine.Studio;
 
-[Importer(ProjectNodeType.AssetImage)]
+[Importer(ProjectNodeKind.AssetImage)]
 public sealed class ImageImporter : Importer<MagickImage>
 {
 	public override string ReferenceType => nameof(AssetReference); // TODO - Image reference
@@ -32,7 +33,7 @@ public sealed class ImageImporter : Importer<MagickImage>
 
 		try
 		{
-			using MagickImage image = new MagickImage(Owner.AbsolutePath);
+			using MagickImage image = new (Owner.AbsolutePath);
 			if (image is null)
 			{
 				ConsoleViewModel.LogException($"Image '{Owner.RelativePath}' couldn't be imported.");
@@ -41,7 +42,10 @@ public sealed class ImageImporter : Importer<MagickImage>
 			}
 
 			// TODO - convert
-			image.Format      = MagickFormat.Dds;
+			image.Format          = MagickFormat.Dds;
+			var pixels = image.GetPixels();
+			//pixels.
+			//var compression = DdsCompression.Dxt5;
 
 			relativeResourcePath = $"{Owner.RelativePath}.dds";
 			string absolutePath = Path.Join(resourcesRootPath, relativeResourcePath);
@@ -51,7 +55,6 @@ public sealed class ImageImporter : Importer<MagickImage>
 		{
 			ConsoleViewModel.LogException($"Image '{Owner.RelativePath}' import failed: {e}");
 			relativeResourcePath = null;
-			return;
 		}
 	}
 

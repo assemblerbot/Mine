@@ -6,7 +6,7 @@ using Veldrid;
 
 namespace Mine.Studio;
 
-[Importer(ProjectNodeType.AssetScene)]
+[Importer(ProjectNodeKind.AssetScene)]
 public sealed class SceneImporter : Importer<Assimp.Scene>
 {
 	public override string ReferenceType => nameof(SceneReference);
@@ -341,6 +341,11 @@ public sealed class SceneImporter : Importer<Assimp.Scene>
 			(child, index) => child.Name != node.Children[index].Name,
 			index => sceneImporterHierarchyNodeSettings.Children![index] = new SceneImporterHierarchyNodeSettings(node.Children[index].Name)
 		);
+
+		for (int i = 0; i < node.ChildCount; ++i)
+		{
+			settingsChanged |= UpdateImportSettingsHierarchyNode(node.Children[i], sceneImporterHierarchyNodeSettings.Children![i]);
+		}
 
 		// meshes
 		settingsChanged |= ResizeAndUpdateList(

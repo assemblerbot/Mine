@@ -8,7 +8,7 @@ public abstract class ProjectNode : ISelectable
 	// TODO - type of node should be System.Type - not enum and it should contain the type of referenced class
 	
 	[HideInInspector]     public readonly ProjectModel    Project;
-	[ReadOnlyInInspector] public          ProjectNodeType Type        = ProjectNodeType.Uninitialized;
+	[ReadOnlyInInspector] public          ProjectNodeKind Kind        = ProjectNodeKind.Uninitialized;
 	[HideInInspector]     public          Type?           ContentType = null;
 
 	public          string Name { get; }
@@ -68,9 +68,9 @@ public abstract class ProjectNode : ISelectable
 		File.WriteAllBytes(metaPath, json);
 	}
 
-	public void SetNodeType(ProjectNodeType type)
+	public void SetNodeType(ProjectNodeKind kind)
 	{
-		Type = type;
+		Kind = kind;
 	}
 
 	public T? GetImporter<T>() where T : Importer

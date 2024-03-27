@@ -2,8 +2,8 @@
 
 public sealed class ProjectRootNode : ProjectFolderNode
 {
-	public ProjectRootNode(ProjectModel project, string name, string absolutePath, ProjectNodeType type)
-		: base(project, name, absolutePath, "", false, type)
+	public ProjectRootNode(ProjectModel project, string name, string absolutePath, ProjectNodeKind kind)
+		: base(project, name, absolutePath, "", false, kind)
 	{
 	}
 

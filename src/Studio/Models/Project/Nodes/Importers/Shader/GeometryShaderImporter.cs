@@ -1,6 +1,6 @@
 namespace Mine.Studio;
 
-[Importer(ProjectNodeType.AssetGeometryShader)]
+[Importer(ProjectNodeKind.AssetGeometryShader)]
 public sealed class GeometryShaderImporter : ShaderImporter
 {
 	public GeometryShaderImporter(ProjectNode owner) : base(owner)

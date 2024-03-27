@@ -2,7 +2,7 @@ using Mine.Framework;
 
 namespace Mine.Studio;
 
-[Importer(ProjectNodeType.AssetMaterial)]
+[Importer(ProjectNodeKind.AssetMaterial)]
 public sealed class MaterialImporter : Importer<Material>
 {
 	public override string ReferenceType => nameof(AssetReference); // TODO - remove ?

@@ -1,6 +1,6 @@
 namespace Mine.Studio;
 
-[Importer(ProjectNodeType.AssetVertexShader)]
+[Importer(ProjectNodeKind.AssetVertexShader)]
 public sealed class VertexShaderImporter : ShaderImporter
 {
 	public VertexShaderImporter(ProjectNode owner) : base(owner)
