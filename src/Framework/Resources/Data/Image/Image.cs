@@ -1,15 +1,20 @@
+using ImageMagick;
+using Veldrid;
+
 namespace Mine.Framework;
 
-public class Image
+[Serializable]
+public sealed class Image
 {
-	public readonly int    Width;
-	public readonly int    Height;
-	public readonly uint[] Pixels32BitRGBA;
+	public readonly int         Width;
+	public readonly int         Height;
+	public readonly PixelFormat Format;
+	public readonly byte[]      Data;
+	// TODO - mipmaps, cube maps
 
-	public Image(int width, int height, uint[] pixels32BitRgba)
+	public static Image CreateFromMagicImage(MagickImage magickImage)
 	{
-		Width           = width;
-		Height          = height;
-		Pixels32BitRGBA = pixels32BitRgba;
+		magickImage.Format = MagickFormat.Rgba;
+		magickImage.Depth  = 8;
 	}
 }

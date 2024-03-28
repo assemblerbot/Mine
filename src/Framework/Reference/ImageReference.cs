@@ -1,4 +1,5 @@
 using ImageMagick;
+using OdinSerializer;
 
 namespace Mine.Framework;
 
@@ -18,10 +19,13 @@ public sealed class ImageReference : Reference<Image>
 				return null;
 			}
 
+			if (Path.EndsWith(".image"))
+			{
+				return SerializationUtility.DeserializeValue<Image>(bytes, DataFormat.Binary);
+			}
+
 			MagickImage image = new (bytes);
 			
-			//image.Width
-			//image.GetPixels();
 			return null;
 
 		}
