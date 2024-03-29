@@ -555,7 +555,7 @@ public sealed class ProjectModel
 					// created file
 					EnqueueProjectTaskFromWatcher(CreateNewAssetFileTask(_assetsFolder!, relativePath, path));
 					EnqueueProjectTaskFromWatcher(CreateInitNodeTask(_assetsFolder!, eventRelativePath));
-					//EnqueueProjectTaskFromWatcher(CreateImportTask(_assetsFolder!, eventRelativePath));
+					//EnqueueProjectTaskFromWatcher(CreateImportTask(_assetsFolder!, eventRelativePath, false));
 				}
 				break;
 			}

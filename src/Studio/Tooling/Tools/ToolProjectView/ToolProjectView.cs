@@ -254,8 +254,8 @@ public sealed class ToolProjectView : Tool
 		StudioModel.Project.ResumeWatchers();
 	}
 	#endregion
-
-	#region Edit
+	
+	#region Refresh
 	private void OnContextMenuRefresh()
 	{
 		_contextMenuActivatedAt!.RefreshMetaFile();
@@ -265,7 +265,9 @@ public sealed class ToolProjectView : Tool
 	{
 		StudioModel.Project.Import(_contextMenuActivatedAt!, true);
 	}
+	#endregion
 
+	#region Edit
 	private void OnContextMenuEditRename()
 	{
 		// TODO
