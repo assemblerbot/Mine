@@ -7,8 +7,9 @@ public sealed class ProjectThread
 	private readonly CancellationTokenSource      _cancellationTokenSource = new();
 	private readonly EventWaitHandle              _waitHandle              = new AutoResetEvent(false);
 	private readonly ConcurrentQueue<ProjectTask> _tasks                   = new();
-	
-	public int TasksCount => _tasks.Count;
+
+	public bool IsProcessing = false;
+	public int  TasksCount => _tasks.Count;
 	
 	public ProjectThread()
 	{
@@ -57,7 +58,9 @@ public sealed class ProjectThread
 				continue;
 			}
 
+			IsProcessing = true;
 			task.Process(_cancellationTokenSource.Token);
+			IsProcessing = false;
 		}
 	}
 }

@@ -10,13 +10,15 @@ public class StatusBar
 	public enum Color
 	{
 		Info    = 0,
-		Warning = 1,
-		Error   = 2,
+		Busy    = 1,
+		Warning = 2,
+		Error   = 3,
 	}
 
 	private readonly Vector4[] _messageColors =
 	{
 		new(0.0f, 0.8f, 0.0f, 1.0f), // Info
+		new(1.0f, 1.0f, 0.0f, 1.0f), // Busy
 		new(1.0f, 0.5f, 0.0f, 1.0f), // Warning
 		new(1.0f, 0.0f, 0.0f, 1.0f), // Error
 	};

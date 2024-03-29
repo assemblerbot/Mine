@@ -24,10 +24,9 @@ public sealed class ImageReference : Reference<Image>
 				return SerializationUtility.DeserializeValue<Image>(bytes, DataFormat.Binary);
 			}
 
+			// fixed conversion?
 			MagickImage image = new (bytes);
-			
-			return null;
-
+			return Image.CreateFromMagicImage2D(image, ImagePixelFormat.R8_G8_B8_A8, 1);
 		}
 		catch (Exception e)
 		{

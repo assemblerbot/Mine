@@ -53,7 +53,8 @@ public sealed class ProjectModel
 	private readonly ConcurrentQueue<ProjectTask> _waitingWatcherTasks = new();
 	
 	private readonly ProjectThread _thread = new ();
-	public           int           TasksCount => _thread.TasksCount;
+	public           bool          IsProcessing => _thread.IsProcessing;
+	public           int           TasksCount   => _thread.TasksCount;
 	
 	public ProjectModel(StudioModelEventAggregator eventAggregator)
 	{
@@ -210,23 +211,51 @@ public sealed class ProjectModel
 		}
 	}
 
-	public void ImportAll()
+	public void ImportAll(bool force)
+	{
+		ImportFolder(_assetsFolder!, force);
+
+		lock (ProjectTreeLock)
+		{
+			EnqueueProjectTask(CreateSaveAssetDatabaseTask());
+		}
+	}
+
+	public void Import(ProjectNode node, bool force)
+	{
+		if (!node.Kind.IsAssetsRelated())
+		{
+			return;
+		}
+
+		if (node.Kind == ProjectNodeKind.AssetFolder)
+		{
+			ProjectFolderNode folderNode = (ProjectFolderNode)node;
+			ImportFolder(folderNode, force);
+			return;
+		}
+
+		lock (ProjectTreeLock)
+		{
+			EnqueueProjectTask(CreateImportFileTask(_assetsFolder!, node.RelativePath, force));
+		}
+	}
+
+	public void ImportFolder(ProjectFolderNode folderNode, bool force)
 	{
 		lock (ProjectTreeLock)
 		{
-			_assetsFolder!.TraverseRecursive(
+			folderNode.TraverseRecursive(
 				node => EnqueueProjectTask(CreateImportFolderTask(_assetsFolder!, node.RelativePath)),
 				TraverseFlags.Directories,
 				default
 			);
 
-			_assetsFolder!.TraverseRecursive(
-				node => EnqueueProjectTask(CreateImportFileTask(_assetsFolder!, node.RelativePath)),
+			folderNode.TraverseRecursive(
+				node => EnqueueProjectTask(CreateImportFileTask(_assetsFolder!, node.RelativePath, force)),
 				TraverseFlags.Files,
 				default
 			);
-
-			EnqueueProjectTask(CreateSaveAssetDatabaseTask());
 		}
 	}
 	#endregion
@@ -827,62 +856,63 @@ public sealed class ProjectModel
 		);
 	}
 
-	private ProjectTask CreateImportFileTask(ProjectRootNode root, string path)
+	private ProjectTask CreateImportFileTask(ProjectRootNode root, string path, bool force)
 	{
 		return new ProjectTask(
 			cancellationToken =>
 			{
+				// check node
+				ProjectAssetFileNode? node = null;
 				lock (ProjectTreeLock)
 				{
-					// check node
-					ProjectAssetFileNode? node = root.FindNode(path) as ProjectAssetFileNode;
-					if (node == null || node.Meta == null)
-					{
-						return;
-					}
-
-					// check file
-					if (!File.Exists(node.AbsolutePath))
-					{
-						return;
-					}
-
-					// calculate hash
-					string? hash = null;
-					try
-					{
-						using FileStream file = new(node.AbsolutePath, FileMode.Open);
-						hash = Convert.ToBase64String(_hashAlgorithm.ComputeHash(file)); // how to cancel compute hash?
-					}
-					catch (Exception e)
-					{
-						return;
-					}
-
-					// check hash
-					if (node.Meta.Hash == hash)
-					{
-						return;
-					}
-
-					try
-					{
-						Importer importer = node.GetImporter<Importer>()!;
-						importer.Import(_projectSettings!.AbsoluteResourcesPath, out string? resourcePath);
-						if (resourcePath is not null)
-						{
-							_assetDatabase![node.Meta.Guid!] = new StudioAssetDatabaseItem(node.Meta.Guid!, node.Meta.ReferenceField, resourcePath, importer.ReferenceType);
-						}
-					}
-					catch (Exception e)
-					{
-						ConsoleViewModel.LogError($"While importing file {node.AbsolutePath} an exception occured: {e}");
-						return;
-					}
-
-					// update hash
-					node.Meta.SetHash(hash);
+					node = root.FindNode(path) as ProjectAssetFileNode;
 				}
+				if (node == null || node.Meta == null)
+				{
+					return;
+				}
+
+				// check file
+				if (!File.Exists(node.AbsolutePath))
+				{
+					return;
+				}
+
+				// calculate hash
+				string? hash = null;
+				try
+				{
+					using FileStream file = new(node.AbsolutePath, FileMode.Open);
+					hash = Convert.ToBase64String(_hashAlgorithm.ComputeHash(file)); // how to cancel compute hash?
+				}
+				catch (Exception e)
+				{
+					return;
+				}
+
+				// check hash
+				if (!force && node.Meta.Hash == hash)
+				{
+					return;
+				}
+
+				try
+				{
+					Importer importer = node.GetImporter<Importer>()!;
+					importer.Import(_projectSettings!.AbsoluteResourcesPath, out string? resourcePath);
+					if (resourcePath is not null)
+					{
+						_assetDatabase![node.Meta.Guid!] = new StudioAssetDatabaseItem(node.Meta.Guid!, node.Meta.ReferenceField, resourcePath, importer.ReferenceType);
+					}
+				}
+				catch (Exception e)
+				{
+					ConsoleViewModel.LogError($"While importing file {node.AbsolutePath} an exception occured: {e}");
+					return;
+				}
+
+				// update hash
+				node.Meta.SetHash(hash);
 			}
 		);
 	}

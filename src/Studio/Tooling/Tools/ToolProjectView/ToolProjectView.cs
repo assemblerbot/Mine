@@ -171,7 +171,8 @@ public sealed class ToolProjectView : Tool
 		// _contextMenu.AddItem("Create/DefinitionAsset",    OnCreateDefinitionAsset,    CanCreateAsset);
 		_contextMenu.AddItem("Create/Prefab", OnCreatePrefab, CanCreatePrefab);
 
-		_contextMenu.AddItem("Refresh", OnContextMenuRefresh, IsAnythingSelected);
+		_contextMenu.AddItem("Refresh meta", OnContextMenuRefresh, IsAnythingSelected);
+		_contextMenu.AddItem("Reimport", OnContextMenuReimport, IsAnythingSelected);
 		_contextMenu.AddSeparator("");
 		
 		_contextMenu.AddItem("Edit/Rename", OnContextMenuEditRename, IsChangeOfContextItemPossible);
@@ -258,6 +259,11 @@ public sealed class ToolProjectView : Tool
 	private void OnContextMenuRefresh()
 	{
 		_contextMenuActivatedAt!.RefreshMetaFile();
+	}
+
+	private void OnContextMenuReimport()
+	{
+		StudioModel.Project.Import(_contextMenuActivatedAt!, true);
 	}
 
 	private void OnContextMenuEditRename()

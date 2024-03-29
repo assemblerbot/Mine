@@ -215,12 +215,12 @@ public sealed class StudioComponent : Component, IUpdatable
 	private void OnProjectReimportAllClicked()
 	{
 		_studioModel.Project.ClearResources();
-		_studioModel.Project.ImportAll();
+		_studioModel.Project.ImportAll(true);
 	}
 
 	private void OnProjectImportChangedClicked()
 	{
-		_studioModel.Project.ImportAll();
+		_studioModel.Project.ImportAll(false);
 	}
 
 	private void OnDebugTaskProcessorTestClicked()
