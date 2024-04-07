@@ -1,6 +1,6 @@
 using Silk.NET.Windowing;
 using Silk.NET.Windowing.Extensions.Veldrid;
-using Veldrid;
+using Gfx;
 
 /*
 
@@ -12,26 +12,26 @@ namespace Mine.Framework;
 
 public class Graphics : IDisposable
 {
+	private GfxApi          _api;
 	private GraphicsDevice  _device;
-	private ResourceFactory _factory;
 
-	public GraphicsDevice  Device  => _device;
-	public ResourceFactory Factory => _factory;
+	public GfxApi         Api    => _api;
+	public GraphicsDevice Device => _device;
 
 	public Graphics(IView view, GraphicsBackend graphicsBackend)
 	{
-		_device = view.CreateGraphicsDevice(
+		_api = GfxApi.Create(graphicsBackend);
+		
+		_device = _api.CreateGraphicsDevice(
+			view,
 			new GraphicsDeviceOptions
 			{
 				// TODO - customization from game
-				PreferDepthRangeZeroToOne         = true,
-				PreferStandardClipSpaceYDirection = true,
-				SwapchainDepthFormat = PixelFormat.D32_Float_S8_UInt, // PixelFormat.D24_UNorm_S8_UInt
-			},
-			graphicsBackend
+				//PreferDepthRangeZeroToOne         = true,
+				//PreferStandardClipSpaceYDirection = true,
+				//SwapchainDepthFormat = PixelFormat.D32_Float_S8_UInt, // PixelFormat.D24_UNorm_S8_UInt
+			}
 		);
-
-		_factory = _device.ResourceFactory;
 	}
 
 	public void Resize(Vector2Int size)

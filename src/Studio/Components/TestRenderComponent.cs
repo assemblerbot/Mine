@@ -1,8 +1,7 @@
 using System.Numerics;
 using System.Text;
 using Mine.Framework;
-using Veldrid;
-using Veldrid.SPIRV;
+using Gfx;
 
 namespace Mine.Studio;
 

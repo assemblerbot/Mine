@@ -1,7 +1,6 @@
 using Silk.NET.Maths;
 using Silk.NET.Windowing;
-using Silk.NET.Windowing.Extensions.Veldrid;
-using Veldrid;
+using Gfx;
 
 namespace Mine.Framework;
 
@@ -27,6 +26,8 @@ public class EngineWindow
 			                     API                     = graphicsBackend.ToGraphicsAPI(),
 			                     VSync                   = true,
 			                     ShouldSwapAutomatically = false,
+			                     WindowState = WindowState.Normal,
+			                     WindowBorder = WindowBorder.Resizable,
 		                     };
         
 		_window = Window.Create(opts);

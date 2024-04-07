@@ -1,5 +1,5 @@
 using Mine.Framework;
-using Veldrid;
+using Gfx;
 
 namespace Mine.Studio;
 

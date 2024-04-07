@@ -4,6 +4,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Framework", "Framework\Fram
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Studio", "Studio\Studio.csproj", "{3D0A7D24-F927-499A-99F6-7135F0FA9391}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gfx", "Gfx\Gfx.csproj", "{45B19AAF-5769-4046-AE80-383397AE91A6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GfxDev", "GfxDev\GfxDev.csproj", "{875EE38B-D57D-4FA6-AA83-FA52E3BB8E61}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +22,13 @@ Global
 		{3D0A7D24-F927-499A-99F6-7135F0FA9391}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3D0A7D24-F927-499A-99F6-7135F0FA9391}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3D0A7D24-F927-499A-99F6-7135F0FA9391}.Release|Any CPU.Build.0 = Release|Any CPU
+		{45B19AAF-5769-4046-AE80-383397AE91A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{45B19AAF-5769-4046-AE80-383397AE91A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{45B19AAF-5769-4046-AE80-383397AE91A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{45B19AAF-5769-4046-AE80-383397AE91A6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{875EE38B-D57D-4FA6-AA83-FA52E3BB8E61}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{875EE38B-D57D-4FA6-AA83-FA52E3BB8E61}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{875EE38B-D57D-4FA6-AA83-FA52E3BB8E61}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{875EE38B-D57D-4FA6-AA83-FA52E3BB8E61}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

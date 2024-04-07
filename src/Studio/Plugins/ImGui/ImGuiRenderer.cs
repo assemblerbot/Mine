@@ -3,7 +3,7 @@ using System.Reflection;
 using ImGuiNET;
 using Mine.Framework;
 using Silk.NET.Input;
-using Veldrid;
+using Gfx;
 
 namespace Mine.ImGuiPlugin;
 

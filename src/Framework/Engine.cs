@@ -1,7 +1,7 @@
-using System.Runtime.InteropServices;
+using Gfx;
 using Silk.NET.Maths;
 using Silk.NET.Windowing;
-using Veldrid;
+using Gfx;
 
 namespace Mine.Framework;
 
@@ -159,22 +159,24 @@ public sealed class Engine
 	// TODO - shouldn't be here
 	private GraphicsBackend GetPreferredBackend()
 	{
-		if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-		{
-			return GraphicsDevice.IsBackendSupported(GraphicsBackend.Vulkan)
-				? GraphicsBackend.Vulkan
-				: GraphicsBackend.Direct3D11;
-		}
-
-		if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-		{
-			return GraphicsDevice.IsBackendSupported(GraphicsBackend.Metal)
-				? GraphicsBackend.Metal
-				: GraphicsBackend.OpenGL;
-		}
-
-		return GraphicsDevice.IsBackendSupported(GraphicsBackend.Vulkan)
-			? GraphicsBackend.Vulkan
-			: GraphicsBackend.OpenGL;
+		return GfxApi.GetDefaultBackend();
+		
+		// if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+		// {
+		// 	return GraphicsDevice.IsBackendSupported(GraphicsBackend.Vulkan)
+		// 		? GraphicsBackend.Vulkan
+		// 		: GraphicsBackend.Direct3D11;
+		// }
+		//
+		// if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+		// {
+		// 	return GraphicsDevice.IsBackendSupported(GraphicsBackend.Metal)
+		// 		? GraphicsBackend.Metal
+		// 		: GraphicsBackend.OpenGL;
+		// }
+		//
+		// return GraphicsDevice.IsBackendSupported(GraphicsBackend.Vulkan)
+		// 	? GraphicsBackend.Vulkan
+		// 	: GraphicsBackend.OpenGL;
 	}
 }
