@@ -37,12 +37,12 @@ public abstract class GfxApi : IDisposable
 	/// </summary>
 	/// <param name="backend">The desired graphics backend.</param>
 	/// <returns>A new <see cref="GfxApi"/>.</returns>
-	public static GfxApi Create(GraphicsBackend backend, IWindow window)
+	public static GfxApi Create(GfxApiOptions options)
 	{
-		return backend switch
+		return options.Backend switch
 		{
-			GraphicsBackend.Vulkan => new VulkanGfxApi(window),
-			_ => throw new ArgumentOutOfRangeException(nameof(backend), backend, null)
+			GraphicsBackend.Vulkan => new VulkanGfxApi(options.Window, options.DebugMessageLog),
+			_ => throw new ArgumentOutOfRangeException(nameof(options.Backend), options.Backend, null)
 		};
 	}
 
@@ -50,6 +50,14 @@ public abstract class GfxApi : IDisposable
 	/// Dispose instance of <see cref="GfxApi"/>
 	/// </summary>
 	public abstract void Dispose();
+
+	/// <summary>
+	/// Enumerate available physical devices.
+	/// </summary>
+	/// <returns>Collection of <see cref="GfxPhysicalDevice"/> objects.</returns>
+	public abstract IReadOnlyList<GfxPhysicalDevice> EnumeratePhysicalDevices();
+	
+	
 	
 	/// <summary>
 	/// Creates a new instance of <see cref="GraphicsDevice"/>.

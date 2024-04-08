@@ -17,6 +17,7 @@ internal class GfxTestApplication
 	public void Run()
 	{
 		InitWindow();
+		_window.Run();
 	}
 
 	private void InitWindow()
@@ -47,14 +48,14 @@ internal class GfxTestApplication
 
 	private void InitGfx()
 	{
-		_api = GfxApi.Create(_graphicsBackend, _window);
-		MainLoop();
-		CleanUp();
+		GfxApiOptions options = new GfxApiOptions(_graphicsBackend, _window, DebugMessageLog);
+		_api = GfxApi.Create(options);
 	}
 
-	private void MainLoop()
+	private void InitGraphicsDevice()
 	{
-		_window.Run();
+		
+		//_api.CreateGraphicsDevice(_window, options);
 	}
 
 	private void CleanUp()
@@ -63,9 +64,15 @@ internal class GfxTestApplication
 		_window.Dispose();
 	}
 
+	private void DebugMessageLog(GfxDebugMessageSeverity severity, GfxDebugMessageKind kind, string message)
+	{
+	}
+
+	// main callbacks
 	private void OnLoad()
 	{
 		InitGfx();
+		InitGraphicsDevice();
 	}
 
 	private void OnUpdate(double obj)
@@ -74,10 +81,12 @@ internal class GfxTestApplication
 
 	private void OnRender(double obj)
 	{
+		
 	}
 
 	private void OnClose()
 	{
+		CleanUp();
 	}
 
 	private void OnResize(Vector2D<int> obj)
