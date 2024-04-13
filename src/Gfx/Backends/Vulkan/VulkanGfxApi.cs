@@ -8,28 +8,31 @@ using Silk.NET.Vulkan.Extensions.KHR;
 
 namespace Gfx;
 
+//using GfxPhysicalDevice = Gfx.PhysicalDevice;
+
 public sealed unsafe class VulkanGfxApi : GfxApi
 {
 	private static readonly string[] _validationLayers = 
-	                                           {
-		                                           "VK_LAYER_KHRONOS_validation",
-	                                           };
+	{
+		"VK_LAYER_KHRONOS_validation",
+	};
 
 	private readonly IWindow  _window;
 	private readonly Vk       _vk;
 	private          Instance _instance;
 
-	private ExtDebugUtils?                                                _debugUtils;
-	private DebugUtilsMessengerEXT                                        _debugMessenger;
-	private Action<GfxDebugMessageSeverity, GfxDebugMessageKind, string>? _debugMessageLog;
-	private bool                                                          IsDebugEnabled => _debugMessageLog != null;
+	private ExtDebugUtils?                                          _debugUtils;
+	private DebugUtilsMessengerEXT                                  _debugMessenger;
+	private Action<DebugMessageSeverity, DebugMessageKind, string>? _debugMessageLog;
+	private bool                                                    IsDebugEnabled => _debugMessageLog != null;
 
 	private KhrSurface? _khrSurface;
 	private SurfaceKHR  _surface;
 	
+	#region Lifecycle
 	internal VulkanGfxApi(
-		IWindow                                                       window,
-		Action<GfxDebugMessageSeverity, GfxDebugMessageKind, string>? debugMessageLog
+		IWindow                                                 window,
+		Action<DebugMessageSeverity, DebugMessageKind, string>? debugMessageLog
 	)
 	{
 		_window          = window;
@@ -40,8 +43,7 @@ public sealed unsafe class VulkanGfxApi : GfxApi
 		SetupDebugMessenger();
 		CreateSurface();
 
-		_vk.GetPhysicalDeviceProperties(new PhysicalDevice(), out PhysicalDeviceProperties properties);
-		properties.
+		_vk.GetPhysicalDeviceProperties(new Silk.NET.Vulkan.PhysicalDevice(), out PhysicalDeviceProperties properties);
 	}
 
 	public override void Dispose()
@@ -55,19 +57,24 @@ public sealed unsafe class VulkanGfxApi : GfxApi
 		_vk.DestroyInstance(_instance, null);
 		_vk.Dispose();
 	}
+	#endregion Lifecycle
 
-	public override IReadOnlyList<GfxPhysicalDevice> EnumeratePhysicalDevices()
+	#region Base overrides
+	public override IReadOnlyList<PhysicalDevice> EnumeratePhysicalDevices()
 	{
-		IReadOnlyCollection<PhysicalDevice>? devices = _vk.GetPhysicalDevices(_instance);
-		
-		
+		IReadOnlyCollection<Silk.NET.Vulkan.PhysicalDevice>? devices = _vk.GetPhysicalDevices(_instance);
+		return devices.Where(IsDeviceSuitable).Select(device => new VulkanPhysicalDevice()).ToList();
 	}
 
 	public override GraphicsDevice CreateGraphicsDevice(IView window, GraphicsDeviceOptions options)
 	{
+		// TODO
 		return new VulkanGraphicsDevice(options);
 	}
-
+	
+	#endregion Base overrides
+	
+	#region Private
 	private void CreateInstance()
 	{
 		if (IsDebugEnabled && !ValidationLayersSupported())
@@ -81,7 +88,7 @@ public sealed unsafe class VulkanGfxApi : GfxApi
 			                          PApplicationName   = (byte*)Marshal.StringToHGlobalAnsi(_window.Title),
 			                          ApplicationVersion = new Version32(1, 0, 0),
 			                          PEngineName        = (byte*)Marshal.StringToHGlobalAnsi("Mine"),
-			                          EngineVersion      = new Version32(1,                                     0,                                     0),
+			                          EngineVersion      = new Version32(1,                                      0,                                      0),
 			                          ApiVersion         = new Version32((uint)_window.API.Version.MajorVersion, (uint)_window.API.Version.MinorVersion, 0U)
 		                          };
 
@@ -89,12 +96,12 @@ public sealed unsafe class VulkanGfxApi : GfxApi
 		                                {
 			                                SType            = StructureType.InstanceCreateInfo,
 			                                PApplicationInfo = &appInfo,
-			                                Flags            = RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
+			                                Flags = RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
 				                                ? InstanceCreateFlags.EnumeratePortabilityBitKhr
 				                                : InstanceCreateFlags.None,
 		                                };
 
-		string[] extensions   = GetRequiredExtensions();
+		string[] extensions = GetRequiredExtensions();
 		createInfo.EnabledExtensionCount   = (uint)extensions.Length;
 		createInfo.PpEnabledExtensionNames = (byte**)SilkMarshal.StringArrayToPtr(extensions); ;
 		
@@ -177,7 +184,7 @@ public sealed unsafe class VulkanGfxApi : GfxApi
 	private string[] GetRequiredExtensions()
 	{
 		byte**    windowExtensions = _window!.VkSurface!.GetRequiredExtensions(out var windowExtensionCount);
-		string[]? extensions     = SilkMarshal.PtrToStringArray((nint)windowExtensions, (int)windowExtensionCount);
+		string[]? extensions       = SilkMarshal.PtrToStringArray((nint)windowExtensions, (int)windowExtensionCount);
 
 		if(RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
 		{
@@ -209,4 +216,17 @@ public sealed unsafe class VulkanGfxApi : GfxApi
 		_debugMessageLog!.Invoke(messageSeverity.ToGfxDebugMessageSeverity(), messageTypes.ToGfxDebugMessageKind(), Marshal.PtrToStringAnsi((nint) pCallbackData->PMessage) ?? ""); 
 		return Vk.False;
 	}
+
+	private bool IsDeviceSuitable(Silk.NET.Vulkan.PhysicalDevice physicalDevice)
+	{
+		//VulkanQueueFamilyIndices indices = FindQueueFamilyIndices(physicalDevice);
+		return true;
+	}
+
+	// private VulkanQueueFamilyIndices FindQueueFamilyIndices(Silk.NET.Vulkan.PhysicalDevice physicalDevice)
+	// {
+	// 	
+	// }
+
+	#endregion
 }

@@ -1,6 +1,6 @@
 namespace Gfx;
 
-public enum GfxDebugMessageKind
+public enum DebugMessageKind
 {
 	None,
 	General,

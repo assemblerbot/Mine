@@ -4,18 +4,18 @@ namespace Gfx;
 
 public static class VulkanGfxDebugMessageSeverityExtensions
 {
-	public static GfxDebugMessageSeverity ToGfxDebugMessageSeverity(this DebugUtilsMessageSeverityFlagsEXT severity)
+	public static DebugMessageSeverity ToGfxDebugMessageSeverity(this DebugUtilsMessageSeverityFlagsEXT severity)
 	{
 		if (severity.HasFlag(DebugUtilsMessageSeverityFlagsEXT.ErrorBitExt))
 		{
-			return GfxDebugMessageSeverity.Error;
+			return DebugMessageSeverity.Error;
 		}
 
 		if (severity.HasFlag(DebugUtilsMessageSeverityFlagsEXT.WarningBitExt))
 		{
-			return GfxDebugMessageSeverity.Warning;
+			return DebugMessageSeverity.Warning;
 		}
 
-		return GfxDebugMessageSeverity.Info;
+		return DebugMessageSeverity.Info;
 	}
 }

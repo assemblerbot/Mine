@@ -64,7 +64,7 @@ internal class GfxTestApplication
 		_window.Dispose();
 	}
 
-	private void DebugMessageLog(GfxDebugMessageSeverity severity, GfxDebugMessageKind kind, string message)
+	private void DebugMessageLog(DebugMessageSeverity severity, DebugMessageKind kind, string message)
 	{
 	}
 

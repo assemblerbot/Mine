@@ -1,6 +1,6 @@
 namespace Gfx;
 
-public enum GfxDebugMessageSeverity
+public enum DebugMessageSeverity
 {
 	Info,
 	Warning,
