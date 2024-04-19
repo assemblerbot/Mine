@@ -1,3 +1,19 @@
+
+layout(set = 0, binding = 0)  cbuffer WorldMatrixConstants
+{
+	float4x4 WorldMatrix;
+};
+
+layout(set = 1, binding = 0)  cbuffer ViewProjectionMatrixConstants
+{
+	float4x4 ViewProjectionMatrix;
+};
+
+layout(set = 2, binding = 0) cbuffer MaterialVertex
+{
+	float4 LightDirection;
+};
+
 layout(set = 3, binding = 0) cbuffer MaterialPixel
 {
 	float4 SurfaceColor;
@@ -22,10 +38,14 @@ struct VStoPS
 	layout(location=3) float4 VertexColor : TEXCOORD1;
 };
 
-half4 main(VStoPS input) : SV_TARGET
+float4 main(VStoPS input) : SV_TARGET
 {
-	half4 ndotl = saturate(dot(input.Normal, -DirectionalLightDirection));
-	//return input.Position*0.0001 + float4(input.UV, 0,0)*0.0001 + input.Color*0.0001 + _texture.Sample(_sampler, input.UV);
-	//return SurfaceColor * input.VertexColor * AmbientLightColor;
-	return SurfaceColor * (ndotl * DirectionalLightColor + AmbientLightColor);
+	float4 tmp = 0.0001 * saturate(input.Position * WorldMatrix + input.Position * ViewProjectionMatrix + LightDirection);
+	
+	tmp += 0.0001 * SurfaceColor;
+	tmp += 0.0001 * AmbientLightColor;
+	tmp += 0.0001 * DirectionalLightColor;
+
+	float4 ndotl = saturate(dot(input.Normal, -DirectionalLightDirection));
+	return SurfaceColor * (ndotl * DirectionalLightColor + AmbientLightColor) + tmp;
 }
